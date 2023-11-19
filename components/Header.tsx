@@ -12,7 +12,7 @@ const user = {
 };
 const navigation = [
   { name: "Events", href: "/dashboard/events", current: true },
-  { name: "TriviaAI", href: "/dashboard/ai", current: false },
+  { name: "TriviaAI", href: "/dashboard/trivia-ai", current: false },
 ];
 const userNavigation = [
   { name: "Your Profile", href: "#" },
