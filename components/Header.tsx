@@ -2,30 +2,34 @@
 
 import { Fragment, useEffect, useState } from "react";
 import { createClient } from "@/utils/supabase/client";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { Disclosure, Menu, Transition } from "@headlessui/react";
 import {
   Bars3Icon,
   UserCircleIcon,
   XMarkIcon,
 } from "@heroicons/react/24/outline";
-import { Tables } from "@/types/database.types";
 
 const navigation = [
   { name: "Events", href: "/dashboard/events", current: true },
   { name: "TriviaAI", href: "/dashboard/trivia-ai", current: false },
-];
-const userNavigation = [
-  { name: "Your Profile", href: "/dashboard/profile" },
-  { name: "Sign out", href: "#" },
 ];
 
 function classNames(...classes: any[]) {
   return classes.filter(Boolean).join(" ");
 }
 
-export default function Example() {
+export default function Header() {
   const supabase = createClient();
+  const router = useRouter();
+
   const [user, setUser] = useState();
+
+  const userNavigation = [
+    { name: "Settings", href: "/dashboard/settings" },
+    { name: "Sign out", href: "/auth/signout" },
+  ];
 
   useEffect(() => {
     const getUser = async () => {
@@ -106,7 +110,7 @@ export default function Example() {
                           {userNavigation.map((item) => (
                             <Menu.Item key={item.name}>
                               {({ active }) => (
-                                <a
+                                <Link
                                   href={item.href}
                                   className={classNames(
                                     active ? "bg-gray-100" : "",
@@ -114,7 +118,7 @@ export default function Example() {
                                   )}
                                 >
                                   {item.name}
-                                </a>
+                                </Link>
                               )}
                             </Menu.Item>
                           ))}

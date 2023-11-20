@@ -9,15 +9,19 @@ import { createClient } from "@/utils/supabase/client";
 import { Tables } from "@/types/database.types";
 
 export default function EventsPage() {
-  // const cookieStore = cookies();
   const supabase = createClient();
+
+  const [user, setUser] = useState();
 
   const [allEvents, setAllEvents] = useState<
     Tables<"v001_events_stag">[] | null
   >([]);
 
-  const getAllEvents = async () => {
-    const { data, error } = await supabase.from("v001_events_stag").select();
+  const getAllEvents = async (userId) => {
+    const { data, error } = await supabase
+      .from("v001_events_stag")
+      .select()
+      .eq("owner", userId);
 
     if (data) {
       setAllEvents(data);
@@ -25,11 +29,16 @@ export default function EventsPage() {
   };
 
   useEffect(() => {
-    const getSess = async () => {
-      console.log(await supabase.auth.getSession());
+    const getUser = async () => {
+      const { data } = await supabase.auth.getUser();
+      console.log(data);
+      if (data) {
+        setUser(data.user);
+        getAllEvents(data.user.id);
+      }
     };
-    getSess();
-    getAllEvents();
+
+    getUser();
   }, []);
 
   return (
@@ -50,7 +59,7 @@ export default function EventsPage() {
             className="grid grid-cols-1 gap-x-6 gap-y-8 lg:grid-cols-3 xl:gap-x-8"
           >
             {allEvents?.map((item) => (
-              <Link href={`/dashboard/event/${item.id}`}>
+              <Link key={item.id} href={`/dashboard/event/${item.id}`}>
                 <li
                   key={item.id}
                   className="overflow-hidden rounded-xl border border-gray-200 hover:bg-gray-50"
