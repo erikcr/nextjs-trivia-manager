@@ -15,7 +15,8 @@ import {
   ClockIcon,
   CheckCircleIcon,
   PaperAirplaneIcon,
-  SparklesIcon
+  SparklesIcon,
+  Bars2Icon,
 } from "@heroicons/react/24/outline";
 
 import { createClient } from "@/utils/supabase/client";
@@ -31,11 +32,16 @@ const navigation = [
   { name: "Settings", href: "#", icon: Cog6ToothIcon, current: false },
 ];
 
+const userNavigation = [
+  { name: "Your profile", href: "#" },
+  { name: "Sign out", href: "#" },
+];
+
 function classNames(...classes: any[]) {
   return classes.filter(Boolean).join(" ");
 }
 
-export default function EventPage() {
+export default function Example() {
   const { eventId } = useParams();
   const supabase = createClient();
   const { messages, input, handleInputChange, handleSubmit } = useChat();
@@ -48,6 +54,37 @@ export default function EventPage() {
   const [activeRound, setActiveRound] = useState<Tables<"v001_rounds_stag">>();
   const [questions, setQuestions] = useState<Tables<"v001_questions_stag">[]>();
   const [response, setResponse] = useState<TriviaItem[]>([]);
+  const [dragId, setDragId] = useState();
+
+  const handleDrag = (ev) => {
+    setDragId(ev.currentTarget.id);
+  };
+
+  const handleDrop = (ev) => {
+    if (!rounds) return;
+
+    const dragBox = rounds.find((item) => item.order_num === Number(dragId));
+    const dropBox = rounds.find(
+      (item) => item.order_num === Number(ev.currentTarget.id)
+    );
+
+    const dragBoxOrder = dragBox?.order_num;
+    const dropBoxOrder = dropBox?.order_num;
+
+    const newBoxState = rounds.map((item) => {
+      if (item.order_num === Number(dragId)) {
+        item.order_num = dropBoxOrder;
+        console.log(`dropBoxOrder: ${item.order_num}`);
+      }
+      if (item.order_num === Number(ev.currentTarget.id)) {
+        item.order_num = dragBoxOrder;
+        console.log(`dragBoxOrder: ${item.order_num}`);
+      }
+      return item;
+    });
+
+    setRounds(newBoxState);
+  };
 
   useEffect(() => {
     const getQuestions = async () => {
@@ -111,7 +148,15 @@ export default function EventPage() {
 
   return (
     <>
-      <div>
+      {/*
+        This example requires updating your template:
+
+        ```
+        <html class="h-full bg-white">
+        <body class="h-full">
+        ```
+      */}
+      <div className="">
         <Transition.Root show={sidebarOpen} as={Fragment}>
           <Dialog
             as="div"
@@ -181,8 +226,8 @@ export default function EventPage() {
                               href={item.href}
                               className={classNames(
                                 item.current
-                                  ? "bg-gray-800 text-white"
-                                  : "text-gray-400 hover:text-white hover:bg-gray-800",
+                                  ? "bg-gray-300 text-white"
+                                  : "text-gray-400 hover:text-white hover:bg-gray-300",
                                 "group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold"
                               )}
                             >
@@ -203,10 +248,8 @@ export default function EventPage() {
           </Dialog>
         </Transition.Root>
 
-        {/**
-         * Left-side primary column
-         */}
-        <div className="hidden lg:fixed lg:inset-y-0 lg:left-0 lg:z-50 lg:block lg:w-20 lg:overflow-y-auto lg:bg-gray-900 lg:pb-4">
+        {/* Static sidebar for desktop */}
+        <div className="hidden lg:fixed lg:inset-y-0 lg:left-0 lg:z-50 lg:block lg:w-20 lg:overflow-y-auto lg:bg-white lg:pb-4 dark:bg-slate-800">
           <div className="flex h-16 shrink-0 items-center justify-center">
             <img
               className="h-8 w-auto"
@@ -222,8 +265,8 @@ export default function EventPage() {
                     href={item.href}
                     className={classNames(
                       item.current
-                        ? "bg-gray-800 text-white"
-                        : "text-gray-400 hover:text-white hover:bg-gray-800",
+                        ? "bg-gray-300 text-gray-800"
+                        : "text-gray-500 hover:text-gray-800 hover:bg-gray-300",
                       "group flex gap-x-3 rounded-md p-3 text-sm leading-6 font-semibold"
                     )}
                   >
@@ -257,11 +300,6 @@ export default function EventPage() {
             />
 
             <div className="flex flex-1 gap-x-4 self-stretch lg:gap-x-6">
-              {/* <div className="relative flex flex-1">
-                <h2 className="text-base font-semibold leading-6 text-gray-900">
-                  Event Name
-                </h2>
-              </div> */}
               <form className="relative flex flex-1" action="#" method="GET">
                 <label htmlFor="search-field" className="sr-only">
                   Search
@@ -277,10 +315,9 @@ export default function EventPage() {
               <div className="flex items-center gap-x-4 lg:gap-x-6">
                 <button
                   type="button"
-                  className="-m-2.5 p-2.5 hover:text-gray-500"
+                  className="-m-2.5 p-2.5 text-gray-400 hover:text-gray-500"
                 >
                   <span className="sr-only">View notifications</span>
-                  Activate
                 </button>
 
                 {/* Separator */}
@@ -295,15 +332,11 @@ export default function EventPage() {
                     <span className="sr-only">Open user menu</span>
                     <span className="hidden lg:flex lg:items-center">
                       <span
-                        className="font-semibold leading-6 text-gray-900"
+                        className="ml-4 text-sm font-semibold leading-6 text-gray-900"
                         aria-hidden="true"
                       >
-                        Actions
+                        Start event
                       </span>
-                      <ChevronDownIcon
-                        className="ml-2 h-5 w-5 text-gray-400"
-                        aria-hidden="true"
-                      />
                     </span>
                   </Menu.Button>
                   <Transition
@@ -316,16 +349,17 @@ export default function EventPage() {
                     leaveTo="transform opacity-0 scale-95"
                   >
                     <Menu.Items className="absolute right-0 z-10 mt-2.5 w-32 origin-top-right rounded-md bg-white py-2 shadow-lg ring-1 ring-gray-900/5 focus:outline-none">
-                      {["Activate"].map((item) => (
-                        <Menu.Item key={item}>
+                      {userNavigation.map((item) => (
+                        <Menu.Item key={item.name}>
                           {({ active }) => (
                             <a
+                              href={item.href}
                               className={classNames(
                                 active ? "bg-gray-50" : "",
                                 "block px-3 py-1 text-sm leading-6 text-gray-900"
                               )}
                             >
-                              {item}
+                              {item.name}
                             </a>
                           )}
                         </Menu.Item>
@@ -338,230 +372,58 @@ export default function EventPage() {
           </div>
 
           <main className="xl:pl-96">
-            <div className="px-4 py-10 sm:px-6 lg:px-16 lg:py-6">
-              <h3 className="text-base font-semibold leading-6 text-gray-900">
-                Questions
-              </h3>
-
-              <dl className="grid grid-cols-1 sm:grid-cols-2 divide-y divide-gray-100">
-                {qLoading && (
-                  <div role="status" className="max-w-sm animate-pulse py-3">
-                    <div className="h-2.5 bg-gray-200 rounded-full dark:bg-gray-700 w-48 mb-4"></div>
-                    <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[360px] mb-2.5"></div>
-                    <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 mb-2.5"></div>
-                    <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[330px] mb-2.5"></div>
-                    <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[300px] mb-2.5"></div>
-                    <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[360px]"></div>
-                    <span className="sr-only">Loading...</span>
-                  </div>
-                )}
-
-                {questions?.map((item) => (
-                  <div className="px-4 py-3 sm:col-span-2 sm:px-0">
-                    <dt className="text-sm font-medium leading-6 text-gray-900">
-                      {item.question}
-                    </dt>
-                    <dd className="mt-1 text-sm leading-6 text-gray-700 sm:mt-2">
-                      {item.answer}
-                    </dd>
-                  </div>
-                ))}
-              </dl>
+            <div className="px-4 py-10 sm:px-6 lg:px-8 lg:py-6">
+              {/* Main area */}
             </div>
           </main>
         </div>
 
-        {/**
-         * Mobile header
-         */}
-        <div className="sticky top-0 z-40 flex items-center gap-x-6 bg-gray-900 px-4 py-4 shadow-sm sm:px-6 lg:hidden">
-          <button
-            type="button"
-            className="-m-2.5 p-2.5 text-gray-400 lg:hidden"
-            onClick={() => setSidebarOpen(true)}
-          >
-            <span className="sr-only">Open sidebar</span>
-            <Bars3Icon className="h-6 w-6" aria-hidden="true" />
-          </button>
-          <div className="flex-1 text-sm font-semibold leading-6 text-white">
-            {}
-          </div>
-          <a href="#">
-            <span className="sr-only">Your profile</span>
-            <img
-              className="h-8 w-8 rounded-full bg-gray-800"
-              src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
-              alt=""
-            />
-          </a>
-        </div>
-
-        {/**
-         * Left-side secondary expanded column
-         */}
         <aside className="fixed bottom-0 left-20 top-16 hidden w-96 overflow-y-auto border-r border-gray-200 px-4 py-6 sm:px-6 lg:px-8 xl:block">
-          <div>
-            <h3 className="text-base font-semibold leading-6 text-gray-900">
-              Rounds
-            </h3>
-
-            <ul role="list" className="-mb-8 mt-3">
-              {rounds?.map((item, index) => (
-                <li key={item.id}>
-                  <div className="relative pb-8">
-                    {index !== rounds.length - 1 ? (
-                      <span
-                        className="absolute left-5 top-5 -ml-px h-full w-0.5 bg-gray-200"
+          <nav className="flex flex-1 flex-col" aria-label="Sidebar">
+            <ul role="list" className="-mx-2 space-y-1">
+              {rounds
+                ?.sort((a, b) => a.order_num - b.order_num)
+                .map((item, index) => (
+                  <li
+                    key={item.order_num}
+                    draggable={true}
+                    id={String(item.id)}
+                    onDragOver={(ev) => ev.preventDefault()}
+                    onDragStart={handleDrag}
+                    onDrop={handleDrop}
+                    onClick={() => setActiveRound(item)}
+                  >
+                    <div
+                      className={classNames(
+                        item.id === activeRound?.id
+                          ? "bg-gray-50 text-indigo-600"
+                          : "text-gray-700 hover:text-indigo-600 hover:bg-gray-50",
+                        "group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold"
+                      )}
+                    >
+                      <Bars2Icon
+                        className={classNames(
+                          "text-gray-400 group-hover:text-indigo-600",
+                          "h-6 w-6 shrink-0"
+                        )}
                         aria-hidden="true"
                       />
-                    ) : null}
-                    <div className="relative flex items-start space-x-3">
-                      <div className="relative">
-                        {item.status === "PENDING" ? (
-                          <ClockIcon className="flex h-8 w-8 items-center justify-center rounded-full bg-amber-400" />
-                        ) : item.status === "ONGOING" ? (
-                          <SparklesIcon className="flex h-8 w-8 px-1 items-center justify-center rounded-full bg-slate-400" />
-                        ) : (
-                          <CheckCircleIcon className="flex h-8 w-8 items-center justify-center rounded-full bg-green-400" />
-                        )}
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <div>
-                          <div className="text-sm">
-                            <p>{item.name}</p>
-                          </div>
-                        </div>
-                        <div className="mt-2 text-sm text-gray-700">
-                          <p>{item.description}</p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </li>
-              ))}
-            </ul>
-
-            <ul role="list" className="mt-3 grid grid-cols-1 gap-5 sm:gap-6">
-              {loading && (
-                <li
-                  role="status"
-                  className="col-span-1 animate-pulse flex rounded-md hover:shadow-sm"
-                >
-                  <div className="bg-gray-200 flex w-16 flex-shrink-0 items-center justify-center rounded-l-md text-sm font-medium text-white"></div>
-                  <div className="flex flex-1 items-center justify-between truncate border-b border-r border-t border-gray-200 bg-white">
-                    <div className="flex-1 truncate px-4 py-2 text-sm">
-                      <div className="h-2.5 bg-gray-200 rounded-full dark:bg-gray-200 w-48 mb-4"></div>
-                      <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-100 max-w-[360px] mb-2.5"></div>
-                    </div>
-                    <div className="flex-shrink-0 pr-2">
-                      <button
-                        type="button"
-                        className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-transparent bg-white text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-                      >
-                        <span className="sr-only"></span>
-                        <EllipsisVerticalIcon
-                          className="h-5 w-5"
-                          aria-hidden="true"
-                        />
-                      </button>
-                    </div>
-                    {/* <span className="sr-only">Loading...</span> */}
-                  </div>
-                </li>
-              )}
-
-              {rounds?.map((item, index) => (
-                <li
-                  key={item.id}
-                  className={classNames(
-                    item.id === activeRound?.id
-                      ? "border-r-2 border-red-600"
-                      : "",
-                    "col-span-1 flex rounded-md hover:shadow-sm"
-                  )}
-                >
-                  {/* <div className="bg-gray-400 flex w-16 flex-shrink-0 items-center justify-center rounded-l-md text-sm font-medium text-white">
-                    {item.order_num}
-                  </div>
-                  <div className="flex flex-1 items-center justify-between truncate border-b border-r border-t border-gray-200 bg-white">
-                    <div
-                      className="flex-1 truncate px-4 py-2 text-sm"
-                      onClick={() => setActiveRound(item)}
-                    >
-                      <p className="font-medium text-gray-900 hover:text-gray-600">
-                        {item.name}
-                      </p>
-                      <p className="text-gray-500"># Questions</p>
-                    </div>
-                    <div className="flex-shrink-0 pr-2">
-                      <button
-                        type="button"
-                        className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-transparent bg-white text-gray-400 hover:text-gray-500 focus:outline-none"
-                      >
-                        <span className="sr-only">Open options</span>
-                        <EllipsisVerticalIcon
-                          className="h-5 w-5"
-                          aria-hidden="true"
-                        />
-                      </button>
-                    </div>
-                  </div> */}
-                </li>
-              ))}
-            </ul>
-          </div>
-        </aside>
-
-        {/**
-         * Right-side column
-         */}
-        {/* <aside className="fixed bottom-0 left-20 top-16 hidden w-96 overflow-y-auto border-r border-gray-200 px-4 py-6 sm:px-6 lg:px-8 xl:block"> */}
-        <aside className="fixed bottom-0 right-0 top-16 hidden w-96 overflow-y-auto border-l border-gray-200 px-4 py-6 sm:px-6 lg:px-8 xl:block">
-          <h3 className="text-base font-semibold leading-6 text-gray-900">
-            TriviaAI
-          </h3>
-
-          <form onSubmit={handleSubmit}>
-            <div className="mt-2">
-              <input
-                type="text"
-                name="chat-input"
-                id="chat-input"
-                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                placeholder="A trivia topic"
-                value={input}
-                onChange={handleInputChange}
-              />
-            </div>
-          </form>
-
-          <ul role="list" className="mt-4">
-            {response.map((item, index) => (
-              <li key={index}>
-                <div className="pb-4">
-                  <div className="relative flex">
-                    <div>
-                      <span className="h-8 w-8 rounded-full flex items-center justify-center">
-                        <input
-                          id="comments"
-                          aria-describedby="comments-description"
-                          name="comments"
-                          type="checkbox"
-                          className="h-4 w-4 rounded border-gray-300"
-                        />
-                      </span>
-                    </div>
-                    <div className="flex min-w-0 flex-1 justify-between space-x-4 pt-1.5">
                       <div>
-                        <p className="text-sm text-gray-700">{item.question}</p>
-                        <p className="text-sm text-gray-950">{item.answer} </p>
+                        {item.name}
+                        {item.count ? (
+                          <span
+                            className="ml-auto w-9 min-w-max whitespace-nowrap rounded-full bg-white px-2.5 py-0.5 text-center text-xs font-medium leading-5 text-gray-600 ring-1 ring-inset ring-gray-200"
+                            aria-hidden="true"
+                          >
+                            {item.count}
+                          </span>
+                        ) : null}
                       </div>
                     </div>
-                  </div>
-                </div>
-              </li>
-            ))}
-          </ul>
+                  </li>
+                ))}
+            </ul>
+          </nav>
         </aside>
       </div>
     </>
