@@ -12,9 +12,15 @@ import {
 } from "@heroicons/react/24/outline";
 import { useParams } from "next/navigation";
 import { User } from "@supabase/supabase-js";
+import { useChat } from "ai/react";
 
 import { createClient } from "@/utils/supabase/client";
 import { Tables } from "@/types/database.types";
+
+type TriviaItem = {
+  question: string;
+  answer: string;
+};
 
 const navigation = [
   { name: "Home", href: "#", icon: HomeIcon, current: true },
@@ -28,6 +34,7 @@ function classNames(...classes: any[]) {
 export default function EventPage() {
   const { eventId } = useParams();
   const supabase = createClient();
+  const { messages, input, handleInputChange, handleSubmit } = useChat();
 
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
@@ -36,6 +43,7 @@ export default function EventPage() {
   const [rounds, setRounds] = useState<Tables<"v001_rounds_stag">[]>();
   const [activeRound, setActiveRound] = useState<Tables<"v001_rounds_stag">>();
   const [questions, setQuestions] = useState<Tables<"v001_questions_stag">[]>();
+  const [response, setResponse] = useState<TriviaItem[]>([]);
 
   useEffect(() => {
     const getQuestions = async () => {
@@ -87,6 +95,15 @@ export default function EventPage() {
 
     getUser();
   }, []);
+
+  useEffect(() => {
+    messages.map((item) => {
+      if (item.role === "assistant") {
+        let content = JSON.parse(item.content);
+        setResponse(content);
+      }
+    });
+  }, [messages]);
 
   return (
     <>
@@ -270,47 +287,6 @@ export default function EventPage() {
                   </div>
                 ))}
               </dl>
-
-              {/* <div
-                key={item.id}
-                className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6"
-              >
-                <div className="sm:col-span-3">
-                  <label
-                    htmlFor={`question-${item.id}`}
-                    className="block text-sm font-medium leading-6 text-gray-900"
-                  >
-                    Question
-                  </label>
-                  <div className="mt-2">
-                    <input
-                      type="text"
-                      name={`question-${item.id}`}
-                      id={`question-${item.id}`}
-                      autoComplete="question"
-                      className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                    />
-                  </div>
-                </div>
-
-                <div className="sm:col-span-3">
-                  <label
-                    htmlFor={`answer-${item.id}`}
-                    className="block text-sm font-medium leading-6 text-gray-900"
-                  >
-                    Answer
-                  </label>
-                  <div className="mt-2">
-                    <input
-                      type="text"
-                      name={`answer-${item.id}`}
-                      id={`answer-${item.id}`}
-                      autoComplete="answer"
-                      className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                    />
-                  </div>
-                </div>
-              </div> */}
             </div>
           </div>
         </main>
@@ -391,6 +367,55 @@ export default function EventPage() {
               ))}
             </ul>
           </div>
+        </aside>
+
+        <aside className="fixed inset-y-0 right-0 hidden w-96 overflow-y-auto border-l border-gray-200 px-4 py-6 sm:px-6 lg:px-8 xl:block">
+          {/* Secondary column (hidden on smaller screens) */}
+          <h3 className="text-base font-semibold leading-6 text-gray-900">
+            Assistance
+          </h3>
+
+          <form onSubmit={handleSubmit}>
+            <div className="mt-2">
+              <input
+                type="text"
+                name="chat-input"
+                id="chat-input"
+                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                placeholder="A trivia topic"
+                value={input}
+                onChange={handleInputChange}
+              />
+            </div>
+          </form>
+
+          <ul role="list" className="mt-4">
+            {response.map((item, index) => (
+              <li key={index}>
+                <div className="pb-4">
+                  <div className="relative flex">
+                    <div>
+                      <span className="h-8 w-8 rounded-full flex items-center justify-center">
+                        <input
+                          id="comments"
+                          aria-describedby="comments-description"
+                          name="comments"
+                          type="checkbox"
+                          className="h-4 w-4 rounded border-gray-300"
+                        />
+                      </span>
+                    </div>
+                    <div className="flex min-w-0 flex-1 justify-between space-x-4 pt-1.5">
+                      <div>
+                        <p className="text-sm text-gray-700">{item.question}</p>
+                        <p className="text-sm text-gray-950">{item.answer} </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </li>
+            ))}
+          </ul>
         </aside>
       </div>
     </>
