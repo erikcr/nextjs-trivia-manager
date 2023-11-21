@@ -31,6 +31,7 @@ export default function EventPage() {
 
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [qLoading, setQLoading] = useState(true);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [rounds, setRounds] = useState<Tables<"v001_rounds_stag">[]>();
   const [activeRound, setActiveRound] = useState<Tables<"v001_rounds_stag">>();
@@ -46,6 +47,7 @@ export default function EventPage() {
 
       if (data) {
         setQuestions(data);
+        setQLoading(false);
       }
     };
 
@@ -244,28 +246,30 @@ export default function EventPage() {
                 Questions
               </h3>
 
-              <div className="mt-6 border-t border-gray-100">
+              <dl className="grid grid-cols-1 sm:grid-cols-2 divide-y divide-gray-100">
+                {qLoading && (
+                  <div role="status" className="max-w-sm animate-pulse py-3">
+                    <div className="h-2.5 bg-gray-200 rounded-full dark:bg-gray-700 w-48 mb-4"></div>
+                    <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[360px] mb-2.5"></div>
+                    <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 mb-2.5"></div>
+                    <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[330px] mb-2.5"></div>
+                    <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[300px] mb-2.5"></div>
+                    <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[360px]"></div>
+                    <span className="sr-only">Loading...</span>
+                  </div>
+                )}
+
                 {questions?.map((item) => (
-                  <dl key={item.id} className="divide-y divide-gray-300">
-                    <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-                      <dt className="text-sm font-medium leading-6 text-gray-900">
-                        {item.question}
-                      </dt>
-                      <dd className="mt-1 flex text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
-                        <span className="flex-grow">{item.answer}</span>
-                        <span className="ml-4 flex-shrink-0">
-                          <button
-                            type="button"
-                            className="rounded-md font-medium text-indigo-600 hover:text-indigo-500"
-                          >
-                            Edit
-                          </button>
-                        </span>
-                      </dd>
-                    </div>
-                  </dl>
+                  <div className="px-4 py-3 sm:col-span-2 sm:px-0">
+                    <dt className="text-sm font-medium leading-6 text-gray-900">
+                      {item.question}
+                    </dt>
+                    <dd className="mt-1 text-sm leading-6 text-gray-700 sm:mt-2">
+                      {item.answer}
+                    </dd>
+                  </div>
                 ))}
-              </div>
+              </dl>
 
               {/* <div
                 key={item.id}
