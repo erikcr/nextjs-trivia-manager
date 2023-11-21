@@ -11,6 +11,7 @@ import {
   Cog6ToothIcon,
 } from "@heroicons/react/24/outline";
 import { useParams } from "next/navigation";
+import { User } from "@supabase/supabase-js";
 
 import { createClient } from "@/utils/supabase/client";
 import { Tables } from "@/types/database.types";
@@ -28,31 +29,57 @@ export default function EventPage() {
   const { eventId } = useParams();
   const supabase = createClient();
 
+  const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [rounds, setRounds] = useState<Tables<"v001_rounds_stag">[]>([]);
+  const [rounds, setRounds] = useState<Tables<"v001_rounds_stag">[]>();
   const [activeRound, setActiveRound] = useState<Tables<"v001_rounds_stag">>();
+  const [questions, setQuestions] = useState<Tables<"v001_questions_stag">[]>();
 
-  const getRounds = async (userId: string | undefined) => {
-    const { data, error } = await supabase
-      .from("v001_rounds_stag")
-      .select()
-      .order("order_num")
-      .eq("event_id", eventId)
-      .eq("owner", userId);
+  useEffect(() => {
+    const getQuestions = async () => {
+      const { data, error } = await supabase
+        .from("v001_questions_stag")
+        .select()
+        .eq("round_id", activeRound?.id)
+        .eq("owner", user?.id);
 
-    if (data) {
-      setRounds(data);
-      setActiveRound(data[0]);
-      setLoading(false);
+      if (data) {
+        setQuestions(data);
+      }
+    };
+
+    if (activeRound) {
+      getQuestions();
     }
-  };
+  }, [activeRound]);
+
+  useEffect(() => {
+    const getRounds = async () => {
+      const { data, error } = await supabase
+        .from("v001_rounds_stag")
+        .select()
+        .order("order_num")
+        .eq("event_id", eventId)
+        .eq("owner", user?.id);
+
+      if (data) {
+        setRounds(data);
+        setActiveRound(data[0]);
+        setLoading(false);
+      }
+    };
+
+    if (user) {
+      getRounds();
+    }
+  }, [user]);
 
   useEffect(() => {
     const getUser = async () => {
       const { data } = await supabase.auth.getUser();
       if (data) {
-        getRounds(data.user?.id);
+        setUser(data.user);
       }
     };
 
@@ -217,10 +244,36 @@ export default function EventPage() {
                 Questions
               </h3>
 
-              <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
+              <div className="mt-6 border-t border-gray-100">
+                {questions?.map((item) => (
+                  <dl key={item.id} className="divide-y divide-gray-300">
+                    <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+                      <dt className="text-sm font-medium leading-6 text-gray-900">
+                        {item.question}
+                      </dt>
+                      <dd className="mt-1 flex text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
+                        <span className="flex-grow">{item.answer}</span>
+                        <span className="ml-4 flex-shrink-0">
+                          <button
+                            type="button"
+                            className="rounded-md font-medium text-indigo-600 hover:text-indigo-500"
+                          >
+                            Edit
+                          </button>
+                        </span>
+                      </dd>
+                    </div>
+                  </dl>
+                ))}
+              </div>
+
+              {/* <div
+                key={item.id}
+                className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6"
+              >
                 <div className="sm:col-span-3">
                   <label
-                    htmlFor="first-name"
+                    htmlFor={`question-${item.id}`}
                     className="block text-sm font-medium leading-6 text-gray-900"
                   >
                     Question
@@ -228,9 +281,9 @@ export default function EventPage() {
                   <div className="mt-2">
                     <input
                       type="text"
-                      name="first-name"
-                      id="first-name"
-                      autoComplete="given-name"
+                      name={`question-${item.id}`}
+                      id={`question-${item.id}`}
+                      autoComplete="question"
                       className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                     />
                   </div>
@@ -238,7 +291,7 @@ export default function EventPage() {
 
                 <div className="sm:col-span-3">
                   <label
-                    htmlFor="last-name"
+                    htmlFor={`answer-${item.id}`}
                     className="block text-sm font-medium leading-6 text-gray-900"
                   >
                     Answer
@@ -246,14 +299,14 @@ export default function EventPage() {
                   <div className="mt-2">
                     <input
                       type="text"
-                      name="last-name"
-                      id="last-name"
-                      autoComplete="family-name"
+                      name={`answer-${item.id}`}
+                      id={`answer-${item.id}`}
+                      autoComplete="answer"
                       className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                     />
                   </div>
                 </div>
-              </div>
+              </div> */}
             </div>
           </div>
         </main>
@@ -294,7 +347,7 @@ export default function EventPage() {
                 </li>
               )}
 
-              {rounds.map((item, index) => (
+              {rounds?.map((item, index) => (
                 <li
                   key={item.id}
                   className={classNames(
