@@ -5,7 +5,7 @@ import { zodToJsonSchema } from "zod-to-json-schema";
 
 import { ChatOpenAI } from "langchain/chat_models/openai";
 import { PromptTemplate, ChatPromptTemplate } from "langchain/prompts";
-import { JsonOutputFunctionsParser } from "langchain/output_parsers";
+import { BaseOutputParser } from "langchain/schema/output_parser";
 
 export const runtime = "edge";
 
@@ -19,6 +19,23 @@ Which rap group released the album "Straight Outta Compton" in 1988? & N.W.A
 A user will provide a topic that they want to ask a trivia question about. As an optional parameter, they will specify the difficulty of the question. If no difficulty is provided, assume a difficulty of 8th grade education level.
 
 You will then generate three question/answer pairs about that topic. Only returned the question/answer pairs and nothing more.`
+
+class TriviaOutputParser extends BaseOutputParser<any[]> {
+    async parse(text: string): Promise<any[]> {
+        let finalQas: any[] = [];
+        const qas = text.split(";").map((item) => item.trim());
+        qas.map((text) => {
+            if (text !== "") {
+                let qa = text.split("&").map((item) => item.trim());
+                finalQas.push({
+                    question: qa[0],
+                    answer: qa[1],
+                });
+            }
+        });
+        return finalQas;
+    }
+}
 
 /**
  * This handler initializes and calls an OpenAI Functions powered
@@ -52,9 +69,9 @@ export async function POST(req: NextRequest) {
             ["human", humanTemplate],
         ]);
 
-        // const parser = new CommaSeparatedListOutputParser();
+        const parser = new TriviaOutputParser();
 
-        const chain = chatPrompt.pipe(model);
+        const chain = chatPrompt.pipe(model).pipe(parser);
 
         const result = await chain.invoke({
             topic: currentMessageContent,
