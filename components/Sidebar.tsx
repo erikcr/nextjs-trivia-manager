@@ -40,6 +40,7 @@ export default function Sidebar() {
 
   const [user, setUser] = useState<User | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [newEventOpen, setNewEventOpen] = useState(true);
 
   useEffect(() => {
     const getUser = async () => {
@@ -50,7 +51,7 @@ export default function Sidebar() {
     };
 
     getUser();
-  });
+  }, []);
 
   return (
     <>
