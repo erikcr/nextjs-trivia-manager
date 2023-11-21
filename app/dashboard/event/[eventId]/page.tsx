@@ -6,14 +6,14 @@ import {
   Bars2Icon,
   Bars3Icon,
   HomeIcon,
-  ChevronRightIcon,
+  EllipsisVerticalIcon,
   XMarkIcon,
   Cog6ToothIcon,
 } from "@heroicons/react/24/outline";
 import { useParams } from "next/navigation";
 
 import { createClient } from "@/utils/supabase/client";
-import { DbResult, Tables } from "@/types/database.types";
+import { Tables } from "@/types/database.types";
 
 const navigation = [
   { name: "Home", href: "#", icon: HomeIcon, current: true },
@@ -28,8 +28,10 @@ export default function EventPage() {
   const { eventId } = useParams();
   const supabase = createClient();
 
+  const [loading, setLoading] = useState(true);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [rounds, setRounds] = useState<Tables<"v001_rounds_stag">[]>([]);
+  const [activeRound, setActiveRound] = useState<Tables<"v001_rounds_stag">>();
 
   const getRounds = async (userId: string | undefined) => {
     const { data, error } = await supabase
@@ -41,6 +43,8 @@ export default function EventPage() {
 
     if (data) {
       setRounds(data);
+      setActiveRound(data[0]);
+      setLoading(false);
     }
   };
 
@@ -256,41 +260,80 @@ export default function EventPage() {
 
         <aside className="fixed inset-y-0 left-20 hidden w-96 overflow-y-auto border-r border-gray-200 mx-4 py-6 sm:mx-6 lg:mx-8 xl:block">
           {/* Secondary column (hidden on smaller screens) */}
-          <h3 className="text-base font-semibold leading-6 text-gray-900">
-            Rounds
-          </h3>
+          <div>
+            <h3 className="text-base font-semibold leading-6 text-gray-900">
+              Rounds
+            </h3>
 
-          <ul role="list" className="overflow-hidden">
-            {rounds.map((item) => (
-              <li
-                key={item.id}
-                className="relative flex justify-between gap-x-6 px-4 py-5 hover:bg-gray-50 sm:px-6"
-              >
-                <div className="flex min-w-0 gap-x-4">
-                  <Bars2Icon className="h-5 w-5 flex-none rounded-full" />
-                  <div className="min-w-0 flex-auto">
-                    <p className="text-sm font-semibold leading-6 text-gray-900">
-                      <a href={item.href}>
-                        <span className="absolute inset-x-0 -top-px bottom-0" />
-                        {item.name}
-                      </a>
-                    </p>
-                    <p className="mt-1 flex text-xs leading-5 text-gray-500">
-                      <a className="relative truncate hover:underline">
-                        {item.email}
-                      </a>
-                    </p>
+            <ul role="list" className="mt-3 grid grid-cols-1 gap-5 sm:gap-6">
+              {loading && (
+                <li
+                  role="status"
+                  className="col-span-1 animate-pulse flex rounded-md hover:shadow-sm"
+                >
+                  <div className="bg-gray-200 flex w-16 flex-shrink-0 items-center justify-center rounded-l-md text-sm font-medium text-white"></div>
+                  <div className="flex flex-1 items-center justify-between truncate border-b border-r border-t border-gray-200 bg-white">
+                    <div className="flex-1 truncate px-4 py-2 text-sm">
+                      <div className="h-2.5 bg-gray-200 rounded-full dark:bg-gray-200 w-48 mb-4"></div>
+                      <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-100 max-w-[360px] mb-2.5"></div>
+                    </div>
+                    <div className="flex-shrink-0 pr-2">
+                      <button
+                        type="button"
+                        className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-transparent bg-white text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                      >
+                        <span className="sr-only"></span>
+                        <EllipsisVerticalIcon
+                          className="h-5 w-5"
+                          aria-hidden="true"
+                        />
+                      </button>
+                    </div>
+                    {/* <span className="sr-only">Loading...</span> */}
                   </div>
-                </div>
-                <div className="flex shrink-0 items-center gap-x-4">
-                  <ChevronRightIcon
-                    className="h-5 w-5 flex-none text-gray-400"
-                    aria-hidden="true"
-                  />
-                </div>
-              </li>
-            ))}
-          </ul>
+                </li>
+              )}
+
+              {rounds.map((item, index) => (
+                <li
+                  key={item.id}
+                  className={classNames(
+                    item.id === activeRound?.id
+                      ? "border-r-2 border-red-600"
+                      : "",
+                    "col-span-1 flex rounded-md hover:shadow-sm"
+                  )}
+                >
+                  <div className="bg-gray-400 flex w-16 flex-shrink-0 items-center justify-center rounded-l-md text-sm font-medium text-white">
+                    {item.order_num}
+                  </div>
+                  <div className="flex flex-1 items-center justify-between truncate border-b border-r border-t border-gray-200 bg-white">
+                    <div
+                      className="flex-1 truncate px-4 py-2 text-sm"
+                      onClick={() => setActiveRound(item)}
+                    >
+                      <p className="font-medium text-gray-900 hover:text-gray-600">
+                        {item.name}
+                      </p>
+                      <p className="text-gray-500"># Questions</p>
+                    </div>
+                    <div className="flex-shrink-0 pr-2">
+                      <button
+                        type="button"
+                        className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-transparent bg-white text-gray-400 hover:text-gray-500 focus:outline-none"
+                      >
+                        <span className="sr-only">Open options</span>
+                        <EllipsisVerticalIcon
+                          className="h-5 w-5"
+                          aria-hidden="true"
+                        />
+                      </button>
+                    </div>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </div>
         </aside>
       </div>
     </>
