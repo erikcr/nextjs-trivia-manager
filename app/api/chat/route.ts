@@ -1,30 +1,68 @@
-// app/api/chat/route.ts
+import { NextRequest, NextResponse } from "next/server";
 
-import OpenAI from 'openai';
-import { OpenAIStream, StreamingTextResponse } from 'ai';
+import { z } from "zod";
+import { zodToJsonSchema } from "zod-to-json-schema";
 
-// Optional, but recommended: run on the edge runtime.
-// See https://vercel.com/docs/concepts/functions/edge-functions
-export const runtime = 'edge';
+import { ChatOpenAI } from "langchain/chat_models/openai";
+import { PromptTemplate, ChatPromptTemplate } from "langchain/prompts";
+import { JsonOutputFunctionsParser } from "langchain/output_parsers";
 
-const openai = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY!,
-});
+export const runtime = "edge";
 
-export async function POST(req: Request) {
-    // Extract the `messages` from the body of the request
-    const { messages } = await req.json();
+const TEMPLATE = `You are a trivia master who generates a list of question/answer pairs. The formatting of the output is of the utmost importance. A single question and answer pair must be separated by an ampersand. Separate each question/answer pair from the next using a semicolon.
 
-    // Request the OpenAI API for the response based on the prompt
-    const response = await openai.chat.completions.create({
-        model: 'gpt-3.5-turbo',
-        stream: true,
-        messages: messages,
-    });
+The questions are to be used primarily for trivia bar games, so the value of the answer should be limited to the relevant phrase and not a complete sentence.
 
-    // Convert the response into a friendly text-stream
-    const stream = OpenAIStream(response);
+A valid examples looks like: Who is considered the "Father of Rap"? & Gil Scott-Heron; What year did the first rap single, "Rapper's Delight," release? & 1979;
+Which rap group released the album "Straight Outta Compton" in 1988? & N.W.A
 
-    // Respond with the stream
-    return new StreamingTextResponse(stream);
+A user will provide a topic that they want to ask a trivia question about. As an optional parameter, they will specify the difficulty of the question. If no difficulty is provided, assume a difficulty of 8th grade education level.
+
+You will then generate three question/answer pairs about that topic. Only returned the question/answer pairs and nothing more.`
+
+/**
+ * This handler initializes and calls an OpenAI Functions powered
+ * structured output chain. See the docs for more information:
+ *
+ * https://js.langchain.com/docs/modules/chains/popular/structured_output
+ */
+export async function POST(req: NextRequest) {
+    try {
+        const body = await req.json();
+        const messages = body.messages ?? [];
+        const currentMessageContent = messages[messages.length - 1].content;
+
+        const prompt = PromptTemplate.fromTemplate(TEMPLATE);
+
+        /**
+         * Function calling is currently only supported with ChatOpenAI models
+         */
+        const model = new ChatOpenAI({
+            temperature: 0.8,
+            openAIApiKey: process.env.OPENAI_API_KEY
+        });
+
+        const formattedPrompt = await prompt.format({});
+
+        const humanTemplate =
+            "Questions about {topic} that are {difficulty} difficulty.";
+
+        const chatPrompt = ChatPromptTemplate.fromMessages([
+            ["system", formattedPrompt],
+            ["human", humanTemplate],
+        ]);
+
+        // const parser = new CommaSeparatedListOutputParser();
+
+        const chain = chatPrompt.pipe(model);
+
+        const result = await chain.invoke({
+            topic: currentMessageContent,
+            difficulty: "hard",
+        });
+
+        return NextResponse.json(result, { status: 200 });
+    } catch (e: any) {
+        return NextResponse.json({ error: e.message }, { status: 500 });
+    }
 }
