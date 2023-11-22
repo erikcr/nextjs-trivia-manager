@@ -229,8 +229,8 @@ export default function Example() {
                     href={item.href}
                     className={classNames(
                       item.current
-                        ? "bg-gray-300 text-gray-800"
-                        : "text-gray-500 hover:text-gray-800 hover:bg-gray-300",
+                        ? "bg-gray-200 text-gray-900"
+                        : "text-gray-600 hover:text-gray-900 hover:bg-gray-200",
                       "group flex gap-x-3 rounded-md p-3 text-sm leading-6 font-semibold"
                     )}
                   >
