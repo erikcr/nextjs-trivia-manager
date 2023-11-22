@@ -58,7 +58,6 @@ export default function DashboardPage() {
 
   const addEvent = async (formData: FormData) => {
     setAddEventLoading(true);
-    console.log("submit create");
     const { data, error } = await supabase
       .from("v001_events_stag")
       .insert([
@@ -74,11 +73,12 @@ export default function DashboardPage() {
       .select();
 
     if (!error) {
+      getAllEvents();
       setNotifTitle("Event created");
       setNotifType("success");
       setNotifShow(true);
       setEventSlideout(false);
-      getAllEvents();
+      setAddEventLoading(false);
     } else {
       console.log(error);
     }
