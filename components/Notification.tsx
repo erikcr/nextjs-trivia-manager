@@ -1,6 +1,9 @@
 import { Fragment, useState } from "react";
 import { Transition } from "@headlessui/react";
-import { CheckCircleIcon } from "@heroicons/react/24/outline";
+import {
+  CheckCircleIcon,
+  ExclamationCircleIcon,
+} from "@heroicons/react/24/outline";
 import { XMarkIcon } from "@heroicons/react/20/solid";
 
 export default function Notification({
@@ -21,7 +24,7 @@ export default function Notification({
       {/* Global notification live region, render this permanently at the end of the document */}
       <div
         aria-live="assertive"
-        className="pointer-events-none fixed inset-0 flex items-end px-4 py-6 sm:items-start sm:p-6"
+        className="z-50 pointer-events-none fixed inset-0 flex items-end px-4 py-6 sm:items-start sm:p-6"
       >
         <div className="flex w-full flex-col items-center space-y-4 sm:items-end">
           {/* Notification panel, dynamically insert this into the live region when it needs to be displayed */}
@@ -39,9 +42,14 @@ export default function Notification({
               <div className="p-4">
                 <div className="flex items-start">
                   <div className="flex-shrink-0">
-                    {type === "success" && (
+                    {type === "success" ? (
                       <CheckCircleIcon
                         className="h-6 w-6 text-green-400"
+                        aria-hidden="true"
+                      />
+                    ) : (
+                      <ExclamationCircleIcon
+                        className="h-6 w-6 text-red-400"
                         aria-hidden="true"
                       />
                     )}
