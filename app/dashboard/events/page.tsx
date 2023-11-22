@@ -37,6 +37,7 @@ export default function DashboardPage() {
   const [user, setUser] = useState<User | null>(null);
   const [open, setOpen] = useState(false);
   const [show, setShow] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const [allEvents, setAllEvents] = useState<
     Tables<"v001_events_stag">[] | null
@@ -54,6 +55,7 @@ export default function DashboardPage() {
 
     if (data) {
       setAllEvents(data);
+      setLoading(false);
     }
   };
 
@@ -223,9 +225,6 @@ export default function DashboardPage() {
                       </span>
                     </div>
                     <div className="ml-3">
-                      <div className="text-base font-medium leading-none text-white">
-                        {user?.name}
-                      </div>
                       <div className="text-sm font-medium leading-none text-gray-400">
                         {user?.email}
                       </div>
@@ -300,47 +299,78 @@ export default function DashboardPage() {
                 </button>
               </li>
 
-              {allEvents?.map((item) => (
-                <Link key={item.id} href={`/dashboard/event/${item.id}`}>
-                  <li
-                    key={item.id}
-                    className="overflow-hidden rounded-xl border border-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600"
-                  >
-                    <div className="flex items-center gap-x-4 border-b border-gray-900/5 bg-gray-50 dark:bg-gray-600 p-6">
-                      <div className="text-sm font-medium leading-6 text-gray-900 dark:text-gray-200">
-                        {item.name}
-                      </div>
-                      <ChevronRightIcon
-                        className="h-5 w-5 relative ml-auto text-gray-400 dark:text-gray-200"
-                        aria-hidden="true"
-                      />
+              {loading && (
+                <li className="animate-pulse overflow-hidden rounded-xl border border-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600">
+                  <div className="flex items-center gap-x-4 border-b border-gray-900/5 bg-gray-50 dark:bg-gray-600 p-6">
+                    <div className="text-sm font-medium leading-6 text-gray-400 dark:text-gray-200">
+                      Loading...
                     </div>
-                    <dl className="-my-3 divide-y divide-gray-100 dark:divide-gray-600 px-6 py-4 text-sm leading-6">
-                      <div className="flex justify-between gap-x-4 py-3">
-                        <dt className="text-gray-500 dark:text-gray-300">
-                          Date
-                        </dt>
-                        <dd className="text-gray-700 dark:text-gray-400">
-                          <time dateTime={item.date_of_event}>
-                            {format(
-                              parseISO(item.date_of_event),
-                              "LLLL d, yyyy"
-                            )}
-                          </time>
-                        </dd>
+                    <ChevronRightIcon
+                      className="h-5 w-5 relative ml-auto text-gray-300 dark:text-gray-200"
+                      aria-hidden="true"
+                    />
+                  </div>
+                  <dl className="-my-3 divide-y divide-gray-100 dark:divide-gray-600 px-6 py-4 text-sm leading-6">
+                    <div className="flex justify-between gap-x-4 py-3">
+                      <dt className="text-gray-300 dark:text-gray-300">Date</dt>
+                      <dd className="text-gray-300 dark:text-gray-400">
+                        Loading...
+                      </dd>
+                    </div>
+                    <div className="flex justify-between gap-x-4 py-3">
+                      <dt className="text-gray-300 dark:text-gray-300">
+                        Venue
+                      </dt>
+                      <dd className="text-gray-300 dark:text-gray-400">
+                        Loading...
+                      </dd>
+                    </div>
+                  </dl>
+                </li>
+              )}
+
+              {!loading &&
+                allEvents?.map((item) => (
+                  <Link key={item.id} href={`/dashboard/event/${item.id}`}>
+                    <li
+                      key={item.id}
+                      className="overflow-hidden rounded-xl border border-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600"
+                    >
+                      <div className="flex items-center gap-x-4 border-b border-gray-900/5 bg-gray-50 dark:bg-gray-600 p-6">
+                        <div className="text-sm font-medium leading-6 text-gray-900 dark:text-gray-200">
+                          {item.name}
+                        </div>
+                        <ChevronRightIcon
+                          className="h-5 w-5 relative ml-auto text-gray-400 dark:text-gray-200"
+                          aria-hidden="true"
+                        />
                       </div>
-                      <div className="flex justify-between gap-x-4 py-3">
-                        <dt className="text-gray-500 dark:text-gray-300">
-                          Venue
-                        </dt>
-                        <dd className="text-gray-700 dark:text-gray-400">
-                          {item.venue}
-                        </dd>
-                      </div>
-                    </dl>
-                  </li>
-                </Link>
-              ))}
+                      <dl className="-my-3 divide-y divide-gray-100 dark:divide-gray-600 px-6 py-4 text-sm leading-6">
+                        <div className="flex justify-between gap-x-4 py-3">
+                          <dt className="text-gray-500 dark:text-gray-300">
+                            Date
+                          </dt>
+                          <dd className="text-gray-700 dark:text-gray-400">
+                            <time dateTime={item.date_of_event}>
+                              {format(
+                                parseISO(item.date_of_event),
+                                "LLLL d, yyyy"
+                              )}
+                            </time>
+                          </dd>
+                        </div>
+                        <div className="flex justify-between gap-x-4 py-3">
+                          <dt className="text-gray-500 dark:text-gray-300">
+                            Venue
+                          </dt>
+                          <dd className="text-gray-700 dark:text-gray-400">
+                            {item.venue}
+                          </dd>
+                        </div>
+                      </dl>
+                    </li>
+                  </Link>
+                ))}
             </ul>
           </div>
         </div>

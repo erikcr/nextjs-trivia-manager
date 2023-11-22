@@ -12,6 +12,7 @@ import {
   Cog6ToothIcon,
   Bars2Icon,
   ChevronRightIcon,
+  CubeIcon,
 } from "@heroicons/react/24/outline";
 
 import { createClient } from "@/utils/supabase/client";
@@ -23,8 +24,27 @@ type TriviaItem = {
 };
 
 const navigation = [
-  { name: "Home", href: "#", icon: HomeIcon, current: true },
-  { name: "Settings", href: "#", icon: Cog6ToothIcon, current: false },
+  {
+    name: "Home",
+    href: "/dashboard/events",
+    icon: HomeIcon,
+    current: false,
+    divider: true,
+  },
+  {
+    name: "Settings",
+    href: "#",
+    icon: CubeIcon,
+    current: true,
+    divider: false,
+  },
+  {
+    name: "Settings",
+    href: "#",
+    icon: Cog6ToothIcon,
+    current: false,
+    divider: false,
+  },
 ];
 
 const userNavigation = [
@@ -240,6 +260,17 @@ export default function Example() {
                     />
                     <span className="sr-only">{item.name}</span>
                   </a>
+
+                  {item.divider && (
+                    <div className="relative pt-10">
+                      <div
+                        className="absolute inset-0 flex items-center"
+                        aria-hidden="true"
+                      >
+                        <div className="w-full border-t border-gray-300" />
+                      </div>
+                    </div>
+                  )}
                 </li>
               ))}
             </ul>
@@ -264,18 +295,60 @@ export default function Example() {
             />
 
             <div className="flex flex-1 gap-x-4 self-stretch lg:gap-x-6">
-              <form className="relative flex flex-1" action="#" method="GET">
-                <label htmlFor="search-field" className="sr-only">
-                  Search
-                </label>
-                <input
-                  id="search-field"
-                  className="block h-full w-full border-0 py-0 pl-8 pr-0 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm"
-                  placeholder="Search..."
-                  type="search"
-                  name="search"
-                />
-              </form>
+              <div className="relative flex flex-1">
+                <nav className="flex" aria-label="Breadcrumb">
+                  <ol role="list" className="flex items-center space-x-4">
+                    <li>
+                      <div>
+                        <a
+                          href="/dashboard/events"
+                          className="text-gray-400 hover:text-gray-500"
+                        >
+                          <HomeIcon
+                            className="h-5 w-5 flex-shrink-0"
+                            aria-hidden="true"
+                          />
+                          <span className="sr-only">Home</span>
+                        </a>
+                      </div>
+                    </li>
+
+                    <li>
+                      <div className="flex items-center">
+                        <ChevronRightIcon
+                          className="h-5 w-5 flex-shrink-0 text-gray-400"
+                          aria-hidden="true"
+                        />
+                        <a
+                          href={`/dashboard/e/${eventId}`}
+                          className="ml-4 text-sm font-medium text-gray-500 hover:text-gray-700"
+                          aria-current="page"
+                        >
+                          Event
+                        </a>
+                      </div>
+                    </li>
+
+                    {/* {pages.map((page) => (
+                      <li key={page.name}>
+                        <div className="flex items-center">
+                          <ChevronRightIcon
+                            className="h-5 w-5 flex-shrink-0 text-gray-400"
+                            aria-hidden="true"
+                          />
+                          <a
+                            href={page.href}
+                            className="ml-4 text-sm font-medium text-gray-500 hover:text-gray-700"
+                            aria-current={page.current ? "page" : undefined}
+                          >
+                            {page.name}
+                          </a>
+                        </div>
+                      </li>
+                    ))} */}
+                  </ol>
+                </nav>
+              </div>
               <div className="flex items-center gap-x-4 lg:gap-x-6">
                 <button
                   type="button"
@@ -337,7 +410,38 @@ export default function Example() {
 
           <main className="xl:pl-96">
             <div className="px-4 py-10 sm:px-6 lg:px-8 lg:py-6">
-              {/* Main area */}
+              <dl className="grid grid-cols-1 sm:grid-cols-2 divide-y divide-gray-100">
+                {qLoading && (
+                  <div role="status" className="max-w-sm animate-pulse py-3">
+                    <div className="h-2.5 bg-gray-200 rounded-full dark:bg-gray-700 w-48 mb-4"></div>
+                    <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[360px] mb-2.5"></div>
+                    <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 mb-2.5"></div>
+                    <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[330px] mb-2.5"></div>
+                    <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[300px] mb-2.5"></div>
+                    <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[360px]"></div>
+                    <span className="sr-only">Loading...</span>
+                  </div>
+                )}
+
+                {!qLoading && !questions?.length && (
+                  <div className="px-4 py-3 sm:col-span-2 sm:px-0">
+                    <dt className="text-sm font-medium leading-6 text-gray-900">
+                      No questions yet.
+                    </dt>
+                  </div>
+                )}
+
+                {!qLoading && questions?.map((item) => (
+                  <div className="px-4 py-3 sm:col-span-2 sm:px-0">
+                    <dt className="text-sm font-medium leading-6 text-gray-900">
+                      {item.question}
+                    </dt>
+                    <dd className="mt-1 text-sm leading-6 text-gray-700 sm:mt-2">
+                      {item.answer}
+                    </dd>
+                  </div>
+                ))}
+              </dl>
             </div>
           </main>
         </div>
@@ -346,7 +450,10 @@ export default function Example() {
           <nav className="flex flex-1 flex-col" aria-label="Sidebar">
             <ul role="list" className="-mx-2 space-y-1">
               {rounds?.map((item) => (
-                <li key={item.id} onClick={() => setActiveRound(item)}>
+                <li key={item.id} onClick={() => {
+                  setQLoading(true);
+                  setActiveRound(item)
+                }}>
                   <div
                     className={classNames(
                       item.id === activeRound?.id
