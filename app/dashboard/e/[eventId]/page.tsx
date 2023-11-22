@@ -350,8 +350,8 @@ export default function Example() {
                   <div
                     className={classNames(
                       item.id === activeRound?.id
-                        ? "bg-gray-50 text-indigo-600"
-                        : "text-gray-700 hover:text-indigo-600 hover:bg-gray-50",
+                        ? "bg-gray-100 text-gray-900"
+                        : "text-gray-500 hover:text-gray-900 hover:bg-gray-50",
                       "group flex justify-between gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold"
                     )}
                   >
@@ -367,8 +367,8 @@ export default function Example() {
                     <ChevronRightIcon
                       className={classNames(
                         item.id === activeRound?.id
-                          ? "text-indigo-600"
-                          : "text-gray-400",
+                          ? "text-gray-900"
+                          : "hidden text-gray-500 hover:visible",
                         "h-5 w-5 shrink-0"
                       )}
                       aria-hidden="true"
