@@ -6,6 +6,7 @@ import { Bars3Icon, BellIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { ChevronRightIcon } from "@heroicons/react/20/solid";
 import Link from "next/link";
 import { User } from "@supabase/supabase-js";
+import { parseISO, format } from "date-fns";
 
 import { createClient } from "@/utils/supabase/client";
 import { Tables } from "@/types/database.types";
@@ -316,12 +317,25 @@ export default function DashboardPage() {
                     </div>
                     <dl className="-my-3 divide-y divide-gray-100 dark:divide-gray-600 px-6 py-4 text-sm leading-6">
                       <div className="flex justify-between gap-x-4 py-3">
-                        <dt className="text-gray-500 dark:text-gray-300">Date</dt>
-                        <dd className="text-gray-700 dark:text-gray-400">{item.date_of_event}</dd>
+                        <dt className="text-gray-500 dark:text-gray-300">
+                          Date
+                        </dt>
+                        <dd className="text-gray-700 dark:text-gray-400">
+                          <time dateTime={item.date_of_event}>
+                            {format(
+                              parseISO(item.date_of_event),
+                              "LLLL d, yyyy"
+                            )}
+                          </time>
+                        </dd>
                       </div>
                       <div className="flex justify-between gap-x-4 py-3">
-                        <dt className="text-gray-500 dark:text-gray-300">Venue</dt>
-                        <dd className="text-gray-700 dark:text-gray-400">{item.venue}</dd>
+                        <dt className="text-gray-500 dark:text-gray-300">
+                          Venue
+                        </dt>
+                        <dd className="text-gray-700 dark:text-gray-400">
+                          {item.venue}
+                        </dd>
                       </div>
                     </dl>
                   </li>
