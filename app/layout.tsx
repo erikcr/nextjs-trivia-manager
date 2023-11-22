@@ -21,7 +21,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className="h-full">
-      <Provider>
+      {/* <Provider> */}
         <body
           className={classNames(
             inter.className,
@@ -30,7 +30,7 @@ export default function RootLayout({
         >
           {children}
         </body>
-      </Provider>
+      {/* </Provider> */}
     </html>
   );
 }

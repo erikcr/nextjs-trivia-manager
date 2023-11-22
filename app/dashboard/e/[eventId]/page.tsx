@@ -6,17 +6,12 @@ import { User } from "@supabase/supabase-js";
 import { useChat } from "ai/react";
 import { Dialog, Transition, Menu } from "@headlessui/react";
 import {
-  ChevronDownIcon,
   Bars3Icon,
   HomeIcon,
-  EllipsisVerticalIcon,
   XMarkIcon,
   Cog6ToothIcon,
-  ClockIcon,
-  CheckCircleIcon,
-  PaperAirplaneIcon,
-  SparklesIcon,
   Bars2Icon,
+  ChevronRightIcon,
 } from "@heroicons/react/24/outline";
 
 import { createClient } from "@/utils/supabase/client";
@@ -54,37 +49,6 @@ export default function Example() {
   const [activeRound, setActiveRound] = useState<Tables<"v001_rounds_stag">>();
   const [questions, setQuestions] = useState<Tables<"v001_questions_stag">[]>();
   const [response, setResponse] = useState<TriviaItem[]>([]);
-  const [dragId, setDragId] = useState();
-
-  const handleDrag = (ev) => {
-    setDragId(ev.currentTarget.id);
-  };
-
-  const handleDrop = (ev) => {
-    if (!rounds) return;
-
-    const dragBox = rounds.find((item) => item.order_num === Number(dragId));
-    const dropBox = rounds.find(
-      (item) => item.order_num === Number(ev.currentTarget.id)
-    );
-
-    const dragBoxOrder = dragBox?.order_num;
-    const dropBoxOrder = dropBox?.order_num;
-
-    const newBoxState = rounds.map((item) => {
-      if (item.order_num === Number(dragId)) {
-        item.order_num = dropBoxOrder;
-        console.log(`dropBoxOrder: ${item.order_num}`);
-      }
-      if (item.order_num === Number(ev.currentTarget.id)) {
-        item.order_num = dragBoxOrder;
-        console.log(`dragBoxOrder: ${item.order_num}`);
-      }
-      return item;
-    });
-
-    setRounds(newBoxState);
-  };
 
   useEffect(() => {
     const getQuestions = async () => {
@@ -249,7 +213,7 @@ export default function Example() {
         </Transition.Root>
 
         {/* Static sidebar for desktop */}
-        <div className="hidden lg:fixed lg:inset-y-0 lg:left-0 lg:z-50 lg:block lg:w-20 lg:overflow-y-auto lg:bg-white lg:pb-4 dark:bg-slate-800">
+        <div className="hidden border-r border-gray-200 lg:fixed lg:inset-y-0 lg:left-0 lg:z-50 lg:block lg:w-20 lg:overflow-y-auto lg:bg-white lg:pb-4 dark:bg-slate-800">
           <div className="flex h-16 shrink-0 items-center justify-center">
             <img
               className="h-8 w-auto"
@@ -381,47 +345,37 @@ export default function Example() {
         <aside className="fixed bottom-0 left-20 top-16 hidden w-96 overflow-y-auto border-r border-gray-200 px-4 py-6 sm:px-6 lg:px-8 xl:block">
           <nav className="flex flex-1 flex-col" aria-label="Sidebar">
             <ul role="list" className="-mx-2 space-y-1">
-              {rounds
-                ?.sort((a, b) => a.order_num - b.order_num)
-                .map((item, index) => (
-                  <li
-                    key={item.order_num}
-                    draggable={true}
-                    id={String(item.id)}
-                    onDragOver={(ev) => ev.preventDefault()}
-                    onDragStart={handleDrag}
-                    onDrop={handleDrop}
-                    onClick={() => setActiveRound(item)}
+              {rounds?.map((item) => (
+                <li key={item.id} onClick={() => setActiveRound(item)}>
+                  <div
+                    className={classNames(
+                      item.id === activeRound?.id
+                        ? "bg-gray-50 text-indigo-600"
+                        : "text-gray-700 hover:text-indigo-600 hover:bg-gray-50",
+                      "group flex justify-between gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold"
+                    )}
                   >
-                    <div
+                    {/* <Bars2Icon
+                      className={classNames(
+                        "text-gray-400 group-hover:text-indigo-600",
+                        "h-6 w-6 shrink-0"
+                      )}
+                      aria-hidden="true"
+                    /> */}
+                    <div>{item.name}</div>
+
+                    <ChevronRightIcon
                       className={classNames(
                         item.id === activeRound?.id
-                          ? "bg-gray-50 text-indigo-600"
-                          : "text-gray-700 hover:text-indigo-600 hover:bg-gray-50",
-                        "group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold"
+                          ? "text-indigo-600"
+                          : "text-gray-400",
+                        "h-5 w-5 shrink-0"
                       )}
-                    >
-                      <Bars2Icon
-                        className={classNames(
-                          "text-gray-400 group-hover:text-indigo-600",
-                          "h-6 w-6 shrink-0"
-                        )}
-                        aria-hidden="true"
-                      />
-                      <div>
-                        {item.name}
-                        {item.count ? (
-                          <span
-                            className="ml-auto w-9 min-w-max whitespace-nowrap rounded-full bg-white px-2.5 py-0.5 text-center text-xs font-medium leading-5 text-gray-600 ring-1 ring-inset ring-gray-200"
-                            aria-hidden="true"
-                          >
-                            {item.count}
-                          </span>
-                        ) : null}
-                      </div>
-                    </div>
-                  </li>
-                ))}
+                      aria-hidden="true"
+                    />
+                  </div>
+                </li>
+              ))}
             </ul>
           </nav>
         </aside>
