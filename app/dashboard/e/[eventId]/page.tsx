@@ -23,6 +23,15 @@ type TriviaItem = {
   answer: string;
 };
 
+const people = [
+  {
+    name: "Lindsay Walton",
+    title: "Front-end Developer",
+    email: "lindsay.walton@example.com",
+    role: "Member",
+  },
+];
+
 const navigation = [
   {
     name: "Home",
@@ -62,7 +71,7 @@ export default function Example() {
   const { messages, input, handleInputChange, handleSubmit } = useChat();
 
   const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [rLoading, setRLoading] = useState(true);
   const [qLoading, setQLoading] = useState(true);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [rounds, setRounds] = useState<Tables<"v001_rounds_stag">[]>();
@@ -101,7 +110,7 @@ export default function Example() {
       if (data) {
         setRounds(data);
         setActiveRound(data[0]);
-        setLoading(false);
+        setRLoading(false);
       }
     };
 
@@ -409,80 +418,139 @@ export default function Example() {
           </div>
 
           <main className="xl:pl-96">
-            <div className="px-4 py-10 sm:px-6 lg:px-8 lg:py-6">
-              <dl className="grid grid-cols-1 sm:grid-cols-2 divide-y divide-gray-100">
-                {qLoading && (
-                  <div role="status" className="max-w-sm animate-pulse py-3">
-                    <div className="h-2.5 bg-gray-200 rounded-full dark:bg-gray-700 w-48 mb-4"></div>
-                    <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[360px] mb-2.5"></div>
-                    <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 mb-2.5"></div>
-                    <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[330px] mb-2.5"></div>
-                    <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[300px] mb-2.5"></div>
-                    <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[360px]"></div>
-                    <span className="sr-only">Loading...</span>
+            <div className="px-4 py-4 sm:px-6 lg:px-8">
+              <div className="sm:flex sm:items-center">
+                <div className="sm:flex-auto">
+                  <h1 className="text-base font-semibold leading-6 text-gray-900">
+                    Questions
+                  </h1>
+                </div>
+                <div className="mt-4 sm:ml-16 sm:mt-0 sm:flex-none">
+                  <button
+                    type="button"
+                    className="block rounded-md bg-indigo-600 px-3 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                  >
+                    Add question
+                  </button>
+                </div>
+              </div>
+              <div className="mt-8 flow-root">
+                <div className="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
+                  <div className="inline-block min-w-full py-2 align-middle">
+                    <table className="min-w-full divide-y divide-gray-300">
+                      <thead>
+                        <tr>
+                          <th
+                            scope="col"
+                            className="w-3/5 py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6 lg:pl-8"
+                          >
+                            Question
+                          </th>
+                          <th
+                            scope="col"
+                            className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+                          >
+                            Answer
+                          </th>
+                          <th
+                            scope="col"
+                            className="relative py-3.5 pl-3 pr-4 sm:pr-6 lg:pr-8"
+                          >
+                            <span className="sr-only">Edit</span>
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-gray-200 bg-white">
+                        {questions?.map((item) => (
+                          <tr key={item.id}>
+                            <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6 lg:pl-8">
+                              {item.question}
+                            </td>
+                            <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                              {item.answer}
+                            </td>
+                            <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6 lg:pr-8">
+                              <a
+                                href="#"
+                                className="text-indigo-600 hover:text-indigo-900"
+                              >
+                                Edit
+                                <span className="sr-only">
+                                  , {item.question}
+                                </span>
+                              </a>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
                   </div>
-                )}
-
-                {!qLoading && !questions?.length && (
-                  <div className="px-4 py-3 sm:col-span-2 sm:px-0">
-                    <dt className="text-sm font-medium leading-6 text-gray-900">
-                      No questions yet.
-                    </dt>
-                  </div>
-                )}
-
-                {!qLoading && questions?.map((item) => (
-                  <div className="px-4 py-3 sm:col-span-2 sm:px-0">
-                    <dt className="text-sm font-medium leading-6 text-gray-900">
-                      {item.question}
-                    </dt>
-                    <dd className="mt-1 text-sm leading-6 text-gray-700 sm:mt-2">
-                      {item.answer}
-                    </dd>
-                  </div>
-                ))}
-              </dl>
+                </div>
+              </div>
             </div>
           </main>
         </div>
 
-        <aside className="fixed bottom-0 left-20 top-16 hidden w-96 overflow-y-auto border-r border-gray-200 px-4 py-6 sm:px-6 lg:px-8 xl:block">
+        <aside className="fixed bottom-0 left-20 top-16 hidden w-96 overflow-y-auto border-r border-gray-200 px-4 py-3 sm:px-6 lg:px-8 xl:block">
+          <header className="flex items-center justify-between mb-3 border-b border-gray-200">
+            <h1 className="text-base font-semibold leading-7 text-gray-900">
+              Rounds
+            </h1>
+          </header>
+
           <nav className="flex flex-1 flex-col" aria-label="Sidebar">
             <ul role="list" className="-mx-2 space-y-1">
-              {rounds?.map((item) => (
-                <li key={item.id} onClick={() => {
-                  setQLoading(true);
-                  setActiveRound(item)
-                }}>
-                  <div
-                    className={classNames(
-                      item.id === activeRound?.id
-                        ? "bg-gray-100 text-gray-900"
-                        : "text-gray-500 hover:text-gray-900 hover:bg-gray-50",
-                      "group flex justify-between gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold"
-                    )}
+              {rLoading && (
+                <li className="animate-pulse">
+                  <div className="bg-gray-100 text-gray-500 group flex justify-between gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold">
+                    <div>Loading...</div>
+
+                    <ChevronRightIcon
+                      className="h-5 w-5 shrink-0"
+                      aria-hidden="true"
+                    />
+                  </div>
+                </li>
+              )}
+
+              {!rLoading &&
+                rounds?.map((item) => (
+                  <li
+                    key={item.id}
+                    onClick={() => {
+                      setQLoading(true);
+                      setActiveRound(item);
+                    }}
                   >
-                    {/* <Bars2Icon
+                    <div
+                      className={classNames(
+                        item.id === activeRound?.id
+                          ? "bg-gray-100 text-gray-900"
+                          : "text-gray-500 hover:text-gray-900 hover:bg-gray-50",
+                        "group flex justify-between gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold"
+                      )}
+                    >
+                      {/* <Bars2Icon
                       className={classNames(
                         "text-gray-400 group-hover:text-indigo-600",
                         "h-6 w-6 shrink-0"
                       )}
                       aria-hidden="true"
                     /> */}
-                    <div>{item.name}</div>
+                      <div>{item.name}</div>
 
-                    <ChevronRightIcon
-                      className={classNames(
-                        item.id === activeRound?.id
-                          ? "text-gray-900"
-                          : "hidden text-gray-500 hover:visible",
-                        "h-5 w-5 shrink-0"
-                      )}
-                      aria-hidden="true"
-                    />
-                  </div>
-                </li>
-              ))}
+                      <ChevronRightIcon
+                        className={classNames(
+                          item.id === activeRound?.id
+                            ? "text-gray-900"
+                            : "hidden text-gray-500 hover:visible",
+                          "h-5 w-5 shrink-0"
+                        )}
+                        aria-hidden="true"
+                      />
+                    </div>
+                  </li>
+                ))}
             </ul>
           </nav>
         </aside>
