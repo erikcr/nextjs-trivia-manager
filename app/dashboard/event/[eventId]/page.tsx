@@ -380,7 +380,7 @@ export default function Example() {
                         aria-hidden="true"
                       />
                       <a
-                        href={`/dashboard/e/${eventId}`}
+                        href={`/dashboard/event/${eventId}`}
                         className="ml-4 text-sm font-medium text-gray-500 hover:text-gray-700"
                         aria-current="page"
                       >
@@ -467,24 +467,8 @@ export default function Example() {
         </div>
 
         <main className="xl:pl-96">
-          <div className="px-4 py-4 sm:px-6 lg:px-8">
-            <div className="sm:flex sm:items-center">
-              <div className="sm:flex-auto">
-                <h1 className="text-base font-semibold leading-6 text-gray-900">
-                  Questions
-                </h1>
-              </div>
-              <div className="mt-4 sm:ml-16 sm:mt-0 sm:flex-none">
-                <button
-                  type="button"
-                  className="block rounded-md bg-indigo-600 px-3 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-                  onClick={() => setQuestionSlideout(true)}
-                >
-                  Add question
-                </button>
-              </div>
-            </div>
-            <div className="mt-8 flow-root">
+          <div className="px-4 sm:px-6 lg:px-8">
+            <div className="flow-root">
               <div className="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
                 <div className="inline-block min-w-full py-2 align-middle">
                   <table className="min-w-full divide-y divide-gray-300">
@@ -492,7 +476,7 @@ export default function Example() {
                       <tr>
                         <th
                           scope="col"
-                          className="w-3/5 py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6 lg:pl-8"
+                          className="w-8/12 py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6 lg:pl-8"
                         >
                           Question
                         </th>
@@ -502,21 +486,23 @@ export default function Example() {
                         >
                           Answer
                         </th>
-                        <th
-                          scope="col"
-                          className="relative py-3.5 pl-3 pr-4 sm:pr-6 lg:pr-8"
-                        >
-                          <span className="sr-only">Edit</span>
+                        <th className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6 lg:pr-8">
+                          <button
+                            type="button"
+                            className="text-indigo-600 hover:text-indigo-900"
+                          >
+                            Add question
+                          </button>
                         </th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-200 bg-white">
                       {questions?.map((item) => (
                         <tr key={item.id}>
-                          <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6 lg:pl-8">
+                          <td className="py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6 lg:pl-8">
                             {item.question}
                           </td>
-                          <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                          <td className="px-3 py-4 text-sm text-gray-500">
                             {item.answer}
                           </td>
                           <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6 lg:pr-8">
