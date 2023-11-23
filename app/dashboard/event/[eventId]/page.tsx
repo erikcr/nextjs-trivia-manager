@@ -16,6 +16,7 @@ import { Tables } from "@/types/database.types";
 
 // Components
 import Notification from "@/components/Notification";
+import RoundSlideout from "@/components/RoundSlideout";
 
 function classNames(...classes: any[]) {
   return classes.filter(Boolean).join(" ");
@@ -41,7 +42,7 @@ export default function EventByIdPage() {
   const [rError, setRError] = useState<PostgrestError>();
   const [activeRound, setActiveRound] = useState<Tables<"v001_rounds_stag">>();
   const [addRoundLoading, setAddRoundLoading] = useState(false);
-  const [roundSlideout, setRoundSlideout] = useState(false);
+  const [roundSlideoutOpen, setRoundSlideoutOpen] = useState(false);
 
   // Questions
   const [questions, setQuestions] = useState<Tables<"v001_questions_stag">[]>();
@@ -94,7 +95,7 @@ export default function EventByIdPage() {
       setNotifTitle("Round added");
       setNotifType("success");
       setNotifShow(true);
-      setRoundSlideout(false);
+      setRoundSlideoutOpen(false);
       setAddRoundLoading(false);
     } else {
       setRError(error);
@@ -230,7 +231,7 @@ export default function EventByIdPage() {
         <div
           className="-mx-2 space-y-1 mb-2"
           onClick={() => {
-            setRoundSlideout(true);
+            setRoundSlideoutOpen(true);
           }}
         >
           <div className="text-gray-900 border-2 border-dashed border-gray-300 hover:border-gray-400 group flex justify-between gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold">
@@ -473,6 +474,27 @@ export default function EventByIdPage() {
   return (
     <>
       {/**
+       * Action notification
+       */}
+      <Notification
+        title={notifTitle}
+        type={notifType}
+        show={notifShow}
+        setShow={setNotifShow}
+      />
+
+      {/**
+       * Round slideout
+       */}
+      <RoundSlideout
+        user={user}
+        rounds={rounds}
+        getRounds={getRounds}
+        roundSlideoutOpen={roundSlideoutOpen}
+        setRoundSlideoutOpen={setRoundSlideoutOpen}
+      />
+
+      {/**
        * Top header
        */}
       <div className="fixed top-0 left-16 right-0 z-40 flex h-16 shrink-0 items-center gap-x-4 border-b border-gray-200 px-4 sm:gap-x-6 sm:px-6 lg:px-8">
@@ -513,16 +535,6 @@ export default function EventByIdPage() {
           <RightSidebar />
         </aside>
       )}
-
-      {/**
-       * Action notification
-       */}
-      <Notification
-        title={notifTitle}
-        type={notifType}
-        show={notifShow}
-        setShow={setNotifShow}
-      />
     </>
   );
 }
