@@ -25,7 +25,7 @@ export default function RootLayout({
         <body
           className={classNames(
             inter.className,
-            "h-full bg-white dark:bg-gray-700"
+            "h-full bg-gray-50 dark:bg-gray-700"
           )}
         >
           {children}

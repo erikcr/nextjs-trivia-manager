@@ -14,6 +14,7 @@ import { Tables } from "@/types/database.types";
 import GeneralLayout from "@/layouts/GeneralLayout";
 import ThemeSwitcher from "@/components/ThemeSwitcher";
 import Notification from "@/components/Notification";
+import Calendar from "@/components/Calendar";
 // import Logo from "@/public/bb-logo.svg"
 import Logo from "@/components/Logo";
 
@@ -21,7 +22,7 @@ function classNames(...classes: any[]) {
   return classes.filter(Boolean).join(" ");
 }
 
-export default function EventsPage() {
+export default function CalendarPage() {
   const supabase = createClient();
 
   // User
@@ -96,104 +97,7 @@ export default function EventsPage() {
   return (
     <>
       <GeneralLayout>
-        <ul
-          role="list"
-          className="grid grid-cols-1 gap-x-6 gap-y-8 md:grid-cols-2 lg:grid-cols-3 xl:gap-x-8"
-        >
-          <li>
-            <button
-              type="button"
-              className="relative block w-full rounded-lg border-2 border-dashed border-gray-300 p-12 text-center hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-              onClick={() => {
-                setEventSlideout(true);
-              }}
-            >
-              <svg
-                className="mx-auto h-12 w-12 text-gray-400"
-                stroke="currentColor"
-                fill="none"
-                viewBox="0 0 48 48"
-                aria-hidden="true"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M8 14v20c0 4.418 7.163 8 16 8 1.381 0 2.721-.087 4-.252M8 14c0 4.418 7.163 8 16 8s16-3.582 16-8M8 14c0-4.418 7.163-8 16-8s16 3.582 16 8m0 0v14m0-4c0 4.418-7.163 8-16 8S8 28.418 8 24m32 10v6m0 0v6m0-6h6m-6 0h-6"
-                />
-              </svg>
-              <span className="mt-2 block text-sm font-semibold text-gray-900 dark:text-gray-400">
-                Create a new event
-              </span>
-            </button>
-          </li>
-
-          {eLoading && (
-            <li className="animate-pulse overflow-hidden rounded-xl border border-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600">
-              <div className="flex items-center gap-x-4 border-b border-gray-900/5 bg-gray-100 dark:bg-gray-600 p-6">
-                <div className="text-sm font-medium leading-6 text-gray-400 dark:text-gray-200">
-                  Loading...
-                </div>
-                <ChevronRightIcon
-                  className="h-5 w-5 relative ml-auto text-gray-300 dark:text-gray-200"
-                  aria-hidden="true"
-                />
-              </div>
-              <dl className="-my-3 divide-y divide-gray-100 dark:divide-gray-600 px-6 py-4 text-sm leading-6">
-                <div className="flex justify-between gap-x-4 py-3">
-                  <dt className="text-gray-300 dark:text-gray-300">Date</dt>
-                  <dd className="text-gray-300 dark:text-gray-400">
-                    Loading...
-                  </dd>
-                </div>
-                <div className="flex justify-between gap-x-4 py-3">
-                  <dt className="text-gray-300 dark:text-gray-300">Venue</dt>
-                  <dd className="text-gray-300 dark:text-gray-400">
-                    Loading...
-                  </dd>
-                </div>
-              </dl>
-            </li>
-          )}
-
-          {!eLoading &&
-            allEvents?.map((item) => (
-              <Link key={item.id} href={`/dashboard/event/${item.id}`}>
-                <li
-                  key={item.id}
-                  className="overflow-hidden rounded-xl border border-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600"
-                >
-                  <div className="flex items-center gap-x-4 border-b border-gray-900/5 bg-gray-100 dark:bg-gray-600 p-6">
-                    <div className="text-sm font-medium leading-6 text-gray-900 dark:text-gray-200">
-                      {item.name}
-                    </div>
-                    <ChevronRightIcon
-                      className="h-5 w-5 relative ml-auto text-gray-400 dark:text-gray-200"
-                      aria-hidden="true"
-                    />
-                  </div>
-                  <dl className="-my-3 divide-y divide-gray-100 dark:divide-gray-600 px-6 py-4 text-sm leading-6">
-                    <div className="flex justify-between gap-x-4 py-3">
-                      <dt className="text-gray-500 dark:text-gray-300">Date</dt>
-                      <dd className="text-gray-700 dark:text-gray-400">
-                        <time dateTime={item.date_of_event}>
-                          {format(parseISO(item.date_of_event), "LLLL d, yyyy")}
-                        </time>
-                      </dd>
-                    </div>
-                    <div className="flex justify-between gap-x-4 py-3">
-                      <dt className="text-gray-500 dark:text-gray-300">
-                        Venue
-                      </dt>
-                      <dd className="text-gray-700 dark:text-gray-400">
-                        {item.venue}
-                      </dd>
-                    </div>
-                  </dl>
-                </li>
-              </Link>
-            ))}
-        </ul>
+        <Calendar />
       </GeneralLayout>
 
       {/**

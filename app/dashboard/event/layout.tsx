@@ -65,7 +65,11 @@ function classNames(...classes: any[]) {
   return classes.filter(Boolean).join(" ");
 }
 
-export default function EventByIdPage() {
+export default function EventLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const { eventId } = useParams();
   const supabase = createClient();
   const { messages, input, handleInputChange, handleSubmit } = useChat();
@@ -466,64 +470,7 @@ export default function EventByIdPage() {
           </div>
         </div>
 
-        <main className="fixed lg:left-96 pt-16">
-          <div className="px-4 sm:px-6 lg:px-8">
-            <div className="flow-root">
-              <div className="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
-                <div className="inline-block min-w-full py-2 align-middle">
-                  <table className="min-w-full divide-y divide-gray-300">
-                    <thead>
-                      <tr>
-                        <th
-                          scope="col"
-                          className="w-8/12 py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6 lg:pl-8"
-                        >
-                          Question
-                        </th>
-                        <th
-                          scope="col"
-                          className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
-                        >
-                          Answer
-                        </th>
-                        <th className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6 lg:pr-8">
-                          <button
-                            type="button"
-                            className="text-indigo-600 hover:text-indigo-900"
-                            onClick={() => setQuestionSlideout(true)}
-                          >
-                            Add
-                          </button>
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-gray-200">
-                      {questions?.map((item) => (
-                        <tr key={item.id}>
-                          <td className="py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6 lg:pl-8">
-                            {item.question}
-                          </td>
-                          <td className="px-3 py-4 text-sm text-gray-500">
-                            {item.answer}
-                          </td>
-                          <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6 lg:pr-8">
-                            <a
-                              href="#"
-                              className="text-indigo-600 hover:text-indigo-900"
-                            >
-                              Edit
-                              <span className="sr-only">, {item.question}</span>
-                            </a>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </div>
-          </div>
-        </main>
+        <main className="fixed lg:left-96 xl:pr-96 pt-16">{children}</main>
       </div>
 
       {/**
