@@ -11,8 +11,8 @@ import ThemeSwitcher from "@/components/ThemeSwitcher";
 
 const navigation = [
   { name: "Events", href: "/manage/events", display: true },
-  { name: "Calendar", href: "/manage/calendar", display: true },
-  { name: "Settings", href: "/manage/settings", display: true },
+  // { name: "Calendar", href: "/manage/calendar", display: true },
+  // { name: "Settings", href: "/manage/settings", display: true },
 ];
 
 function classNames(...classes: any[]) {
@@ -116,9 +116,11 @@ export default function ManageLayout({
                 </div>
                 <div className="hidden md:block">
                   <div className="ml-4 flex items-center md:ml-6">
+                    <ThemeSwitcher />
+                    
                     <button
                       type="button"
-                      className="relative rounded-full text-md bg-gray-800 p-1 text-gray-400 hover:text-white"
+                      className="relative rounded-full text-sm font-medium bg-gray-800 p-1 text-gray-400 hover:text-white"
                       onClick={signOut}
                     >
                       <span className="absolute -inset-1.5" />
