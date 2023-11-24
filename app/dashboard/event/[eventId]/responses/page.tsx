@@ -3,8 +3,11 @@
 import { useEffect, useState } from "react";
 import { useParams, usePathname } from "next/navigation";
 import {
+  ChevronRightIcon,
   RocketLaunchIcon,
   ArrowRightOnRectangleIcon,
+  CheckCircleIcon,
+  XCircleIcon,
 } from "@heroicons/react/24/outline";
 
 // Supabase
@@ -32,14 +35,15 @@ const navigation = [
   { name: "Settings", href: "#", current: false },
 ];
 
-export default function EventEditorPage() {
+export default function EventResponsesPage() {
   const { eventId } = useParams();
   const pathname = usePathname();
   const supabase = createClient();
 
   // Navigation
   const navigation = [
-    { name: "Editor", href: `/dashboard/event/${eventId}` },
+    { name: "Responses", href: `/dashboard/event/${eventId}/responses` },
+    { name: "Teams", href: `/dashboard/event/${eventId}/responses/teams` },
     {
       name: "Settings",
       href: `/dashboard/event/${eventId}/settings`,
@@ -66,8 +70,15 @@ export default function EventEditorPage() {
   const [questions, setQuestions] = useState<Tables<"v001_questions_stag">[]>();
   const [qLoading, setQLoading] = useState(true);
   const [qError, setQError] = useState<PostgrestError>();
+  const [activeQuestion, setActiveQuestion] =
+    useState<Tables<"v001_questions_stag">>();
   const [addQuestionLoading, setAddQuestionLoading] = useState(false);
   const [questionSlideout, setQuestionSlideout] = useState(false);
+
+  // Responses
+  const [responses, setResponses] = useState<Tables<"v001_responses_stag">[]>();
+  const [rpLoading, setRpLoading] = useState(true);
+  const [rpError, setRpError] = useState<PostgrestError>();
 
   // Notification
   const [notifShow, setNotifShow] = useState(false);
@@ -121,7 +132,6 @@ export default function EventEditorPage() {
       setAddRoundLoading(false);
     } else {
       setRError(error);
-      console.log(error);
     }
   };
 
@@ -134,6 +144,7 @@ export default function EventEditorPage() {
 
     if (data) {
       setQuestions(data);
+      setActiveQuestion(data[0]);
       setQLoading(false);
     }
   };
@@ -159,6 +170,29 @@ export default function EventEditorPage() {
       setNotifShow(true);
       setQuestionSlideout(false);
       getQuestions();
+    }
+  };
+
+  const getResponses = async () => {
+    const { data, error } = await supabase
+      .from("v001_responses_stag")
+      .select("*, v001_teams_stag( name )")
+      .eq("question_id", activeQuestion?.id);
+
+    if (data) {
+      setResponses(data);
+      setRpLoading(false);
+    }
+  };
+
+  const approveResponse = async (responseId: number, isCorrect: boolean) => {
+    const { data, error } = await supabase
+      .from("v001_responses_stag")
+      .update({ is_correct: isCorrect })
+      .eq("id", responseId);
+
+    if (!error) {
+      getResponses();
     }
   };
 
@@ -189,6 +223,12 @@ export default function EventEditorPage() {
       setELoading(false);
     }
   };
+
+  useEffect(() => {
+    if (activeQuestion) {
+      getResponses();
+    }
+  }, [activeQuestion]);
 
   useEffect(() => {
     if (activeRound) {
@@ -420,17 +460,6 @@ export default function EventEditorPage() {
         </div>
 
         <div className="mx-6 my-3">
-          <div
-            className="-mx-2 space-y-1 mb-2"
-            onClick={() => {
-              setRoundSlideoutOpen(true);
-            }}
-          >
-            <div className="text-gray-900 border-2 border-dashed border-gray-300 hover:border-gray-400 group flex justify-between gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold">
-              <div>Add round</div>
-            </div>
-          </div>
-
           <nav className="flex flex-1 flex-col" aria-label="Sidebar">
             <ul role="list" className="-mx-2 space-y-1">
               {rounds?.map((item) => (
@@ -466,111 +495,138 @@ export default function EventEditorPage() {
 
   const MainContent = () => {
     return (
-      <div className="px-4 sm:px-6 lg:px-8">
-        <div className="flow-root">
-          <div className="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
-            <div className="inline-block min-w-full py-2 align-middle">
-              <table className="min-w-full divide-y divide-gray-300">
-                <thead>
-                  <tr>
-                    <th
-                      scope="col"
-                      className="w-8/12 py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6 lg:pl-8"
-                    >
-                      Question
-                    </th>
-                    <th
-                      scope="col"
-                      className="w-2/12 px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
-                    >
-                      Answer
-                    </th>
-                    <th
-                      scope="col"
-                      className="relative py-3.5 pl-3 pr-4 text-right sm:pr-6 lg:pr-8 text-gray-50"
-                    >
-                      a
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-200">
-                  {qLoading && (
-                    <tr className="animate-pulse">
-                      <td className="py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6 lg:pl-8">
-                        <div className="bg-gray-200 group flex justify-between gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold" />
-                      </td>
-                      <td className=" px-3 py-4 text-sm text-gray-500">
-                        <div className="bg-gray-200 group flex justify-between gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold" />
-                      </td>
-                      <td className="relative py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6 lg:pr-8"></td>
-                    </tr>
-                  )}
-
-                  {!qLoading && !questions?.length && (
-                    <tr>
-                      <td className="py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6 lg:pl-8">
-                        No questions yet.
-                      </td>
-                      <td className=" px-3 py-4 text-sm text-gray-500"></td>
-                      <td className="relative py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6 lg:pr-8"></td>
-                    </tr>
-                  )}
-
-                  {questions?.map((item) => (
-                    <tr key={item.id}>
-                      <td className="py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6 lg:pl-8">
-                        {item.question}
-                      </td>
-                      <td className=" px-3 py-4 text-sm text-gray-500">
-                        {item.answer}
-                      </td>
-                      <td className="relative py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6 lg:pr-8">
-                        <button
-                          type="button"
-                          className="text-primary hover:text-primary-hover"
-                          onClick={() => setQuestionSlideout(true)}
-                        >
-                          Edit
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+      <ul role="list" className="divide-y divide-gray-200">
+        {questions?.map((item) => (
+          <li
+            key={item.id}
+            className={classNames(
+              activeQuestion?.id === item.id ? "bg-gray-100" : "",
+              "relative flex justify-between gap-x-6 px-4 py-2 hover:bg-gray-100 sm:px-6"
+            )}
+            onClick={() => setActiveQuestion(item)}
+          >
+            <div className="flex min-w-0 gap-x-4">
+              <div className="min-w-0 flex-auto">
+                <p className="text-sm font-semibold leading-6 text-gray-900">
+                  <span className="absolute inset-x-0 -top-px bottom-0" />
+                  {item.answer}
+                </p>
+                <p className="mt-1 flex text-xs leading-5 text-gray-500">
+                  {item.question}
+                </p>
+              </div>
             </div>
+            <div className="flex shrink-0 items-center gap-x-4">
+              <div className="hidden sm:flex sm:flex-col sm:items-end">
+                <span
+                  className={classNames(
+                    item.status === "PENDING"
+                      ? "bg-blue-100"
+                      : item.status === "ONGOING"
+                      ? "bg-green-100"
+                      : "bg-gray-100",
+                    "inline-flex items-center rounded-full px-2 py-1 text-xs font-medium text-gray-600 ring-1 ring-inset"
+                  )}
+                >
+                  {item.status}
+                </span>
+              </div>
+              <ChevronRightIcon
+                className="h-5 w-5 flex-none text-gray-400"
+                aria-hidden="true"
+              />
+            </div>
+          </li>
+        ))}
+      </ul>
+    );
+  };
+
+  const ResponseItem = ({ item }: { item: Tables<"v001_responses_stag"> }) => {
+    return (
+      <li
+        key={item.id}
+        className="flex flex-wrap items-center justify-between gap-x-6 gap-y-4 py-2 sm:flex-nowrap"
+      >
+        <div>
+          <p className="text-sm font-semibold leading-6 text-gray-900">
+            {item.submitted_answer}
+          </p>
+          <div className="mt-1 flex items-center gap-x-2 text-xs leading-5 text-gray-500">
+            <p>{item.v001_teams_stag.name}</p>
           </div>
         </div>
-      </div>
+        <dl className="flex w-full flex-none justify-between gap-x-8 sm:w-auto">
+          <div className="flex -space-x-0.5">
+            <dt className="sr-only">Commenters</dt>
+          </div>
+          <div className="flex w-16 gap-x-2.5">
+            <dt>
+              <span className="sr-only">Total comments</span>
+              <CheckCircleIcon
+                className="h-6 w-6 text-green-600"
+                aria-hidden="true"
+                onClick={() => approveResponse(item.id, true)}
+              />
+            </dt>
+            <dd className="text-sm leading-6 text-gray-900">
+              <XCircleIcon
+                className="h-6 w-6 text-red-600"
+                aria-hidden="true"
+                onClick={() => approveResponse(item.id, false)}
+              />
+            </dd>
+          </div>
+        </dl>
+      </li>
     );
   };
 
   const RightSidebar = () => {
     return (
-      <div className="hidden sm:block">
-        <div className="border-b border-gray-300">
-          <nav
-            className="-mb-px flex space-x-4 px-4 sm:px-6 justify-end"
-            aria-label="Tabs"
-          >
-            {rightSidebarTabs.map((tab) => (
-              <p
-                key={tab.name}
-                className={classNames(
-                  tab.current
-                    ? "border-primary text-primary"
-                    : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700",
-                  "whitespace-nowrap border-b py-4 px-1 text-sm font-medium"
-                )}
-                aria-current={tab.current ? "page" : undefined}
-              >
-                {tab.name}
-              </p>
-            ))}
-          </nav>
+      <nav className="h-full overflow-y-auto" aria-label="Directory">
+        <div className="relative">
+          <div className="sticky top-0 z-10 border-y border-b-gray-200 border-t-gray-100 bg-gray-100 px-6 py-1.5 text-sm font-semibold leading-6 text-gray-900">
+            <h3>Pending</h3>
+          </div>
+
+          <ul role="list" className="divide-y divide-gray-100 px-6">
+            {responses
+              ?.filter((item) => item.is_correct === null)
+              .map((item) => (
+                <ResponseItem item={item} />
+              ))}
+          </ul>
         </div>
 
-        <QuestionForm />
-      </div>
+        <div className="relative">
+          <div className="sticky top-0 z-10 border-y border-b-gray-200 border-t-gray-100 bg-gray-100 px-6 py-1.5 text-sm font-semibold leading-6 text-gray-900">
+            <h3>Correct</h3>
+          </div>
+
+          <ul role="list" className="divide-y divide-gray-100 px-6">
+            {responses
+              ?.filter((item) => item.is_correct === true)
+              .map((item) => (
+                <ResponseItem item={item} />
+              ))}
+          </ul>
+        </div>
+
+        <div className="relative">
+          <div className="sticky top-0 z-10 border-y border-b-gray-200 border-t-gray-100 bg-gray-100 px-6 py-1.5 text-sm font-semibold leading-6 text-gray-900">
+            <h3>Incorrect</h3>
+          </div>
+
+          <ul role="list" className="divide-y divide-gray-100 px-6">
+            {responses
+              ?.filter((item) => item.is_correct === false)
+              .map((item) => (
+                <ResponseItem item={item} />
+              ))}
+          </ul>
+        </div>
+      </nav>
     );
   };
 
@@ -624,7 +680,7 @@ export default function EventEditorPage() {
         className={classNames(
           "fixed pt-16",
           showLeftSidebar ? "left-80" : "left-0",
-          showRightSidebar ? "right-96" : "right-0"
+          showRightSidebar ? "right-1/3" : "right-0"
         )}
       >
         <MainContent />
@@ -634,7 +690,7 @@ export default function EventEditorPage() {
        * Right-side column
        */}
       {showRightSidebar && (
-        <aside className="fixed bottom-0 right-0 top-16 hidden w-96 overflow-y-auto border-l border-gray-200 xl:block">
+        <aside className="fixed bottom-0 right-0 top-16 hidden w-1/3 overflow-y-auto border-l border-gray-200 xl:block">
           <RightSidebar />
         </aside>
       )}
