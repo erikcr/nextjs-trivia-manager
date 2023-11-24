@@ -150,7 +150,16 @@ export default function EventsPage() {
 
         {!eLoading &&
           allEvents?.map((item) => (
-            <Link key={item.id} href={`/dashboard/event/${item.id}`}>
+            <Link
+              key={item.id}
+              href={
+                item.status === "PENDING"
+                  ? `/dashboard/event/${item.id}`
+                  : item.status === "ONGOING"
+                  ? `/dashboard/event/${item.id}/responses`
+                  : ""
+              }
+            >
               <li
                 key={item.id}
                 className="overflow-hidden rounded-xl border border-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600"

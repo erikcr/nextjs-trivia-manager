@@ -365,16 +365,18 @@ export default function EventResponsesPage() {
           <div className="flex h-16 justify-between">
             <div className="flex">
               <div className="flex flex-shrink-0 items-center">
-                <img
-                  className="block h-8 w-auto lg:hidden"
-                  src="https://tailwindui.com/img/logos/mark.svg?color=amber&shade=600"
-                  alt="Your Company"
-                />
-                <img
-                  className="hidden h-8 w-auto lg:block"
-                  src="https://tailwindui.com/img/logos/mark.svg?color=amber&shade=600"
-                  alt="Your Company"
-                />
+                <a href="/manage/events">
+                  <img
+                    className="block h-8 w-auto lg:hidden"
+                    src="https://tailwindui.com/img/logos/mark.svg?color=amber&shade=600"
+                    alt="Your Company"
+                  />
+                  <img
+                    className="hidden h-8 w-auto lg:block"
+                    src="https://tailwindui.com/img/logos/mark.svg?color=amber&shade=600"
+                    alt="Your Company"
+                  />
+                </a>
               </div>
               <div className="hidden sm:-my-px sm:ml-6 sm:flex sm:space-x-8">
                 {navigation.map((item) => (
@@ -412,7 +414,7 @@ export default function EventResponsesPage() {
                       : event?.status === "ONGOING"
                       ? "bg-green-100"
                       : "bg-gray-100",
-                    "inline-flex items-center rounded-full px-2 py-1 text-xs font-medium text-gray-600 ring-1 ring-inset"
+                    "inline-flex items-center rounded-full px-2 mr-3 py-1 text-xs font-medium text-gray-600 ring-1 ring-inset"
                   )}
                 >
                   {event?.status}
@@ -423,11 +425,7 @@ export default function EventResponsesPage() {
                   className="inline-flex items-center gap-x-1.5 rounded-md px-2.5 py-1.5 text-sm text-gray-900 hover:text-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
                   onClick={() => startEvent()}
                 >
-                  START EVENT
-                  <RocketLaunchIcon
-                    className="-mr-0.5 h-5 w-5"
-                    aria-hidden="true"
-                  />
+                  END EVENT
                 </button>
               </div>
             )}

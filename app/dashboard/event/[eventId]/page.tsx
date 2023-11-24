@@ -1,10 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useParams, usePathname } from "next/navigation";
+import { Fragment, useEffect, useRef, useState } from "react";
+import { useParams, usePathname, useRouter } from "next/navigation";
+import { Dialog, Transition } from "@headlessui/react";
 import {
   RocketLaunchIcon,
   ArrowRightOnRectangleIcon,
+  CheckIcon,
 } from "@heroicons/react/24/outline";
 
 // Supabase
@@ -35,6 +37,8 @@ const navigation = [
 export default function EventEditorPage() {
   const { eventId } = useParams();
   const pathname = usePathname();
+  const router = useRouter();
+
   const supabase = createClient();
 
   // Navigation
@@ -77,6 +81,10 @@ export default function EventEditorPage() {
   // Display toggles
   const [showLeftSidebar, setShowLeftSidebar] = useState(true);
   const [showRightSidebar, setShowRightSidebar] = useState(true);
+
+  // Modal
+  const [startConfirmShow, setStartConfirmShow] = useState(false);
+  const cancelButtonRef = useRef(null);
 
   const getRounds = async () => {
     const { data, error } = await supabase
@@ -172,6 +180,7 @@ export default function EventEditorPage() {
 
     if (data) {
       setEvent(data[0]);
+      router.push(`/dashboard/event/${event?.id}/responses`);
     } else if (error) {
       console.log(error);
     }
@@ -325,16 +334,18 @@ export default function EventEditorPage() {
           <div className="flex h-16 justify-between">
             <div className="flex">
               <div className="flex flex-shrink-0 items-center">
-                <img
-                  className="block h-8 w-auto lg:hidden"
-                  src="https://tailwindui.com/img/logos/mark.svg?color=amber&shade=600"
-                  alt="Your Company"
-                />
-                <img
-                  className="hidden h-8 w-auto lg:block"
-                  src="https://tailwindui.com/img/logos/mark.svg?color=amber&shade=600"
-                  alt="Your Company"
-                />
+                <a href="/manage/events">
+                  <img
+                    className="block h-8 w-auto lg:hidden"
+                    src="https://tailwindui.com/img/logos/mark.svg?color=amber&shade=600"
+                    alt="Your Company"
+                  />
+                  <img
+                    className="hidden h-8 w-auto lg:block"
+                    src="https://tailwindui.com/img/logos/mark.svg?color=amber&shade=600"
+                    alt="Your Company"
+                  />
+                </a>
               </div>
               <div className="hidden sm:-my-px sm:ml-6 sm:flex sm:space-x-8">
                 {navigation.map((item) => (
@@ -372,7 +383,7 @@ export default function EventEditorPage() {
                       : event?.status === "ONGOING"
                       ? "bg-green-100"
                       : "bg-gray-100",
-                    "inline-flex items-center rounded-full px-2 py-1 text-xs font-medium text-gray-600 ring-1 ring-inset"
+                    "inline-flex items-center rounded-full px-2 mr-3 py-1 text-xs font-medium text-gray-600 ring-1 ring-inset"
                   )}
                 >
                   {event?.status}
@@ -381,7 +392,7 @@ export default function EventEditorPage() {
                 <button
                   type="button"
                   className="inline-flex items-center gap-x-1.5 rounded-md px-2.5 py-1.5 text-sm text-gray-900 hover:text-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
-                  onClick={() => startEvent()}
+                  onClick={() => setStartConfirmShow(true)}
                 >
                   START EVENT
                   <RocketLaunchIcon
@@ -638,6 +649,88 @@ export default function EventEditorPage() {
           <RightSidebar />
         </aside>
       )}
+
+      {/**
+       * Start event confirm modal
+       */}
+      <Transition.Root show={startConfirmShow} as={Fragment}>
+        <Dialog
+          as="div"
+          className="relative z-50"
+          initialFocus={cancelButtonRef}
+          onClose={setStartConfirmShow}
+        >
+          <Transition.Child
+            as={Fragment}
+            enter="ease-out duration-300"
+            enterFrom="opacity-0"
+            enterTo="opacity-100"
+            leave="ease-in duration-200"
+            leaveFrom="opacity-100"
+            leaveTo="opacity-0"
+          >
+            <div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" />
+          </Transition.Child>
+
+          <div className="fixed inset-0 z-10 w-screen overflow-y-auto">
+            <div className="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+              <Transition.Child
+                as={Fragment}
+                enter="ease-out duration-300"
+                enterFrom="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                enterTo="opacity-100 translate-y-0 sm:scale-100"
+                leave="ease-in duration-200"
+                leaveFrom="opacity-100 translate-y-0 sm:scale-100"
+                leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+              >
+                <Dialog.Panel className="relative transform overflow-hidden rounded-lg bg-white px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6">
+                  <div>
+                    <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-green-100">
+                      <CheckIcon
+                        className="h-6 w-6 text-green-600"
+                        aria-hidden="true"
+                      />
+                    </div>
+                    <div className="mt-3 text-center sm:mt-5">
+                      <Dialog.Title
+                        as="h3"
+                        className="text-base font-semibold leading-6 text-gray-900"
+                      >
+                        Confirm event start
+                      </Dialog.Title>
+                      <div className="mt-2">
+                        <p className="text-sm text-gray-500">
+                          Make sure all of your event settings and details are
+                          correct. You will not be able to make any edits once
+                          you start the event.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="mt-5 sm:mt-6 sm:grid sm:grid-flow-row-dense sm:grid-cols-2 sm:gap-3">
+                    <button
+                      type="button"
+                      className="inline-flex w-full justify-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 sm:col-start-2"
+                      onClick={() => startEvent()}
+                    >
+                      Let's go
+                      <RocketLaunchIcon className="h-5 w-5 pl-1 mr-2" />
+                    </button>
+                    <button
+                      type="button"
+                      className="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:col-start-1 sm:mt-0"
+                      onClick={() => setStartConfirmShow(false)}
+                      ref={cancelButtonRef}
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </Dialog.Panel>
+              </Transition.Child>
+            </div>
+          </div>
+        </Dialog>
+      </Transition.Root>
     </>
   );
 }
