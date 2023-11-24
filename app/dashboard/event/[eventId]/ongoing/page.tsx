@@ -1,16 +1,14 @@
 "use client";
 
-import { Fragment, useEffect, useState } from "react";
-import { useParams, usePathname } from "next/navigation";
-import { Disclosure, Menu, Transition } from "@headlessui/react";
+import { useEffect, useState } from "react";
+import { useParams } from "next/navigation";
 import {
-  Bars3Icon,
-  BellIcon,
-  XMarkIcon,
   HomeIcon,
   ChevronRightIcon,
   RocketLaunchIcon,
   ArrowRightOnRectangleIcon,
+  CheckCircleIcon,
+  XCircleIcon,
 } from "@heroicons/react/24/outline";
 
 // Supabase
@@ -26,31 +24,15 @@ function classNames(...classes: any[]) {
   return classes.filter(Boolean).join(" ");
 }
 
-const leftSidebarTabs = [{ name: "Rounds", href: "#", current: true }];
-const rightSidebarTabs = [
-  { name: "Manual", href: "#", current: true },
-  { name: "TriviaAI", href: "#", current: false },
+const leftSidebarTabs = [
+  { name: "Rounds", href: "#", current: true },
+  { name: "Teams", href: "#", current: false },
 ];
-
-const navigation = [
-  { name: "Editor", href: "#", current: true },
-  { name: "Team", href: "#", current: false },
-  { name: "Settings", href: "#", current: false },
-];
+const rightSidebarTabs = [{ name: "Responses", href: "#", current: true }];
 
 export default function EventEditorPage() {
   const { eventId } = useParams();
-  const pathname = usePathname();
   const supabase = createClient();
-
-  // Navigation
-  const navigation = [
-    { name: "Editor", href: `/dashboard/event/${eventId}` },
-    {
-      name: "Settings",
-      href: `/dashboard/event/${eventId}/settings`,
-    },
-  ];
 
   // User
   const [user, setUser] = useState<User | null>(null);
@@ -59,6 +41,10 @@ export default function EventEditorPage() {
   const [event, setEvent] = useState<Tables<"v001_events_stag">>();
   const [eLoading, setELoading] = useState(true);
   const [eError, setEError] = useState<PostgrestError>();
+
+  // Teams
+  const [teams, setTeams] = useState<Tables<"v001_teams_stag">[]>();
+  const [tLoading, setTLoading] = useState(true);
 
   // Rounds
   const [rounds, setRounds] = useState<Tables<"v001_rounds_stag">[]>();
@@ -72,8 +58,15 @@ export default function EventEditorPage() {
   const [questions, setQuestions] = useState<Tables<"v001_questions_stag">[]>();
   const [qLoading, setQLoading] = useState(true);
   const [qError, setQError] = useState<PostgrestError>();
+  const [activeQuestion, setActiveQuestion] =
+    useState<Tables<"v001_questions_stag">>();
   const [addQuestionLoading, setAddQuestionLoading] = useState(false);
   const [questionSlideout, setQuestionSlideout] = useState(false);
+
+  // Responses
+  const [responses, setResponses] = useState<Tables<"v001_responses_stag">[]>();
+  const [rpLoading, setRpLoading] = useState(true);
+  const [rpError, setRpError] = useState<PostgrestError>();
 
   // Notification
   const [notifShow, setNotifShow] = useState(false);
@@ -83,6 +76,81 @@ export default function EventEditorPage() {
   // Display toggles
   const [showLeftSidebar, setShowLeftSidebar] = useState(true);
   const [showRightSidebar, setShowRightSidebar] = useState(true);
+
+  const getResponses = async (defaultQuestionId?: string) => {
+    const questionId = activeQuestion ? activeQuestion.id : defaultQuestionId;
+    console.log(questionId);
+    const { data, error } = await supabase
+      .from("v001_responses_stag")
+      .select()
+      .order("inserted_at")
+      .eq("question_id", questionId);
+
+    if (data) {
+      setResponses(data);
+      setRpLoading(false);
+    }
+  };
+
+  const approveRespose = async (responseId: number, isCorrect: boolean) => {
+    const { error } = await supabase
+      .from("v001_responses_stag")
+      .update({ is_correct: isCorrect })
+      .eq("id", 1);
+
+    console.log(error);
+    // console.log(responseId);
+    // const { data, error } = await supabase
+    //   .from("v001_responses_stag")
+    //   .update({ is_correct: isCorrect })
+    //   .eq("id", responseId)
+    //   .select();
+
+    // console.log(data);
+    // console.log(error);
+
+    // getResponses();
+  };
+
+  const getQuestions = async () => {
+    const { data, error } = await supabase
+      .from("v001_questions_stag")
+      .select()
+      .eq("round_id", activeRound?.id)
+      .eq("owner", user?.id);
+
+    if (data) {
+      setQuestions(data);
+      setActiveQuestion(data[0]);
+      setQLoading(false);
+      console.log(data[0].id);
+      getResponses(data[0].id);
+    }
+  };
+
+  const addQuestion = async (formData: FormData) => {
+    setAddQuestionLoading(true);
+    const { data, error } = await supabase
+      .from("v001_questions_stag")
+      .insert([
+        {
+          question: formData.get("question"),
+          answer: formData.get("answer"),
+          points: formData.get("points"),
+          round_id: activeRound?.id,
+          owner: user?.id,
+        },
+      ])
+      .select();
+
+    if (!error) {
+      setNotifTitle("Question added");
+      setNotifType("success");
+      setNotifShow(true);
+      setQuestionSlideout(false);
+      getQuestions();
+    }
+  };
 
   const getRounds = async () => {
     const { data, error } = await supabase
@@ -96,6 +164,18 @@ export default function EventEditorPage() {
       setRounds(data);
       setActiveRound(data[0]);
       setRLoading(false);
+    }
+  };
+
+  const getTeams = async () => {
+    const { data, error } = await supabase
+      .from("v001_teams_stag")
+      .select()
+      .eq("event_id", eventId);
+
+    if (data) {
+      setTeams(data);
+      setTLoading(false);
     }
   };
 
@@ -127,43 +207,6 @@ export default function EventEditorPage() {
     }
   };
 
-  const getQuestions = async () => {
-    const { data, error } = await supabase
-      .from("v001_questions_stag")
-      .select()
-      .eq("round_id", activeRound?.id)
-      .eq("owner", user?.id);
-
-    if (data) {
-      setQuestions(data);
-      setQLoading(false);
-    }
-  };
-
-  const addQuestion = async (formData: FormData) => {
-    setAddQuestionLoading(true);
-    const { data, error } = await supabase
-      .from("v001_questions_stag")
-      .insert([
-        {
-          question: formData.get("question"),
-          answer: formData.get("answer"),
-          points: formData.get("points"),
-          round_id: activeRound?.id,
-          owner: user?.id,
-        },
-      ])
-      .select();
-
-    if (!error) {
-      setNotifTitle("Question added");
-      setNotifType("success");
-      setNotifShow(true);
-      setQuestionSlideout(false);
-      getQuestions();
-    }
-  };
-
   const getEvent = async () => {
     const { data, error } = await supabase
       .from("v001_events_stag")
@@ -176,21 +219,6 @@ export default function EventEditorPage() {
     }
   };
 
-  const startEvent = async () => {
-    const { data, error } = await supabase
-      .from("v001_events_stag")
-      .update({ status: "ONGOING" })
-      .eq("id", event?.id)
-      .select();
-
-    if (data) {
-      console.log(data);
-      setEvent(data[0]);
-    } else if (error) {
-      console.log(error);
-    }
-  };
-
   useEffect(() => {
     if (activeRound) {
       getQuestions();
@@ -200,6 +228,12 @@ export default function EventEditorPage() {
   useEffect(() => {
     if (user) {
       getRounds();
+    }
+  }, [user]);
+
+  useEffect(() => {
+    if (user) {
+      getTeams();
     }
   }, [user]);
 
@@ -231,69 +265,67 @@ export default function EventEditorPage() {
 
   const TopHeader = () => {
     return (
-      <div className="min-h-full w-full">
-        <div className="mx-auto px-6">
-          <div className="flex h-16 justify-between">
-            <div className="flex">
-              <div className="flex flex-shrink-0 items-center">
-                <img
-                  className="block h-8 w-auto lg:hidden"
-                  src="https://tailwindui.com/img/logos/mark.svg?color=amber&shade=600"
-                  alt="Your Company"
-                />
-                <img
-                  className="hidden h-8 w-auto lg:block"
-                  src="https://tailwindui.com/img/logos/mark.svg?color=amber&shade=600"
-                  alt="Your Company"
-                />
-              </div>
-              <div className="hidden sm:-my-px sm:ml-6 sm:flex sm:space-x-8">
-                {navigation.map((item) => (
+      <div className="flex flex-1 gap-x-4 self-stretch lg:gap-x-6">
+        <div className="relative flex flex-1">
+          <nav className="flex" aria-label="Breadcrumb">
+            <ol role="list" className="flex items-center space-x-4">
+              <li>
+                <div>
                   <a
-                    key={item.name}
-                    href={item.href}
-                    className={classNames(
-                      pathname === item.href
-                        ? "border-primary text-gray-900"
-                        : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700",
-                      "inline-flex items-center border-b-2 px-1 pt-1 text-sm font-medium"
-                    )}
-                    aria-current={pathname === item.href ? "page" : undefined}
+                    href="/dashboard/events"
+                    className="text-gray-900 hover:text-gray-500"
                   >
-                    {item.name}
+                    <HomeIcon
+                      className="h-5 w-5 flex-shrink-0"
+                      aria-hidden="true"
+                    />
+                    <span className="sr-only">Home</span>
                   </a>
-                ))}
-              </div>
-            </div>
-            {event && (
-              <div className="hidden sm:ml-6 sm:flex sm:items-center">
-                <span
-                  className={classNames(
-                    event?.status === "PENDING"
-                      ? "bg-blue-100"
-                      : event?.status === "ONGOING"
-                      ? "bg-green-100"
-                      : "bg-gray-100",
-                    "inline-flex items-center rounded-full px-2 py-1 text-xs font-medium text-gray-600 ring-1 ring-inset"
-                  )}
-                >
-                  {event?.status}
-                </span>
+                </div>
+              </li>
 
-                <button
-                  type="button"
-                  className="inline-flex items-center gap-x-1.5 rounded-md px-2.5 py-1.5 text-sm text-gray-900 hover:text-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
-                  onClick={() => startEvent()}
-                >
-                  START EVENT
-                  <RocketLaunchIcon
-                    className="-mr-0.5 h-5 w-5"
+              <li>
+                <div className="flex items-center">
+                  <ChevronRightIcon
+                    className="h-5 w-5 flex-shrink-0 text-gray-900"
                     aria-hidden="true"
                   />
-                </button>
-              </div>
+                  <a
+                    href={`/dashboard/event/${eventId}`}
+                    className="ml-4 text-sm font-medium text-gray-900 hover:text-gray-700"
+                    aria-current="page"
+                  >
+                    {event ? event.name : "Event"}
+                  </a>
+                </div>
+              </li>
+            </ol>
+          </nav>
+        </div>
+
+        <div className="flex items-center">
+          <span
+            className={classNames(
+              event?.status === "PENDING"
+                ? "bg-blue-50 text-blue-700 ring-blue-700/10"
+                : event?.status === "ONGOING"
+                ? "bg-green-50 text-green-700 ring-green-700/10"
+                : event?.status === "COMPLETE"
+                ? "bg-gray-50 text-gray-700 ring-gray-700/10"
+                : "",
+              "inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ring-1 ring-inset"
             )}
-          </div>
+          >
+            {event?.status}
+          </span>
+
+          <button
+            type="button"
+            className="inline-flex items-center gap-x-1.5 rounded-md px-2.5 py-1.5 text-sm text-gray-900 hover:text-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+          >
+            START EVENT
+            <RocketLaunchIcon className="-mr-0.5 h-5 w-5" aria-hidden="true" />
+          </button>
         </div>
       </div>
     );
@@ -322,17 +354,6 @@ export default function EventEditorPage() {
         </div>
 
         <div className="mx-6 my-3">
-          <div
-            className="-mx-2 space-y-1 mb-2"
-            onClick={() => {
-              setRoundSlideoutOpen(true);
-            }}
-          >
-            <div className="text-gray-900 border-2 border-dashed border-gray-300 hover:border-gray-400 group flex justify-between gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold">
-              <div>Add round</div>
-            </div>
-          </div>
-
           <nav className="flex flex-1 flex-col" aria-label="Sidebar">
             <ul role="list" className="-mx-2 space-y-1">
               {rounds?.map((item) => (
@@ -477,91 +498,57 @@ export default function EventEditorPage() {
           </nav>
         </div>
 
-        <form action={addQuestion}>
-          <div className="space-y-12 px-4 sm:px-6">
-            <div className="pb-12">
-              {/* Question */}
-              <div className="space-y-2 sm:grid sm:grid-cols-3 sm:gap-4 sm:space-y-0 sm:py-5">
-                <div>
-                  <label
-                    htmlFor="question"
-                    className="block text-sm font-medium leading-6 text-gray-900 sm:mt-1.5"
+        <ul role="list" className="divide-y divide-gray-100 px-6">
+          {responses?.map((item) => (
+            <li
+              key={item.id}
+              className="flex items-center justify-between gap-x-6 py-2"
+            >
+              <div className="min-w-0">
+                <div className="flex items-start gap-x-3">
+                  <p className="text-sm font-semibold leading-6 text-gray-900">
+                    {item.submitted_answer}
+                  </p>
+                  <p
+                    className={classNames(
+                      item.is_correct === null
+                        ? "bg-blue-50 text-blue-700 ring-blue-green/10"
+                        : item.is_correct === true
+                        ? "bg-green-50 text-green-700 ring-blue-green/10"
+                        : "bg-red-50 text-red-700 ring-blue-red/10",
+                      "rounded-md whitespace-nowrap mt-0.5 px-1.5 py-0.5 text-xs font-medium ring-1 ring-inset"
+                    )}
                   >
-                    Question <span className="text-red-600">*</span>
-                  </label>
+                    {item.is_correct === null
+                      ? "Pending"
+                      : item.is_correct === true
+                      ? "Correct"
+                      : "Incorrect"}
+                  </p>
                 </div>
-                <div className="sm:col-span-2">
-                  <textarea
-                    required
-                    disabled={addQuestionLoading}
-                    name="question"
-                    id="question"
-                    rows={3}
-                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
-                    defaultValue={""}
-                  />
+                <div className="mt-1 flex items-center gap-x-2 text-xs leading-5 text-gray-500">
+                  <p className="whitespace-nowrap">
+                    {teams?.find((team) => team.id === item.team_id)?.name}
+                  </p>
                 </div>
               </div>
-
-              {/* Answer */}
-              <div className="space-y-2 sm:grid sm:grid-cols-3 sm:gap-4 sm:space-y-0 sm:py-5">
-                <div>
-                  <label
-                    htmlFor="answer"
-                    className="block text-sm font-medium leading-6 text-gray-900 sm:mt-1.5"
-                  >
-                    Answer <span className="text-red-600">*</span>
-                  </label>
-                </div>
-                <div className="sm:col-span-2">
-                  <input
-                    required
-                    disabled={addQuestionLoading}
-                    id="answer"
-                    name="answer"
-                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
-                  />
-                </div>
+              <div className="flex flex-none items-center gap-x-4">
+                <CheckCircleIcon
+                  className="h-5 w-5 text-green-700"
+                  onClick={() => {
+                    approveRespose(item?.id, true);
+                  }}
+                />
+                <XCircleIcon
+                  className="h-5 w-5 text-red-700"
+                  onClick={() => {
+                    approveRespose(item?.id, false);
+                  }}
+                />
               </div>
-
-              {/* Points */}
-              <div className="space-y-2 sm:grid sm:grid-cols-3 sm:gap-4 sm:space-y-0 sm:py-5">
-                <div>
-                  <label
-                    htmlFor="points"
-                    className="block text-sm font-medium leading-6 text-gray-900 sm:mt-1.5"
-                  >
-                    Points <span className="text-red-600">*</span>
-                  </label>
-                </div>
-                <div className="sm:col-span-2">
-                  <input
-                    required
-                    disabled={addQuestionLoading}
-                    type="number"
-                    name="points"
-                    id="points"
-                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
-                    defaultValue={1}
-                  />
-                </div>
-              </div>
-
-              {/* Action buttons */}
-              <div className="flex-shrink-0 py-5">
-                <div className="flex justify-end space-x-3">
-                  <button
-                    disabled={addRoundLoading}
-                    type="submit"
-                    className="inline-flex justify-center rounded-md bg-primary px-3 py-2 text-sm font-semibold text-white hover:bg-primary-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
-                  >
-                    <>Add</>
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </form>
+            </li>
+          ))}
+        </ul>
       </div>
     );
   };
@@ -592,7 +579,7 @@ export default function EventEditorPage() {
       {/**
        * Top header
        */}
-      <div className="fixed top-0 left-0 right-0 z-40 flex h-16 shrink-0 items-center gap-x-4 border-b border-gray-200">
+      <div className="fixed top-0 left-0 right-0 z-40 flex h-16 shrink-0 items-center gap-x-4 border-b border-gray-200 px-4 sm:gap-x-6 sm:px-6 lg:px-8">
         <TopHeader />
       </div>
 
@@ -600,7 +587,7 @@ export default function EventEditorPage() {
        * Left-side column
        */}
       {showLeftSidebar ? (
-        <aside className="fixed bottom-0 left-0 top-16 hidden w-80 overflow-y-auto border-r border-gray-200 xl:block">
+        <aside className="fixed bottom-0 left-16 top-16 hidden w-80 overflow-y-auto border-r border-gray-200 xl:block">
           <LeftSidebar />
         </aside>
       ) : (
@@ -614,9 +601,9 @@ export default function EventEditorPage() {
        */}
       <main
         className={classNames(
-          "fixed pt-16",
-          showLeftSidebar ? "left-80" : "left-0",
-          showRightSidebar ? "right-96" : "right-0"
+          "fixed pt-16 right-1/3",
+          showLeftSidebar ? "left-96" : "left-32",
+          showRightSidebar ? "right-1/2" : "right-0"
         )}
       >
         <MainContent />
@@ -626,7 +613,7 @@ export default function EventEditorPage() {
        * Right-side column
        */}
       {showRightSidebar && (
-        <aside className="fixed bottom-0 right-0 top-16 hidden w-96 overflow-y-auto border-l border-gray-200 xl:block">
+        <aside className="fixed bottom-0 right-0 top-16 hidden w-1/3 overflow-y-auto border-l border-gray-200 xl:block">
           <RightSidebar />
         </aside>
       )}
