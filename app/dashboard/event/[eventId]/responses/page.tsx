@@ -43,7 +43,7 @@ export default function EventResponsesPage() {
   // Navigation
   const navigation = [
     { name: "Responses", href: `/dashboard/event/${eventId}/responses` },
-    { name: "Teams", href: `/dashboard/event/${eventId}/responses/teams` },
+    { name: "Teams", href: `/dashboard/event/${eventId}/teams` },
     {
       name: "Settings",
       href: `/dashboard/event/${eventId}/settings`,
@@ -257,7 +257,7 @@ export default function EventResponsesPage() {
     };
 
     getUser();
-  }, []);
+  });
 
   // useEffect(() => {
   //   messages.map((item) => {
@@ -542,17 +542,14 @@ export default function EventResponsesPage() {
 
   const ResponseItem = ({ item }: { item: Tables<"v001_responses_stag"> }) => {
     return (
-      <li
-        key={item.id}
-        className="flex flex-wrap items-center justify-between gap-x-6 gap-y-4 py-2 sm:flex-nowrap"
-      >
+      <li className="flex flex-wrap items-center justify-between gap-x-6 gap-y-4 py-2 sm:flex-nowrap">
         <div>
           <p className="text-sm font-semibold leading-6 text-gray-900">
             {item.submitted_answer}
           </p>
-          <div className="mt-1 flex items-center gap-x-2 text-xs leading-5 text-gray-500">
+          {/* <div className="mt-1 flex items-center gap-x-2 text-xs leading-5 text-gray-500">
             <p>{item.v001_teams_stag.name}</p>
-          </div>
+          </div> */}
         </div>
         <dl className="flex w-full flex-none justify-between gap-x-8 sm:w-auto">
           <div className="flex -space-x-0.5">
@@ -592,7 +589,7 @@ export default function EventResponsesPage() {
             {responses
               ?.filter((item) => item.is_correct === null)
               .map((item) => (
-                <ResponseItem item={item} />
+                <ResponseItem key={item.id} item={item} />
               ))}
           </ul>
         </div>
@@ -606,7 +603,7 @@ export default function EventResponsesPage() {
             {responses
               ?.filter((item) => item.is_correct === true)
               .map((item) => (
-                <ResponseItem item={item} />
+                <ResponseItem key={item.id} item={item} />
               ))}
           </ul>
         </div>
@@ -620,7 +617,7 @@ export default function EventResponsesPage() {
             {responses
               ?.filter((item) => item.is_correct === false)
               .map((item) => (
-                <ResponseItem item={item} />
+                <ResponseItem key={item.id} item={item} />
               ))}
           </ul>
         </div>

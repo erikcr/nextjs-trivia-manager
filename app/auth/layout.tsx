@@ -28,7 +28,7 @@ export default function AuthLayout({
     };
 
     checkAuth();
-  }, []);
+  });
 
   if (!authenticated)
     return (

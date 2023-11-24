@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { usePathname } from "next/navigation";
 import { Dialog, Switch } from "@headlessui/react";
 import { Bars3Icon } from "@heroicons/react/20/solid";
 import {
@@ -31,6 +32,8 @@ function classNames(...classes: any[]) {
 }
 
 export default function SettingsLayout() {
+  const pathname = usePathname();
+
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [automaticTimezoneEnabled, setAutomaticTimezoneEnabled] =
     useState(true);
@@ -48,7 +51,7 @@ export default function SettingsLayout() {
                 <a
                   href={item.href}
                   className={classNames(
-                    item.current
+                    pathname === item.href
                       ? "bg-gray-50 text-indigo-600"
                       : "text-gray-700 hover:text-indigo-600 hover:bg-gray-50",
                     "group flex gap-x-3 rounded-md py-2 pl-2 pr-3 text-sm leading-6 font-semibold"
@@ -56,7 +59,7 @@ export default function SettingsLayout() {
                 >
                   <item.icon
                     className={classNames(
-                      item.current
+                      pathname === item.href
                         ? "text-indigo-600"
                         : "text-gray-400 group-hover:text-indigo-600",
                       "h-6 w-6 shrink-0"

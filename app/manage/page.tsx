@@ -8,5 +8,5 @@ export default function ManagePage() {
 
   useEffect(() => {
     router.push("/manage/events");
-  }, []);
+  });
 }

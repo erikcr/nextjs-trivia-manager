@@ -8,6 +8,7 @@ import { createClient } from "@/utils/supabase/client";
 
 // Components
 import ThemeSwitcher from "@/components/ThemeSwitcher";
+import Image from "next/image";
 
 const navigation = [
   { name: "Events", href: "/manage/events", display: true },
@@ -48,7 +49,7 @@ export default function ManageLayout({
     };
 
     checkAuth();
-  }, []);
+  });
 
   if (!authenticated)
     return (
@@ -81,13 +82,14 @@ export default function ManageLayout({
             <div className="border-b border-gray-700">
               <div className="flex h-16 items-center justify-between px-4 sm:px-0">
                 <div className="flex items-center">
-                  <div className="flex-shrink-0">
-                    <img
-                      className="h-8 w-8"
+                  {/* <div className="flex-shrink-0">
+                    <Image
+                      width={32}
+                      height={32}
                       src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=500"
                       alt="Your Company"
                     />
-                  </div>
+                  </div> */}
                   <div className="hidden md:block">
                     <div className="ml-10 flex items-baseline space-x-4">
                       {navigation.map((item) => {
@@ -117,7 +119,7 @@ export default function ManageLayout({
                 <div className="hidden md:block">
                   <div className="ml-4 flex items-center md:ml-6">
                     <ThemeSwitcher />
-                    
+
                     <button
                       type="button"
                       className="relative rounded-full text-sm font-medium bg-gray-800 p-1 text-gray-400 hover:text-white"

@@ -1,8 +1,8 @@
-import { NextRequest } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { Message as VercelChatMessage, StreamingTextResponse } from 'ai';
 
 import { ChatOpenAI } from 'langchain/chat_models/openai';
-import { BytesOutputParser, BaseOutputParser } from 'langchain/schema/output_parser';
+import { BytesOutputParser, BaseOutputParser, FormatInstructionsOptions } from 'langchain/schema/output_parser';
 import { PromptTemplate, ChatPromptTemplate } from 'langchain/prompts';
 
 export const runtime = 'edge';
@@ -30,6 +30,12 @@ class OutputParser extends BaseOutputParser<any[]> {
         });
         return finalQas;
     }
+
+    getFormatInstructions(options?: FormatInstructionsOptions | undefined): string {
+        return "return value from getFormatInstructions";
+    }
+
+    lc_namespace: string[] = [];
 }
 
 const TEMPLATE = `You are a pirate named Patchy. All responses must be extremely verbose and in pirate dialect.
@@ -58,51 +64,53 @@ You will then generate three question/answer pairs about that topic. Only return
  * https://js.langchain.com/docs/guides/expression_language/cookbook#prompttemplate--llm--outputparser
  */
 export async function POST(req: NextRequest) {
-    const body = await req.json();
-    const messages = body.messages ?? [];
-    const formattedPreviousMessages = messages.slice(0, -1).map(formatMessage);
-    const currentMessageContent = messages[messages.length - 1].content;
+    //     const body = await req.json();
+    //     const messages = body.messages ?? [];
+    //     const formattedPreviousMessages = messages.slice(0, -1).map(formatMessage);
+    //     const currentMessageContent = messages[messages.length - 1].content;
 
-    const prompt = PromptTemplate.fromTemplate(TriviaQuestionPrompt);
-    /**
-     * See a full list of supported models at:
-     * https://js.langchain.com/docs/modules/model_io/models/
-     */
-    const model = new ChatOpenAI({
-        openAIApiKey: process.env.OPENAI_API_KEY!,
-        temperature: 0.8,
-    });
+    //     const prompt = PromptTemplate.fromTemplate(TriviaQuestionPrompt);
+    //     /**
+    //      * See a full list of supported models at:
+    //      * https://js.langchain.com/docs/modules/model_io/models/
+    //      */
+    //     const model = new ChatOpenAI({
+    //         openAIApiKey: process.env.OPENAI_API_KEY!,
+    //         temperature: 0.8,
+    //     });
 
-    /**
-     * Chat models stream message chunks rather than bytes, so this
-     * output parser handles serialization and encoding.
-     */
-    const outputParser = new OutputParser();
+    //     /**
+    //      * Chat models stream message chunks rather than bytes, so this
+    //      * output parser handles serialization and encoding.
+    //      */
+    //     const outputParser = new OutputParser();
 
-    /*
-     * Can also initialize as:
-     *
-     * import { RunnableSequence } from "langchain/schema/runnable";
-     * const chain = RunnableSequence.from([prompt, model, outputParser]);
-     */
+    //     /*
+    //      * Can also initialize as:
+    //      *
+    //      * import { RunnableSequence } from "langchain/schema/runnable";
+    //      * const chain = RunnableSequence.from([prompt, model, outputParser]);
+    //      */
 
-    const humanTemplate =
-        "Generate questions about {topic}.";
+    //     const humanTemplate =
+    //         "Generate questions about {topic}.";
 
-    const formattedPrompt = await prompt.format({
-        topic: "colorful socks",
-    });
+    //     const formattedPrompt = await prompt.format({
+    //         topic: "colorful socks",
+    //     });
 
-    const chatPrompt = ChatPromptTemplate.fromMessages([
-        ["system", formattedPrompt],
-        ["human", humanTemplate],
-    ]);
+    //     const chatPrompt = ChatPromptTemplate.fromMessages([
+    //         ["system", formattedPrompt],
+    //         ["human", humanTemplate],
+    //     ]);
 
-    const chain = chatPrompt.pipe(model).pipe(outputParser);
+    //     const chain = chatPrompt.pipe(model).pipe(outputParser);
 
-    const result = await chain.invoke({
-        topic: currentMessageContent,
-    });
+    //     const result = await chain.invoke({
+    //         topic: currentMessageContent,
+    //     });
 
-    return new result;
+    //     return result;
+
+    return NextResponse.json({ message: 'Response from LangChain' }, { status: 200 })
 }
