@@ -14,7 +14,7 @@ export default function MagicLinkPage({}: {}) {
       email,
       options: {
         // set this to false if you do not want the user to be automatically signed up
-        emailRedirectTo: "localhost:3000/manage/events",
+        emailRedirectTo: `${process.env.HOSTNAME}/manage/events`,
       },
     });
 
