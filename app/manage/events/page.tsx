@@ -51,7 +51,6 @@ export default function EventsPage() {
   };
 
   const addEvent = async (formData: FormData) => {
-    setAddEventLoading(true);
     const { data, error } = await supabase
       .from("v001_events_stag")
       .insert([
@@ -226,7 +225,10 @@ export default function EventsPage() {
                   <Dialog.Panel className="pointer-events-auto w-screen max-w-2xl">
                     <form
                       className="flex h-full flex-col overflow-y-scroll bg-white shadow-xl"
-                      action={addEvent}
+                      action={(e) => {
+                        setAddEventLoading(true);
+                        addEvent(e);
+                      }}
                     >
                       <div className="flex-1">
                         {/* Header */}
