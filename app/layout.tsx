@@ -21,16 +21,16 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className="h-full">
-      {/* <Provider> */}
-        <body
-          className={classNames(
-            inter.className,
-            "h-full bg-gray-50 dark:bg-gray-700"
-          )}
-        >
-          {children}
-        </body>
-      {/* </Provider> */}
+      <body
+        className={classNames(
+          inter.className,
+          "h-full bg-gray-50 dark:bg-gray-700"
+        )}
+      >
+        {/* <Provider> */}
+          <div>{children}</div>
+        {/* </Provider> */}
+      </body>
     </html>
   );
 }

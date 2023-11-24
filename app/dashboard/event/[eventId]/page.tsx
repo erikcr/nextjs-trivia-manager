@@ -96,6 +96,10 @@ export default function EventEditorPage() {
       setRounds(data);
       setActiveRound(data[0]);
       setRLoading(false);
+
+      if (!data.length) {
+        setQLoading(false);
+      }
     }
   };
 
@@ -183,7 +187,8 @@ export default function EventEditorPage() {
     const { data, error } = await supabase
       .from("v001_events_stag")
       .select()
-      .eq("owner", eventId);
+      .eq("id", eventId)
+      .eq("owner", user?.id);
 
     if (data) {
       setEvent(data[0]);
@@ -229,6 +234,96 @@ export default function EventEditorPage() {
   //   });
   // }, [messages]);
 
+  const QuestionForm = () => {
+    return (
+      <form action={addQuestion}>
+        <div className="space-y-12 px-4 sm:px-6">
+          <div className="pb-12">
+            {/* Question */}
+            <div className="space-y-2 sm:grid sm:grid-cols-3 sm:gap-4 sm:space-y-0 sm:py-5">
+              <div>
+                <label
+                  htmlFor="question"
+                  className="block text-sm font-medium leading-6 text-gray-900 sm:mt-1.5"
+                >
+                  Question <span className="text-red-600">*</span>
+                </label>
+              </div>
+              <div className="sm:col-span-2">
+                <textarea
+                  required
+                  disabled={addQuestionLoading}
+                  name="question"
+                  id="question"
+                  rows={3}
+                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
+                  defaultValue={""}
+                />
+              </div>
+            </div>
+
+            {/* Answer */}
+            <div className="space-y-2 sm:grid sm:grid-cols-3 sm:gap-4 sm:space-y-0 sm:py-5">
+              <div>
+                <label
+                  htmlFor="answer"
+                  className="block text-sm font-medium leading-6 text-gray-900 sm:mt-1.5"
+                >
+                  Answer <span className="text-red-600">*</span>
+                </label>
+              </div>
+              <div className="sm:col-span-2">
+                <input
+                  required
+                  disabled={addQuestionLoading}
+                  id="answer"
+                  name="answer"
+                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
+                />
+              </div>
+            </div>
+
+            {/* Points */}
+            <div className="space-y-2 sm:grid sm:grid-cols-3 sm:gap-4 sm:space-y-0 sm:py-5">
+              <div>
+                <label
+                  htmlFor="points"
+                  className="block text-sm font-medium leading-6 text-gray-900 sm:mt-1.5"
+                >
+                  Points <span className="text-red-600">*</span>
+                </label>
+              </div>
+              <div className="sm:col-span-2">
+                <input
+                  required
+                  disabled={addQuestionLoading}
+                  type="number"
+                  name="points"
+                  id="points"
+                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
+                  defaultValue={1}
+                />
+              </div>
+            </div>
+
+            {/* Action buttons */}
+            <div className="flex-shrink-0 py-5">
+              <div className="flex justify-end space-x-3">
+                <button
+                  disabled={addRoundLoading}
+                  type="submit"
+                  className="inline-flex justify-center rounded-md bg-primary px-3 py-2 text-sm font-semibold text-white hover:bg-primary-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+                >
+                  <>Add</>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </form>
+    );
+  };
+
   const TopHeader = () => {
     return (
       <div className="min-h-full w-full">
@@ -265,9 +360,17 @@ export default function EventEditorPage() {
                 ))}
               </div>
             </div>
+
+            {event && (
+              <div className="flex">
+                <div className="inline-flex items-center px-1 pt-1 font-medium">
+                  {event.name}
+                </div>
+              </div>
+            )}
+
             {event && (
               <div className="hidden sm:ml-6 sm:flex sm:items-center">
-                {event.name}
                 <span
                   className={classNames(
                     event?.status === "PENDING"
@@ -478,91 +581,7 @@ export default function EventEditorPage() {
           </nav>
         </div>
 
-        <form action={addQuestion}>
-          <div className="space-y-12 px-4 sm:px-6">
-            <div className="pb-12">
-              {/* Question */}
-              <div className="space-y-2 sm:grid sm:grid-cols-3 sm:gap-4 sm:space-y-0 sm:py-5">
-                <div>
-                  <label
-                    htmlFor="question"
-                    className="block text-sm font-medium leading-6 text-gray-900 sm:mt-1.5"
-                  >
-                    Question <span className="text-red-600">*</span>
-                  </label>
-                </div>
-                <div className="sm:col-span-2">
-                  <textarea
-                    required
-                    disabled={addQuestionLoading}
-                    name="question"
-                    id="question"
-                    rows={3}
-                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
-                    defaultValue={""}
-                  />
-                </div>
-              </div>
-
-              {/* Answer */}
-              <div className="space-y-2 sm:grid sm:grid-cols-3 sm:gap-4 sm:space-y-0 sm:py-5">
-                <div>
-                  <label
-                    htmlFor="answer"
-                    className="block text-sm font-medium leading-6 text-gray-900 sm:mt-1.5"
-                  >
-                    Answer <span className="text-red-600">*</span>
-                  </label>
-                </div>
-                <div className="sm:col-span-2">
-                  <input
-                    required
-                    disabled={addQuestionLoading}
-                    id="answer"
-                    name="answer"
-                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
-                  />
-                </div>
-              </div>
-
-              {/* Points */}
-              <div className="space-y-2 sm:grid sm:grid-cols-3 sm:gap-4 sm:space-y-0 sm:py-5">
-                <div>
-                  <label
-                    htmlFor="points"
-                    className="block text-sm font-medium leading-6 text-gray-900 sm:mt-1.5"
-                  >
-                    Points <span className="text-red-600">*</span>
-                  </label>
-                </div>
-                <div className="sm:col-span-2">
-                  <input
-                    required
-                    disabled={addQuestionLoading}
-                    type="number"
-                    name="points"
-                    id="points"
-                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
-                    defaultValue={1}
-                  />
-                </div>
-              </div>
-
-              {/* Action buttons */}
-              <div className="flex-shrink-0 py-5">
-                <div className="flex justify-end space-x-3">
-                  <button
-                    disabled={addRoundLoading}
-                    type="submit"
-                    className="inline-flex justify-center rounded-md bg-primary px-3 py-2 text-sm font-semibold text-white hover:bg-primary-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
-                  >
-                    <>Add</>
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </form>
+        <QuestionForm />
       </div>
     );
   };
