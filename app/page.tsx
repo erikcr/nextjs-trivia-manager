@@ -78,7 +78,7 @@ export default function Example() {
               </Link>
             ) : (
               <Link
-                href="/dashboard/events"
+                href="/manage/events"
                 className="text-sm font-semibold leading-6 text-gray-900"
               >
                 Dashboard <span aria-hidden="true">&rarr;</span>
@@ -135,7 +135,7 @@ export default function Example() {
                     </Link>
                   ) : (
                     <Link
-                      href="/dashboard/events"
+                      href="/manage/events"
                       className="-mx-3 block rounded-lg px-3 py-2.5 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50"
                     >
                       Dashboard
@@ -191,7 +191,7 @@ export default function Example() {
             </p>
             <div className="mt-10 flex items-center gap-x-6">
               <a
-                href="/login"
+                href="/auth/login"
                 className="rounded-md bg-indigo-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
               >
                 Get started

@@ -20,7 +20,7 @@ export default function LoginScreen({}: {}) {
       return redirect("/auth/login?message=Could not authenticate user");
     }
 
-    return redirect("/dashboard/events");
+    return redirect("/manage/events");
   };
 
   return (
@@ -100,10 +100,10 @@ export default function LoginScreen({}: {}) {
           <p className="mt-10 text-center text-sm text-gray-500">
             Not a member?{" "}
             <a
-              href="#"
+              href="/auth/signup"
               className="font-semibold leading-6 text-indigo-600 hover:text-indigo-500"
             >
-              Start a 14 day free trial
+              Sign up
             </a>
           </p>
         </div>

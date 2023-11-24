@@ -24,9 +24,7 @@ export default function SignupScreen({}: {}) {
       return redirect("/auth/signup?message=Could not authenticate user");
     }
 
-    return redirect(
-      "/auth/signup?message=Check email to continue sign in process"
-    );
+    return redirect("/manage/events");
   };
 
   return (
@@ -94,6 +92,16 @@ export default function SignupScreen({}: {}) {
               </button>
             </div>
           </form>
+
+          <p className="mt-10 text-center text-sm text-gray-500">
+            Already a memeber?{" "}
+            <a
+              href="/auth/login"
+              className="font-semibold leading-6 text-indigo-600 hover:text-indigo-500"
+            >
+              Login
+            </a>
+          </p>
         </div>
       </div>
     </>

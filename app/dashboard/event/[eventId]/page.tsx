@@ -20,7 +20,7 @@ import { Tables } from "@/types/database.types";
 
 // Components
 import Notification from "@/components/Notification";
-import RoundSlideout from "@/components/RoundSlideout";
+import RoundSlideout from "@/components/slideouts/RoundSlideout";
 
 function classNames(...classes: any[]) {
   return classes.filter(Boolean).join(" ");
@@ -164,30 +164,30 @@ export default function EventEditorPage() {
     }
   };
 
-  const getEvent = async () => {
-    const { data, error } = await supabase
-      .from("v001_events_stag")
-      .select()
-      .eq("owner", user?.id);
-
-    if (data) {
-      setEvent(data[0]);
-      setELoading(false);
-    }
-  };
-
   const startEvent = async () => {
     const { data, error } = await supabase
       .from("v001_events_stag")
       .update({ status: "ONGOING" })
       .eq("id", event?.id)
+      .eq("owner", user?.id)
       .select();
 
     if (data) {
-      console.log(data);
       setEvent(data[0]);
     } else if (error) {
       console.log(error);
+    }
+  };
+
+  const getEvent = async () => {
+    const { data, error } = await supabase
+      .from("v001_events_stag")
+      .select()
+      .eq("owner", eventId);
+
+    if (data) {
+      setEvent(data[0]);
+      setELoading(false);
     }
   };
 
@@ -267,6 +267,7 @@ export default function EventEditorPage() {
             </div>
             {event && (
               <div className="hidden sm:ml-6 sm:flex sm:items-center">
+                {event.name}
                 <span
                   className={classNames(
                     event?.status === "PENDING"
