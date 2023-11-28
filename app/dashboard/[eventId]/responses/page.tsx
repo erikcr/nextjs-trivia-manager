@@ -175,17 +175,6 @@ export default function EventResponsesPage() {
     }
   };
 
-  const approveResponse = async (responseId: number, isCorrect: boolean) => {
-    const { data, error } = await supabase
-      .from("v001_responses_stag")
-      .update({ is_correct: isCorrect })
-      .eq("id", responseId);
-
-    if (!error) {
-      getResponses();
-    }
-  };
-
   const endEvent = async () => {
     const { data, error } = await supabase
       .from("v001_events_stag")
@@ -210,8 +199,14 @@ export default function EventResponsesPage() {
       .eq("owner", user?.id);
 
     if (data) {
-      setEvent(data[0]);
-      setELoading(false);
+      if (data[0].status === "PENDING") {
+        router.push(`/dashboard/${data[0].id}/editor`);
+      } else if (data[0].status === "COMPLETE") {
+        router.push(`/dashboard/${data[0].id}/complete`);
+      } else {
+        setEvent(data[0]);
+        setELoading(false);
+      }
     }
   };
 
@@ -248,287 +243,7 @@ export default function EventResponsesPage() {
     };
 
     getUser();
-  });
-
-  const QuestionForm = () => {
-    return (
-      <form action={addQuestion}>
-        <div className="space-y-12 px-4 sm:px-6">
-          <div className="pb-12">
-            {/* Question */}
-            <div className="space-y-2 sm:grid sm:grid-cols-3 sm:gap-4 sm:space-y-0 sm:py-5">
-              <div>
-                <label
-                  htmlFor="question"
-                  className="block text-sm font-medium leading-6 text-gray-900 sm:mt-1.5"
-                >
-                  Question <span className="text-red-600">*</span>
-                </label>
-              </div>
-              <div className="sm:col-span-2">
-                <textarea
-                  required
-                  disabled={addQuestionLoading}
-                  name="question"
-                  id="question"
-                  rows={3}
-                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
-                  defaultValue={""}
-                />
-              </div>
-            </div>
-
-            {/* Answer */}
-            <div className="space-y-2 sm:grid sm:grid-cols-3 sm:gap-4 sm:space-y-0 sm:py-5">
-              <div>
-                <label
-                  htmlFor="answer"
-                  className="block text-sm font-medium leading-6 text-gray-900 sm:mt-1.5"
-                >
-                  Answer <span className="text-red-600">*</span>
-                </label>
-              </div>
-              <div className="sm:col-span-2">
-                <input
-                  required
-                  disabled={addQuestionLoading}
-                  id="answer"
-                  name="answer"
-                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
-                />
-              </div>
-            </div>
-
-            {/* Points */}
-            <div className="space-y-2 sm:grid sm:grid-cols-3 sm:gap-4 sm:space-y-0 sm:py-5">
-              <div>
-                <label
-                  htmlFor="points"
-                  className="block text-sm font-medium leading-6 text-gray-900 sm:mt-1.5"
-                >
-                  Points <span className="text-red-600">*</span>
-                </label>
-              </div>
-              <div className="sm:col-span-2">
-                <input
-                  required
-                  disabled={addQuestionLoading}
-                  type="number"
-                  name="points"
-                  id="points"
-                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
-                  defaultValue={1}
-                />
-              </div>
-            </div>
-
-            {/* Action buttons */}
-            <div className="flex-shrink-0 py-5">
-              <div className="flex justify-end space-x-3">
-                <button
-                  disabled={addRoundLoading}
-                  type="submit"
-                  className="inline-flex justify-center rounded-md bg-primary px-3 py-2 text-sm font-semibold text-white hover:bg-primary-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
-                >
-                  <>Add</>
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </form>
-    );
-  };
-
-  const LeftSidebar = () => {
-    return (
-      <div className="hidden sm:block">
-        <div className="border-b border-gray-300">
-          <nav className="-mb-px flex space-x-4 px-4 sm:px-6" aria-label="Tabs">
-            {leftSidebarTabs.map((tab) => (
-              <p
-                key={tab.name}
-                className={classNames(
-                  tab.current
-                    ? "border-primary text-primary"
-                    : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700",
-                  "whitespace-nowrap border-b py-4 px-1 text-sm font-medium"
-                )}
-                aria-current={tab.current ? "page" : undefined}
-              >
-                {tab.name}
-              </p>
-            ))}
-          </nav>
-        </div>
-
-        <div className="mx-6 my-3">
-          <nav className="flex flex-1 flex-col" aria-label="Sidebar">
-            <ul role="list" className="-mx-2 space-y-1">
-              {rounds?.map((item) => (
-                <li key={item.id} onClick={() => setActiveRound(item)}>
-                  <div
-                    // href={item.href}
-                    className={classNames(
-                      item.id === activeRound?.id
-                        ? "bg-gray-200 text-primary"
-                        : "text-gray-700 hover:text-primary hover:bg-gray-50",
-                      "group flex gap-x-3 rounded-md p-2 pl-3 text-sm leading-6 font-semibold"
-                    )}
-                  >
-                    {item.name}
-                  </div>
-                </li>
-              ))}
-            </ul>
-          </nav>
-        </div>
-      </div>
-    );
-  };
-
-  const LeftSidebarMin = () => {
-    return (
-      <ArrowRightOnRectangleIcon
-        className="h-7 w-7 flex-shrink-0"
-        onClick={() => setShowLeftSidebar(true)}
-      />
-    );
-  };
-
-  const MainContent = () => {
-    return (
-      <ul role="list" className="divide-y divide-gray-200">
-        {questions?.map((item) => (
-          <li
-            key={item.id}
-            className={classNames(
-              activeQuestion?.id === item.id ? "bg-gray-100" : "",
-              "relative flex justify-between gap-x-6 px-4 py-2 hover:bg-gray-100 sm:px-6"
-            )}
-            onClick={() => setActiveQuestion(item)}
-          >
-            <div className="flex min-w-0 gap-x-4">
-              <div className="min-w-0 flex-auto">
-                <p className="text-sm font-semibold leading-6 text-gray-900">
-                  <span className="absolute inset-x-0 -top-px bottom-0" />
-                  {item.answer}
-                </p>
-                <p className="mt-1 flex text-xs leading-5 text-gray-500">
-                  {item.question}
-                </p>
-              </div>
-            </div>
-            <div className="flex shrink-0 items-center gap-x-4">
-              <div className="hidden sm:flex sm:flex-col sm:items-end">
-                <span
-                  className={classNames(
-                    item.status === "PENDING"
-                      ? "bg-blue-100"
-                      : item.status === "ONGOING"
-                      ? "bg-green-100"
-                      : "bg-gray-100",
-                    "inline-flex items-center rounded-full px-2 py-1 text-xs font-medium text-gray-600 ring-1 ring-inset"
-                  )}
-                >
-                  {item.status}
-                </span>
-              </div>
-              <ChevronRightIcon
-                className="h-5 w-5 flex-none text-gray-400"
-                aria-hidden="true"
-              />
-            </div>
-          </li>
-        ))}
-      </ul>
-    );
-  };
-
-  const ResponseItem = ({ item }: { item: Tables<"v001_responses_stag"> }) => {
-    return (
-      <li className="flex flex-wrap items-center justify-between gap-x-6 gap-y-4 py-2 sm:flex-nowrap">
-        <div>
-          <p className="text-sm font-semibold leading-6 text-gray-900">
-            {item.submitted_answer}
-          </p>
-          {/* <div className="mt-1 flex items-center gap-x-2 text-xs leading-5 text-gray-500">
-            <p>{item.v001_teams_stag.name}</p>
-          </div> */}
-        </div>
-        <dl className="flex w-full flex-none justify-between gap-x-8 sm:w-auto">
-          <div className="flex -space-x-0.5">
-            <dt className="sr-only">Commenters</dt>
-          </div>
-          <div className="flex w-16 gap-x-2.5">
-            <dt>
-              <span className="sr-only">Total comments</span>
-              <CheckCircleIcon
-                className="h-6 w-6 text-green-600"
-                aria-hidden="true"
-                onClick={() => approveResponse(item.id, true)}
-              />
-            </dt>
-            <dd className="text-sm leading-6 text-gray-900">
-              <XCircleIcon
-                className="h-6 w-6 text-red-600"
-                aria-hidden="true"
-                onClick={() => approveResponse(item.id, false)}
-              />
-            </dd>
-          </div>
-        </dl>
-      </li>
-    );
-  };
-
-  const RightSidebar = () => {
-    return (
-      <nav className="h-full overflow-y-auto" aria-label="Directory">
-        <div className="relative">
-          <div className="sticky top-0 z-10 border-y border-b-gray-200 border-t-gray-100 bg-gray-100 px-6 py-1.5 text-sm font-semibold leading-6 text-gray-900">
-            <h3>Pending</h3>
-          </div>
-
-          <ul role="list" className="divide-y divide-gray-100 px-6">
-            {responses
-              ?.filter((item) => item.is_correct === null)
-              .map((item) => (
-                <ResponseItem key={item.id} item={item} />
-              ))}
-          </ul>
-        </div>
-
-        <div className="relative">
-          <div className="sticky top-0 z-10 border-y border-b-gray-200 border-t-gray-100 bg-gray-100 px-6 py-1.5 text-sm font-semibold leading-6 text-gray-900">
-            <h3>Correct</h3>
-          </div>
-
-          <ul role="list" className="divide-y divide-gray-100 px-6">
-            {responses
-              ?.filter((item) => item.is_correct === true)
-              .map((item) => (
-                <ResponseItem key={item.id} item={item} />
-              ))}
-          </ul>
-        </div>
-
-        <div className="relative">
-          <div className="sticky top-0 z-10 border-y border-b-gray-200 border-t-gray-100 bg-gray-100 px-6 py-1.5 text-sm font-semibold leading-6 text-gray-900">
-            <h3>Incorrect</h3>
-          </div>
-
-          <ul role="list" className="divide-y divide-gray-100 px-6">
-            {responses
-              ?.filter((item) => item.is_correct === false)
-              .map((item) => (
-                <ResponseItem key={item.id} item={item} />
-              ))}
-          </ul>
-        </div>
-      </nav>
-    );
-  };
+  }, []);
 
   return (
     <>
@@ -552,23 +267,31 @@ export default function EventResponsesPage() {
       {/**
        * Left-side column
        */}
-      {/* <aside className="fixed left-0 top-16 h-16 right-0 xl:w-16 xl:h-full xl:w-80 overflow-y-auto border-r border-gray-200 xl:block">
-        <LeftSidebar />
-      </aside> */}
+      <aside className="fixed left-0 top-16 h-16 right-0 xl:w-16 xl:h-full xl:w-80 overflow-y-auto border-r border-gray-200 xl:block">
+        <LeftSidebar
+          rounds={rounds}
+          activeRound={activeRound}
+          setActiveRound={setActiveRound}
+        />
+      </aside>
 
       {/**
        * Main content
        */}
-      {/* <main className="fixed pt-32 sm:w-2/3 xl:pt-16 xl:left-80 xl:right-96 xl:w-auto">
-        <MainContent />
-      </main> */}
+      <main className="fixed pt-32 sm:w-2/3 xl:pt-16 xl:left-80 xl:right-96 xl:w-auto">
+        <MainContent
+          questions={questions}
+          activeQuestion={activeQuestion}
+          setActiveQuestion={setActiveQuestion}
+        />
+      </main>
 
       {/**
        * Right-side column
        */}
-      {/* <aside className="fixed bottom-0 right-0 top-16 w-1/3 xl:w-96 overflow-y-auto border-l border-gray-200 xl:block">
-        <RightSidebar />
-      </aside> */}
+      <aside className="fixed bottom-0 right-0 top-16 w-1/3 xl:w-96 overflow-y-auto border-l border-gray-200 xl:block">
+        <RightSidebar responses={responses} getResponses={getResponses} />
+      </aside>
 
       {/**
        * End event confirm modal
@@ -746,5 +469,239 @@ function TopHeader({
         </div>
       </div>
     </div>
+  );
+}
+
+function LeftSidebar({
+  rounds,
+  activeRound,
+  setActiveRound,
+}: {
+  rounds: Tables<"v001_rounds_stag">[] | undefined;
+  activeRound: Tables<"v001_rounds_stag"> | undefined;
+  setActiveRound: Function;
+}) {
+  return (
+    <div className="hidden sm:block">
+      <div className="border-b border-gray-300">
+        <nav className="-mb-px flex space-x-4 px-4 sm:px-6" aria-label="Tabs">
+          {leftSidebarTabs.map((tab) => (
+            <p
+              key={tab.name}
+              className={classNames(
+                tab.current
+                  ? "border-primary text-primary"
+                  : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700",
+                "whitespace-nowrap border-b py-4 px-1 text-sm font-medium"
+              )}
+              aria-current={tab.current ? "page" : undefined}
+            >
+              {tab.name}
+            </p>
+          ))}
+        </nav>
+      </div>
+
+      <div className="mx-6 my-3">
+        <nav className="flex flex-1 flex-col" aria-label="Sidebar">
+          <ul role="list" className="-mx-2 space-y-1">
+            {rounds?.map((item) => (
+              <li key={item.id} onClick={() => setActiveRound(item)}>
+                <div
+                  // href={item.href}
+                  className={classNames(
+                    item.id === activeRound?.id
+                      ? "bg-gray-200 text-primary"
+                      : "text-gray-700 hover:text-primary hover:bg-gray-50",
+                    "group flex gap-x-3 rounded-md p-2 pl-3 text-sm leading-6 font-semibold"
+                  )}
+                >
+                  {item.name}
+                </div>
+              </li>
+            ))}
+          </ul>
+        </nav>
+      </div>
+    </div>
+  );
+}
+
+function MainContent({
+  questions,
+  activeQuestion,
+  setActiveQuestion,
+}: {
+  questions: Tables<"v001_questions_stag">[] | undefined;
+  activeQuestion: Tables<"v001_questions_stag"> | undefined;
+  setActiveQuestion: Function;
+}) {
+  return (
+    <ul role="list" className="divide-y divide-gray-200">
+      {questions?.map((item) => (
+        <li
+          key={item.id}
+          className={classNames(
+            activeQuestion?.id === item.id ? "bg-gray-100" : "",
+            "relative flex justify-between gap-x-6 px-4 py-2 hover:bg-gray-100 sm:px-6"
+          )}
+          onClick={() => setActiveQuestion(item)}
+        >
+          <div className="flex min-w-0 gap-x-4">
+            <div className="min-w-0 flex-auto">
+              <p className="text-sm font-semibold leading-6 text-gray-900">
+                <span className="absolute inset-x-0 -top-px bottom-0" />
+                {item.answer}
+              </p>
+              <p className="mt-1 flex text-xs leading-5 text-gray-500">
+                {item.question}
+              </p>
+            </div>
+          </div>
+          <div className="flex shrink-0 items-center gap-x-4">
+            <div className="hidden sm:flex sm:flex-col sm:items-end">
+              <span
+                className={classNames(
+                  item.status === "PENDING"
+                    ? "bg-blue-100"
+                    : item.status === "ONGOING"
+                    ? "bg-green-100"
+                    : "bg-gray-100",
+                  "inline-flex items-center rounded-full px-2 py-1 text-xs font-medium text-gray-600 ring-1 ring-inset"
+                )}
+              >
+                {item.status}
+              </span>
+            </div>
+            <ChevronRightIcon
+              className="h-5 w-5 flex-none text-gray-400"
+              aria-hidden="true"
+            />
+          </div>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+function RightSidebar({
+  responses,
+  getResponses,
+}: {
+  responses: Tables<"v001_responses_stag">[] | undefined;
+  getResponses: Function;
+}) {
+  return (
+    <nav className="h-full overflow-y-auto" aria-label="Directory">
+      <div className="relative">
+        <div className="sticky top-0 z-10 border-y border-b-gray-200 border-t-gray-100 bg-gray-100 px-6 py-1.5 text-sm font-semibold leading-6 text-gray-900">
+          <h3>Pending</h3>
+        </div>
+
+        <ul role="list" className="divide-y divide-gray-100 px-6">
+          {responses
+            ?.filter((item) => item.is_correct === null)
+            .map((item) => (
+              <ResponseItem
+                key={item.id}
+                item={item}
+                getResponses={getResponses}
+              />
+            ))}
+        </ul>
+      </div>
+
+      <div className="relative">
+        <div className="sticky top-0 z-10 border-y border-b-gray-200 border-t-gray-100 bg-gray-100 px-6 py-1.5 text-sm font-semibold leading-6 text-gray-900">
+          <h3>Correct</h3>
+        </div>
+
+        <ul role="list" className="divide-y divide-gray-100 px-6">
+          {responses
+            ?.filter((item) => item.is_correct === true)
+            .map((item) => (
+              <ResponseItem
+                key={item.id}
+                item={item}
+                getResponses={getResponses}
+              />
+            ))}
+        </ul>
+      </div>
+
+      <div className="relative">
+        <div className="sticky top-0 z-10 border-y border-b-gray-200 border-t-gray-100 bg-gray-100 px-6 py-1.5 text-sm font-semibold leading-6 text-gray-900">
+          <h3>Incorrect</h3>
+        </div>
+
+        <ul role="list" className="divide-y divide-gray-100 px-6">
+          {responses
+            ?.filter((item) => item.is_correct === false)
+            .map((item) => (
+              <ResponseItem
+                key={item.id}
+                item={item}
+                getResponses={getResponses}
+              />
+            ))}
+        </ul>
+      </div>
+    </nav>
+  );
+}
+
+function ResponseItem({
+  item,
+  getResponses,
+}: {
+  item: Tables<"v001_responses_stag">;
+  getResponses: Function;
+}) {
+  const supabase = createClient();
+
+  const approveResponse = async (responseId: number, isCorrect: boolean) => {
+    const { data, error } = await supabase
+      .from("v001_responses_stag")
+      .update({ is_correct: isCorrect })
+      .eq("id", responseId);
+
+    if (!error) {
+      getResponses();
+    }
+  };
+
+  return (
+    <li className="flex flex-wrap items-center justify-between gap-x-6 gap-y-4 py-2 sm:flex-nowrap">
+      <div>
+        <p className="text-sm font-semibold leading-6 text-gray-900">
+          {item.submitted_answer}
+        </p>
+        {/* <div className="mt-1 flex items-center gap-x-2 text-xs leading-5 text-gray-500">
+          <p>{item.v001_teams_stag.name}</p>
+        </div> */}
+      </div>
+      <dl className="flex w-full flex-none justify-between gap-x-8 sm:w-auto">
+        <div className="flex -space-x-0.5">
+          <dt className="sr-only">Commenters</dt>
+        </div>
+        <div className="flex w-16 gap-x-2.5">
+          <dt>
+            <span className="sr-only">Total comments</span>
+            <CheckCircleIcon
+              className="h-6 w-6 text-green-600"
+              aria-hidden="true"
+              onClick={() => approveResponse(item.id, true)}
+            />
+          </dt>
+          <dd className="text-sm leading-6 text-gray-900">
+            <XCircleIcon
+              className="h-6 w-6 text-red-600"
+              aria-hidden="true"
+              onClick={() => approveResponse(item.id, false)}
+            />
+          </dd>
+        </div>
+      </dl>
+    </li>
   );
 }

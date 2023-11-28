@@ -149,8 +149,14 @@ export default function EditorByIdPage() {
       .eq("owner", user?.id);
 
     if (data) {
-      setEvent(data[0]);
-      setELoading(false);
+      if (data[0].status === "ONGOING") {
+        router.push(`/dashboard/${data[0].id}/responses`);
+      } else if (data[0].status === "COMPLETE") {
+        router.push(`/dashboard/${data[0].id}/complete`);
+      } else {
+        setEvent(data[0]);
+        setELoading(false);
+      }
     }
   };
 
@@ -162,14 +168,12 @@ export default function EditorByIdPage() {
 
   useEffect(() => {
     if (user) {
-      console.log("get rounds");
       getRounds();
     }
   }, [user]);
 
   useEffect(() => {
     if (user) {
-      console.log("get event");
       getEvent();
     }
   }, [user]);
