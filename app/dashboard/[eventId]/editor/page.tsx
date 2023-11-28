@@ -581,7 +581,7 @@ function RightSidebar({
   activeRound,
   getQuestions,
 }: {
-  user: User | undefined;
+  user: User | null;
   activeRound: Tables<"v001_rounds_stag"> | undefined;
   getQuestions: Function;
 }) {
