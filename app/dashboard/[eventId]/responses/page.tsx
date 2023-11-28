@@ -2,6 +2,7 @@
 
 import { Fragment, useEffect, useRef, useState } from "react";
 import { useParams, usePathname, useRouter } from "next/navigation";
+import Image from "next/image";
 import { Dialog, Transition } from "@headlessui/react";
 import {
   ChevronRightIcon,
@@ -10,7 +11,10 @@ import {
   CheckCircleIcon,
   XCircleIcon,
   CheckIcon,
+  Bars3Icon,
 } from "@heroicons/react/24/outline";
+
+import logoBrainyBrawls from "@/public/logos/brainybrawls.svg";
 
 // Supabase
 import { PostgrestError, User } from "@supabase/supabase-js";
@@ -98,68 +102,27 @@ export default function EventResponsesPage() {
     }
   };
 
-  const addRound = async (formData: FormData) => {
-    setAddRoundLoading(true);
-    const { data, error } = await supabase
-      .from("v001_rounds_stag")
-      .insert([
-        {
-          name: formData.get("round-name"),
-          description: formData.get("round-description"),
-          order_num: rounds?.length,
-          event_id: eventId,
-          owner: user?.id,
-        },
-      ])
-      .select();
-
-    if (!error) {
-      getRounds();
-      setNotifTitle("Round added");
-      setNotifType("success");
-      setNotifShow(true);
-      setRoundSlideoutOpen(false);
-      setAddRoundLoading(false);
-    } else {
-      setRError(error);
-    }
-  };
-
   const getQuestions = async () => {
     const { data, error } = await supabase
       .from("v001_questions_stag")
       .select()
+      .order("id")
       .eq("round_id", activeRound?.id)
       .eq("owner", user?.id);
 
     if (data) {
       setQuestions(data);
-      setActiveQuestion(data[0]);
+      setActiveQuestion(data[data.length - 1]);
+
+      const firstPending = data.find((item) => item.status === "PENDING");
+      if (firstPending) {
+        setActiveQuestion(firstPending);
+      }
+      if (!firstPending) {
+        const firstOngoing = data.find((item) => item.status === "ONGOING");
+        setActiveQuestion(firstOngoing);
+      }
       setQLoading(false);
-    }
-  };
-
-  const addQuestion = async (formData: FormData) => {
-    setAddQuestionLoading(true);
-    const { data, error } = await supabase
-      .from("v001_questions_stag")
-      .insert([
-        {
-          question: formData.get("question"),
-          answer: formData.get("answer"),
-          points: formData.get("points"),
-          round_id: activeRound?.id,
-          owner: user?.id,
-        },
-      ])
-      .select();
-
-    if (!error) {
-      setNotifTitle("Question added");
-      setNotifType("success");
-      setNotifShow(true);
-      setQuestionSlideout(false);
-      getQuestions();
     }
   };
 
@@ -290,7 +253,13 @@ export default function EventResponsesPage() {
        * Right-side column
        */}
       <aside className="fixed bottom-0 right-0 top-16 w-1/3 xl:w-96 overflow-y-auto border-l border-gray-200 xl:block">
-        <RightSidebar responses={responses} getResponses={getResponses} />
+        <RightSidebar
+          activeQuestion={activeQuestion}
+          setActiveQuestion={setActiveQuestion}
+          getQuestions={getQuestions}
+          responses={responses}
+          getResponses={getResponses}
+        />
       </aside>
 
       {/**
@@ -299,7 +268,7 @@ export default function EventResponsesPage() {
       <Transition.Root show={endConfirmShow} as={Fragment}>
         <Dialog
           as="div"
-          className="relative"
+          className="relative z-50"
           initialFocus={cancelButtonRef}
           onClose={setEndConfirmShow}
         >
@@ -356,7 +325,7 @@ export default function EventResponsesPage() {
                       className="inline-flex w-full justify-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 sm:col-start-2"
                       onClick={() => endEvent()}
                     >
-                      Event is over
+                      Complete event
                     </button>
                     <button
                       type="button"
@@ -389,61 +358,61 @@ function TopHeader({
   // Navigation
   const navigation = [
     { name: "Responses", href: `/dashboard/${event?.id}/responses` },
-    { name: "Teams", href: `/dashboard/${event?.id}/teams` },
-    {
-      name: "Settings",
-      href: `/dashboard/${event?.id}/settings`,
-    },
+    // { name: "Teams", href: `/dashboard/${event?.id}/teams` },
+    // {
+    //   name: "Settings",
+    //   href: `/dashboard/${event?.id}/settings`,
+    // },
   ];
 
   return (
-    <div className="min-h-full w-full">
-      <div className="mx-auto px-6">
-        <div className="flex h-16 justify-between">
-          <div className="flex">
-            <div className="flex flex-shrink-0 items-center">
-              <a href="/manage/events">
-                <img
-                  className="block h-8 w-auto lg:hidden"
-                  src="https://tailwindui.com/img/logos/mark.svg?color=amber&shade=600"
-                  alt="Your Company"
-                />
-                <img
-                  className="hidden h-8 w-auto lg:block"
-                  src="https://tailwindui.com/img/logos/mark.svg?color=amber&shade=600"
-                  alt="Your Company"
-                />
-              </a>
-            </div>
-            <div className="hidden sm:-my-px sm:ml-6 sm:flex sm:space-x-8">
-              {navigation.map((item) => (
-                <a
-                  key={item.name}
-                  href={item.href}
-                  className={classNames(
-                    pathname === item.href
-                      ? "border-primary text-gray-900"
-                      : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700",
-                    "inline-flex items-center border-b-2 px-1 pt-1 text-sm font-medium"
-                  )}
-                  aria-current={pathname === item.href ? "page" : undefined}
-                >
-                  {item.name}
-                </a>
-              ))}
-            </div>
+    <div className="w-full">
+      <div className="mx-auto px-4">
+        <nav
+          className="mx-auto flex items-center justify-between p-6 lg:px-8"
+          aria-label="Global"
+        >
+          <div className="flex lg:flex-1">
+            <a href="/manage/events" className="-m-1.5 p-1.5">
+              <span className="sr-only">Next.js Trivia Manager</span>
+              <Image
+                src={logoBrainyBrawls}
+                alt="Next.js Trivia Manager"
+                className="h-8 w-8"
+                unoptimized
+              />
+            </a>
+
+            {/* <p>{event?.name}</p> */}
           </div>
 
-          {event && (
-            <div className="flex">
-              <div className="inline-flex items-center px-1 pt-1 font-medium">
-                {event.name}
-              </div>
-            </div>
-          )}
+          <div className="flex lg:hidden">
+            <button
+              type="button"
+              className="-m-2.5 inline-flex items-center justify-center rounded-md p-2.5 text-gray-700"
+            >
+              <span className="sr-only">Open main menu</span>
+              <Bars3Icon className="h-6 w-6" aria-hidden="true" />
+            </button>
+          </div>
 
-          {event && (
-            <div className="hidden sm:ml-6 sm:flex sm:items-center">
+          <div className="hidden lg:flex lg:gap-x-12">
+            {navigation.map((item) => (
+              <a
+                key={item.name}
+                href={item.href}
+                className={classNames(
+                  pathname === item.href ? "text-primary" : "",
+                  "text-sm font-semibold leading-6 text-gray-900"
+                )}
+              >
+                {item.name}
+              </a>
+            ))}
+          </div>
+
+          <div className="hidden lg:flex lg:flex-1 lg:justify-end">
+            {event !== undefined && (
               <span
                 className={classNames(
                   event?.status === "PENDING"
@@ -456,17 +425,18 @@ function TopHeader({
               >
                 {event?.status}
               </span>
+            )}
 
-              <button
-                type="button"
-                className="inline-flex items-center gap-x-1.5 rounded-md px-2.5 py-1.5 text-sm text-gray-900 hover:text-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
-                onClick={() => setEndConfirmShow(true)}
-              >
-                END EVENT
-              </button>
-            </div>
-          )}
-        </div>
+            <button
+              type="button"
+              disabled={event !== undefined}
+              className="inline-flex items-center gap-x-1.5 rounded-md px-2.5 py-1.5 text-sm text-gray-900 hover:text-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+              onClick={() => setEndConfirmShow(true)}
+            >
+              END EVENT
+            </button>
+          </div>
+        </nav>
       </div>
     </div>
   );
@@ -483,25 +453,6 @@ function LeftSidebar({
 }) {
   return (
     <div className="hidden sm:block">
-      <div className="border-b border-gray-300">
-        <nav className="-mb-px flex space-x-4 px-4 sm:px-6" aria-label="Tabs">
-          {leftSidebarTabs.map((tab) => (
-            <p
-              key={tab.name}
-              className={classNames(
-                tab.current
-                  ? "border-primary text-primary"
-                  : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700",
-                "whitespace-nowrap border-b py-4 px-1 text-sm font-medium"
-              )}
-              aria-current={tab.current ? "page" : undefined}
-            >
-              {tab.name}
-            </p>
-          ))}
-        </nav>
-      </div>
-
       <div className="mx-6 my-3">
         <nav className="flex flex-1 flex-col" aria-label="Sidebar">
           <ul role="list" className="-mx-2 space-y-1">
@@ -512,7 +463,7 @@ function LeftSidebar({
                   className={classNames(
                     item.id === activeRound?.id
                       ? "bg-gray-200 text-primary"
-                      : "text-gray-700 hover:text-primary hover:bg-gray-50",
+                      : "text-gray-700 hover:text-primary hover:bg-gray-100",
                     "group flex gap-x-3 rounded-md p-2 pl-3 text-sm leading-6 font-semibold"
                   )}
                 >
@@ -537,116 +488,185 @@ function MainContent({
   setActiveQuestion: Function;
 }) {
   return (
-    <ul role="list" className="divide-y divide-gray-200">
-      {questions?.map((item) => (
-        <li
-          key={item.id}
-          className={classNames(
-            activeQuestion?.id === item.id ? "bg-gray-100" : "",
-            "relative flex justify-between gap-x-6 px-4 py-2 hover:bg-gray-100 sm:px-6"
-          )}
-          onClick={() => setActiveQuestion(item)}
-        >
-          <div className="flex min-w-0 gap-x-4">
-            <div className="min-w-0 flex-auto">
-              <p className="text-sm font-semibold leading-6 text-gray-900">
-                <span className="absolute inset-x-0 -top-px bottom-0" />
-                {item.answer}
-              </p>
-              <p className="mt-1 flex text-xs leading-5 text-gray-500">
-                {item.question}
-              </p>
+    <div className="hidden sm:block">
+      <ul role="list" className="border-b divide-y divide-gray-200">
+        {questions?.map((item) => (
+          <li
+            key={item.id}
+            className={classNames(
+              activeQuestion?.id === item.id ? "bg-gray-100" : "",
+              "relative flex justify-between gap-x-6 px-4 py-2 hover:bg-gray-100 sm:px-6"
+            )}
+            onClick={() => setActiveQuestion(item)}
+          >
+            <div className="flex min-w-0 gap-x-4">
+              <div className="min-w-0 flex-auto">
+                <p className="text-sm font-semibold leading-6 text-gray-900">
+                  <span className="absolute inset-x-0 -top-px bottom-0" />
+                  {item.answer}
+                </p>
+                <p className="mt-1 flex text-xs leading-5 text-gray-500">
+                  {item.question}
+                </p>
+              </div>
             </div>
-          </div>
-          <div className="flex shrink-0 items-center gap-x-4">
-            <div className="hidden sm:flex sm:flex-col sm:items-end">
-              <span
-                className={classNames(
-                  item.status === "PENDING"
-                    ? "bg-blue-100"
-                    : item.status === "ONGOING"
-                    ? "bg-green-100"
-                    : "bg-gray-100",
-                  "inline-flex items-center rounded-full px-2 py-1 text-xs font-medium text-gray-600 ring-1 ring-inset"
-                )}
-              >
-                {item.status}
-              </span>
+            <div className="flex shrink-0 items-center gap-x-4">
+              <div className="hidden sm:flex sm:flex-col sm:items-end">
+                <span
+                  className={classNames(
+                    item.status === "ONGOING"
+                      ? "bg-green-100"
+                      : item.status === "PENDING"
+                      ? "bg-blue-100"
+                      : "bg-gray-100",
+                    "inline-flex items-center rounded-full px-2 py-1 text-xs font-medium text-gray-600 ring-1 ring-inset"
+                  )}
+                >
+                  {item.status}
+                </span>
+              </div>
             </div>
-            <ChevronRightIcon
-              className="h-5 w-5 flex-none text-gray-400"
-              aria-hidden="true"
-            />
-          </div>
-        </li>
-      ))}
-    </ul>
+          </li>
+        ))}
+      </ul>
+    </div>
   );
 }
 
 function RightSidebar({
+  activeQuestion,
+  getQuestions,
   responses,
   getResponses,
 }: {
+  activeQuestion: Tables<"v001_questions_stag"> | undefined;
+  setActiveQuestion: Function;
+  getQuestions: Function;
   responses: Tables<"v001_responses_stag">[] | undefined;
   getResponses: Function;
 }) {
+  const supabase = createClient();
+
+  const updateQuestionOngoing = async () => {
+    const { data, error } = await supabase
+      .from("v001_questions_stag")
+      .update({ status: "ONGOING" })
+      .eq("id", activeQuestion?.id)
+      .select();
+
+    if (data) {
+      getQuestions();
+    } else if (error) {
+      console.log(error);
+    }
+  };
+
+  const activateNextQuestion = async () => {
+    const { data, error } = await supabase
+      .from("v001_questions_stag")
+      .update({ status: "COMPLETE" })
+      .eq("id", activeQuestion?.id)
+      .select();
+
+    if (data) {
+      getQuestions();
+    } else if (error) {
+      console.log(error);
+    }
+  };
+
+  if (!activeQuestion) {
+    return (
+      <div>
+        <nav className="-mb-px flex justify-center pt-8 space-x-4 px-4 sm:px-6">
+          <p>Select a question.</p>
+        </nav>
+      </div>
+    );
+  }
+
   return (
-    <nav className="h-full overflow-y-auto" aria-label="Directory">
-      <div className="relative">
-        <div className="sticky top-0 z-10 border-y border-b-gray-200 border-t-gray-100 bg-gray-100 px-6 py-1.5 text-sm font-semibold leading-6 text-gray-900">
-          <h3>Pending</h3>
-        </div>
-
-        <ul role="list" className="divide-y divide-gray-100 px-6">
-          {responses
-            ?.filter((item) => item.is_correct === null)
-            .map((item) => (
-              <ResponseItem
-                key={item.id}
-                item={item}
-                getResponses={getResponses}
-              />
-            ))}
-        </ul>
+    <div className="hidden sm:block">
+      <div className="border-b border-gray-300">
+        <nav className="-mb-px flex justify-end space-x-4 px-4 sm:px-6">
+          {activeQuestion?.status === "COMPLETE" ? (
+            <p className="hover:text-primary py-4 px-1 text-sm font-medium">
+              Submissions closed
+            </p>
+          ) : activeQuestion?.status === "ONGOING" ? (
+            <button
+              className="py-4 px-1 text-sm font-medium"
+              onClick={activateNextQuestion}
+            >
+              Close question
+            </button>
+          ) : (
+            <button
+              className="py-4 px-1 text-sm font-medium"
+              onClick={updateQuestionOngoing}
+            >
+              Activate question
+            </button>
+          )}
+        </nav>
       </div>
 
-      <div className="relative">
-        <div className="sticky top-0 z-10 border-y border-b-gray-200 border-t-gray-100 bg-gray-100 px-6 py-1.5 text-sm font-semibold leading-6 text-gray-900">
-          <h3>Correct</h3>
+      <div className="h-full overflow-y-auto" aria-label="Responses">
+        <div className="relative">
+          <div className="sticky top-0 z-10 border-y border-b-gray-200 border-t-gray-100 bg-gray-100 px-6 py-1.5 text-sm font-semibold leading-6 text-gray-900">
+            <h3>Pending</h3>
+          </div>
+
+          <ul role="list" className="divide-y divide-gray-100 px-6">
+            {responses
+              ?.filter((item) => item.is_correct === null)
+              .map((item) => (
+                <ResponseItem
+                  key={item.id}
+                  item={item}
+                  getResponses={getResponses}
+                />
+              ))}
+          </ul>
         </div>
 
-        <ul role="list" className="divide-y divide-gray-100 px-6">
-          {responses
-            ?.filter((item) => item.is_correct === true)
-            .map((item) => (
-              <ResponseItem
-                key={item.id}
-                item={item}
-                getResponses={getResponses}
-              />
-            ))}
-        </ul>
-      </div>
+        <div className="relative">
+          <div className="sticky top-0 z-10 border-y border-b-gray-200 border-t-gray-100 bg-gray-100 px-6 py-1.5 text-sm font-semibold leading-6 text-gray-900">
+            <h3>Correct</h3>
+          </div>
 
-      <div className="relative">
-        <div className="sticky top-0 z-10 border-y border-b-gray-200 border-t-gray-100 bg-gray-100 px-6 py-1.5 text-sm font-semibold leading-6 text-gray-900">
-          <h3>Incorrect</h3>
+          <ul role="list" className="divide-y divide-gray-100 px-6">
+            {responses
+              ?.filter((item) => item.is_correct === true)
+              .map((item) => (
+                <ResponseItem
+                  key={item.id}
+                  item={item}
+                  getResponses={getResponses}
+                />
+              ))}
+          </ul>
         </div>
 
-        <ul role="list" className="divide-y divide-gray-100 px-6">
-          {responses
-            ?.filter((item) => item.is_correct === false)
-            .map((item) => (
-              <ResponseItem
-                key={item.id}
-                item={item}
-                getResponses={getResponses}
-              />
-            ))}
-        </ul>
+        <div className="relative">
+          <div className="sticky top-0 z-10 border-y border-b-gray-200 border-t-gray-100 bg-gray-100 px-6 py-1.5 text-sm font-semibold leading-6 text-gray-900">
+            <h3>Incorrect</h3>
+          </div>
+
+          <ul role="list" className="divide-y divide-gray-100 px-6">
+            {responses
+              ?.filter((item) => item.is_correct === false)
+              .map((item) => (
+                <ResponseItem
+                  key={item.id}
+                  item={item}
+                  getResponses={getResponses}
+                />
+              ))}
+          </ul>
+        </div>
       </div>
-    </nav>
+    </div>
   );
 }
 
