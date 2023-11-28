@@ -156,7 +156,7 @@ export default function EventsPage() {
                   ? `/dashboard/${item.id}/editor`
                   : item.status === "ONGOING"
                   ? `/dashboard/${item.id}/responses`
-                  : ""
+                  : `/dashboard/${item.id}/complete`
               }
             >
               <li
@@ -167,10 +167,18 @@ export default function EventsPage() {
                   <div className="text-sm font-medium leading-6 text-gray-900 dark:text-gray-200">
                     {item.name}
                   </div>
-                  <ChevronRightIcon
-                    className="h-5 w-5 relative ml-auto text-gray-400 dark:text-gray-200"
-                    aria-hidden="true"
-                  />
+                  <span
+                    className={classNames(
+                      item?.status === "PENDING"
+                        ? "bg-blue-100"
+                        : item?.status === "ONGOING"
+                        ? "bg-green-100"
+                        : "bg-gray-100",
+                      "inline-flex items-center rounded-full px-2 mr-3 py-1 text-xs font-medium text-gray-600 ring-1 ring-inset"
+                    )}
+                  >
+                    {item.status}
+                  </span>
                 </div>
                 <dl className="-my-3 divide-y divide-gray-100 dark:divide-gray-600 px-6 py-4 text-sm leading-6">
                   <div className="flex justify-between gap-x-4 py-3">

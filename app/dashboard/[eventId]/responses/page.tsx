@@ -1,13 +1,15 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useParams, usePathname } from "next/navigation";
+import { Fragment, useEffect, useRef, useState } from "react";
+import { useParams, usePathname, useRouter } from "next/navigation";
+import { Dialog, Transition } from "@headlessui/react";
 import {
   ChevronRightIcon,
   RocketLaunchIcon,
   ArrowRightOnRectangleIcon,
   CheckCircleIcon,
   XCircleIcon,
+  CheckIcon,
 } from "@heroicons/react/24/outline";
 
 // Supabase
@@ -17,7 +19,6 @@ import { Tables } from "@/types/database.types";
 
 // Components
 import Notification from "@/components/Notification";
-import RoundSlideout from "@/components/slideouts/RoundSlideout";
 
 function classNames(...classes: any[]) {
   return classes.filter(Boolean).join(" ");
@@ -29,26 +30,11 @@ const rightSidebarTabs = [
   { name: "TriviaAI", href: "#", current: false },
 ];
 
-const navigation = [
-  { name: "Editor", href: "#", current: true },
-  { name: "Team", href: "#", current: false },
-  { name: "Settings", href: "#", current: false },
-];
-
 export default function EventResponsesPage() {
   const { eventId } = useParams();
-  const pathname = usePathname();
-  const supabase = createClient();
+  const router = useRouter();
 
-  // Navigation
-  const navigation = [
-    { name: "Responses", href: `/dashboard/event/${eventId}/responses` },
-    { name: "Teams", href: `/dashboard/event/${eventId}/teams` },
-    {
-      name: "Settings",
-      href: `/dashboard/event/${eventId}/settings`,
-    },
-  ];
+  const supabase = createClient();
 
   // User
   const [user, setUser] = useState<User | null>(null);
@@ -88,6 +74,10 @@ export default function EventResponsesPage() {
   // Display toggles
   const [showLeftSidebar, setShowLeftSidebar] = useState(true);
   const [showRightSidebar, setShowRightSidebar] = useState(true);
+
+  // Modal
+  const [endConfirmShow, setEndConfirmShow] = useState(true);
+  const cancelButtonRef = useRef(null);
 
   const getRounds = async () => {
     const { data, error } = await supabase
@@ -196,16 +186,17 @@ export default function EventResponsesPage() {
     }
   };
 
-  const startEvent = async () => {
+  const endEvent = async () => {
     const { data, error } = await supabase
       .from("v001_events_stag")
-      .update({ status: "ONGOING" })
+      .update({ status: "COMPLETE" })
       .eq("id", event?.id)
       .eq("owner", user?.id)
       .select();
 
     if (data) {
       setEvent(data[0]);
+      router.push(`/dashboard/${event?.id}/complete`);
     } else if (error) {
       console.log(error);
     }
@@ -258,15 +249,6 @@ export default function EventResponsesPage() {
 
     getUser();
   });
-
-  // useEffect(() => {
-  //   messages.map((item) => {
-  //     if (item.role === "assistant") {
-  //       let content = JSON.parse(item.content);
-  //       setResponse(content);
-  //     }
-  //   });
-  // }, [messages]);
 
   const QuestionForm = () => {
     return (
@@ -355,83 +337,6 @@ export default function EventResponsesPage() {
           </div>
         </div>
       </form>
-    );
-  };
-
-  const TopHeader = () => {
-    return (
-      <div className="min-h-full w-full">
-        <div className="mx-auto px-6">
-          <div className="flex h-16 justify-between">
-            <div className="flex">
-              <div className="flex flex-shrink-0 items-center">
-                <a href="/manage/events">
-                  <img
-                    className="block h-8 w-auto lg:hidden"
-                    src="https://tailwindui.com/img/logos/mark.svg?color=amber&shade=600"
-                    alt="Your Company"
-                  />
-                  <img
-                    className="hidden h-8 w-auto lg:block"
-                    src="https://tailwindui.com/img/logos/mark.svg?color=amber&shade=600"
-                    alt="Your Company"
-                  />
-                </a>
-              </div>
-              <div className="hidden sm:-my-px sm:ml-6 sm:flex sm:space-x-8">
-                {navigation.map((item) => (
-                  <a
-                    key={item.name}
-                    href={item.href}
-                    className={classNames(
-                      pathname === item.href
-                        ? "border-primary text-gray-900"
-                        : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700",
-                      "inline-flex items-center border-b-2 px-1 pt-1 text-sm font-medium"
-                    )}
-                    aria-current={pathname === item.href ? "page" : undefined}
-                  >
-                    {item.name}
-                  </a>
-                ))}
-              </div>
-            </div>
-
-            {event && (
-              <div className="flex">
-                <div className="inline-flex items-center px-1 pt-1 font-medium">
-                  {event.name}
-                </div>
-              </div>
-            )}
-
-            {event && (
-              <div className="hidden sm:ml-6 sm:flex sm:items-center">
-                <span
-                  className={classNames(
-                    event?.status === "PENDING"
-                      ? "bg-blue-100"
-                      : event?.status === "ONGOING"
-                      ? "bg-green-100"
-                      : "bg-gray-100",
-                    "inline-flex items-center rounded-full px-2 mr-3 py-1 text-xs font-medium text-gray-600 ring-1 ring-inset"
-                  )}
-                >
-                  {event?.status}
-                </span>
-
-                <button
-                  type="button"
-                  className="inline-flex items-center gap-x-1.5 rounded-md px-2.5 py-1.5 text-sm text-gray-900 hover:text-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
-                  onClick={() => startEvent()}
-                >
-                  END EVENT
-                </button>
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
     );
   };
 
@@ -638,57 +543,208 @@ export default function EventResponsesPage() {
       />
 
       {/**
-       * Round slideout
-       */}
-      <RoundSlideout
-        user={user}
-        rounds={rounds}
-        getRounds={getRounds}
-        roundSlideoutOpen={roundSlideoutOpen}
-        setRoundSlideoutOpen={setRoundSlideoutOpen}
-      />
-
-      {/**
        * Top header
        */}
       <div className="fixed top-0 left-0 right-0 z-40 flex h-16 shrink-0 items-center gap-x-4 border-b border-gray-200">
-        <TopHeader />
+        <TopHeader event={event} setEndConfirmShow={setEndConfirmShow} />
       </div>
 
       {/**
        * Left-side column
        */}
-      {showLeftSidebar ? (
-        <aside className="fixed bottom-0 left-0 top-16 hidden w-80 overflow-y-auto border-r border-gray-200 xl:block">
-          <LeftSidebar />
-        </aside>
-      ) : (
-        <aside className="bg-red-100 fixed bottom-0 left-16 top-16 hidden w-16 overflow-y-auto border-r border-gray-200 pl-4 py-3 xl:block">
-          <LeftSidebarMin />
-        </aside>
-      )}
+      {/* <aside className="fixed left-0 top-16 h-16 right-0 xl:w-16 xl:h-full xl:w-80 overflow-y-auto border-r border-gray-200 xl:block">
+        <LeftSidebar />
+      </aside> */}
 
       {/**
        * Main content
        */}
-      <main
-        className={classNames(
-          "fixed pt-16",
-          showLeftSidebar ? "left-80" : "left-0",
-          showRightSidebar ? "right-1/3" : "right-0"
-        )}
-      >
+      {/* <main className="fixed pt-32 sm:w-2/3 xl:pt-16 xl:left-80 xl:right-96 xl:w-auto">
         <MainContent />
-      </main>
+      </main> */}
 
       {/**
        * Right-side column
        */}
-      {showRightSidebar && (
-        <aside className="fixed bottom-0 right-0 top-16 hidden w-1/3 overflow-y-auto border-l border-gray-200 xl:block">
-          <RightSidebar />
-        </aside>
-      )}
+      {/* <aside className="fixed bottom-0 right-0 top-16 w-1/3 xl:w-96 overflow-y-auto border-l border-gray-200 xl:block">
+        <RightSidebar />
+      </aside> */}
+
+      {/**
+       * End event confirm modal
+       */}
+      <Transition.Root show={endConfirmShow} as={Fragment}>
+        <Dialog
+          as="div"
+          className="relative"
+          initialFocus={cancelButtonRef}
+          onClose={setEndConfirmShow}
+        >
+          <Transition.Child
+            as={Fragment}
+            enter="ease-out duration-300"
+            enterFrom="opacity-0"
+            enterTo="opacity-100"
+            leave="ease-in duration-200"
+            leaveFrom="opacity-100"
+            leaveTo="opacity-0"
+          >
+            <div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" />
+          </Transition.Child>
+
+          <div className="fixed inset-0 w-screen overflow-y-auto">
+            <div className="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+              <Transition.Child
+                as={Fragment}
+                enter="ease-out duration-300"
+                enterFrom="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                enterTo="opacity-100 translate-y-0 sm:scale-100"
+                leave="ease-in duration-200"
+                leaveFrom="opacity-100 translate-y-0 sm:scale-100"
+                leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+              >
+                <Dialog.Panel className="relative transform overflow-hidden rounded-lg bg-white px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6">
+                  <div>
+                    <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-green-100">
+                      <CheckIcon
+                        className="h-6 w-6 text-green-600"
+                        aria-hidden="true"
+                      />
+                    </div>
+                    <div className="mt-3 text-center sm:mt-5">
+                      <Dialog.Title
+                        as="h3"
+                        className="text-base font-semibold leading-6 text-gray-900"
+                      >
+                        Confirm event end
+                      </Dialog.Title>
+                      <div className="mt-2">
+                        <p className="text-sm text-gray-500">
+                          Once you confirm the event is over, the teams will
+                          still be able to see their answers and score but will
+                          no longer be able to add or edit.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="mt-5 sm:mt-6 sm:grid sm:grid-flow-row-dense sm:grid-cols-2 sm:gap-3">
+                    <button
+                      type="button"
+                      className="inline-flex w-full justify-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 sm:col-start-2"
+                      onClick={() => endEvent()}
+                    >
+                      Event is over
+                    </button>
+                    <button
+                      type="button"
+                      className="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:col-start-1 sm:mt-0"
+                      onClick={() => setEndConfirmShow(false)}
+                      ref={cancelButtonRef}
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </Dialog.Panel>
+              </Transition.Child>
+            </div>
+          </div>
+        </Dialog>
+      </Transition.Root>
     </>
+  );
+}
+
+function TopHeader({
+  event,
+  setEndConfirmShow,
+}: {
+  event: Tables<"v001_events_stag"> | undefined;
+  setEndConfirmShow: Function;
+}) {
+  const pathname = usePathname();
+
+  // Navigation
+  const navigation = [
+    { name: "Responses", href: `/dashboard/${event?.id}/responses` },
+    { name: "Teams", href: `/dashboard/${event?.id}/teams` },
+    {
+      name: "Settings",
+      href: `/dashboard/${event?.id}/settings`,
+    },
+  ];
+
+  return (
+    <div className="min-h-full w-full">
+      <div className="mx-auto px-6">
+        <div className="flex h-16 justify-between">
+          <div className="flex">
+            <div className="flex flex-shrink-0 items-center">
+              <a href="/manage/events">
+                <img
+                  className="block h-8 w-auto lg:hidden"
+                  src="https://tailwindui.com/img/logos/mark.svg?color=amber&shade=600"
+                  alt="Your Company"
+                />
+                <img
+                  className="hidden h-8 w-auto lg:block"
+                  src="https://tailwindui.com/img/logos/mark.svg?color=amber&shade=600"
+                  alt="Your Company"
+                />
+              </a>
+            </div>
+            <div className="hidden sm:-my-px sm:ml-6 sm:flex sm:space-x-8">
+              {navigation.map((item) => (
+                <a
+                  key={item.name}
+                  href={item.href}
+                  className={classNames(
+                    pathname === item.href
+                      ? "border-primary text-gray-900"
+                      : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700",
+                    "inline-flex items-center border-b-2 px-1 pt-1 text-sm font-medium"
+                  )}
+                  aria-current={pathname === item.href ? "page" : undefined}
+                >
+                  {item.name}
+                </a>
+              ))}
+            </div>
+          </div>
+
+          {event && (
+            <div className="flex">
+              <div className="inline-flex items-center px-1 pt-1 font-medium">
+                {event.name}
+              </div>
+            </div>
+          )}
+
+          {event && (
+            <div className="hidden sm:ml-6 sm:flex sm:items-center">
+              <span
+                className={classNames(
+                  event?.status === "PENDING"
+                    ? "bg-blue-100"
+                    : event?.status === "ONGOING"
+                    ? "bg-green-100"
+                    : "bg-gray-100",
+                  "inline-flex items-center rounded-full px-2 mr-3 py-1 text-xs font-medium text-gray-600 ring-1 ring-inset"
+                )}
+              >
+                {event?.status}
+              </span>
+
+              <button
+                type="button"
+                className="inline-flex items-center gap-x-1.5 rounded-md px-2.5 py-1.5 text-sm text-gray-900 hover:text-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+                onClick={() => setEndConfirmShow(true)}
+              >
+                END EVENT
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
   );
 }

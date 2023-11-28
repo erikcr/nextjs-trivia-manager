@@ -1,12 +1,6 @@
 "use client";
 
-import {
-  FormHTMLAttributes,
-  Fragment,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import { Fragment, useEffect, useRef, useState } from "react";
 import { useParams, usePathname, useRouter } from "next/navigation";
 import { Dialog, Transition } from "@headlessui/react";
 import {
@@ -32,7 +26,6 @@ function classNames(...classes: any[]) {
 
 export default function EditorByIdPage() {
   const { eventId } = useParams();
-  const pathname = usePathname();
   const router = useRouter();
 
   const supabase = createClient();
@@ -139,7 +132,7 @@ export default function EditorByIdPage() {
 
     if (data) {
       setEvent(data[0]);
-      router.push(`/dashboard/event/${event?.id}/responses`);
+      router.push(`/dashboard/${event?.id}/responses`);
     } else if (error) {
       console.log(error);
     }
@@ -207,12 +200,7 @@ export default function EditorByIdPage() {
        * Top header
        */}
       <div className="fixed top-0 left-0 right-0 flex h-16 shrink-0 items-center gap-x-4 border-b border-gray-200">
-        <TopHeader
-          event={event}
-          pathname={pathname}
-          startConfirmShow={startConfirmShow}
-          setStartConfirmShow={setStartConfirmShow}
-        />
+        <TopHeader event={event} setStartConfirmShow={setStartConfirmShow} />
       </div>
 
       {/**
@@ -346,15 +334,13 @@ export default function EditorByIdPage() {
 
 function TopHeader({
   event,
-  pathname,
-  startConfirmShow,
   setStartConfirmShow,
 }: {
   event: Tables<"v001_events_stag"> | undefined;
-  pathname: string;
-  startConfirmShow: boolean;
   setStartConfirmShow: Function;
 }) {
+  const pathname = usePathname();
+
   // Navigation
   const navigation = [
     { name: "Editor", href: `/dashboard/${event?.id}/editor` },
@@ -429,7 +415,7 @@ function TopHeader({
                 type="button"
                 className="inline-flex items-center gap-x-1.5 rounded-md px-2.5 py-1.5 text-sm text-gray-900 hover:text-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
                 onClick={() => {
-                  setStartConfirmShow(!startConfirmShow);
+                  setStartConfirmShow(true);
                 }}
               >
                 START EVENT

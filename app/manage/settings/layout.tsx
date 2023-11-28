@@ -17,12 +17,12 @@ import {
 const secondaryNavigation = [
   {
     name: "General",
-    href: "/dashboard/settings",
+    href: "/manage/settings",
     icon: UserCircleIcon,
   },
   {
     name: "Security",
-    href: "/dashboard/settings/security",
+    href: "/manage/settings/security",
     icon: FingerPrintIcon,
   },
 ];
