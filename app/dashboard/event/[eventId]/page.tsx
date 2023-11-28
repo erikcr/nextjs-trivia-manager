@@ -86,6 +86,10 @@ export default function EventEditorPage() {
   const [startConfirmShow, setStartConfirmShow] = useState(false);
   const cancelButtonRef = useRef(null);
 
+  const toggleStartConfirm = (status: boolean) => {
+    console.log(`${Date.now()} is ${status}`);
+  };
+
   const getRounds = async () => {
     const { data, error } = await supabase
       .from("v001_rounds_stag")
@@ -392,7 +396,9 @@ export default function EventEditorPage() {
                 <button
                   type="button"
                   className="inline-flex items-center gap-x-1.5 rounded-md px-2.5 py-1.5 text-sm text-gray-900 hover:text-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
-                  onClick={() => setStartConfirmShow(true)}
+                  onClick={() => {
+                    toggleStartConfirm(true);
+                  }}
                 >
                   START EVENT
                   <RocketLaunchIcon
@@ -442,7 +448,7 @@ export default function EventEditorPage() {
             </div>
           </div>
 
-          <nav className="flex flex-1 flex-col" aria-label="Sidebar">
+          <nav className="flex flex-1 flex-row md:flex-col" aria-label="Sidebar">
             <ul role="list" className="-mx-2 space-y-1">
               {rounds?.map((item) => (
                 <li key={item.id} onClick={() => setActiveRound(item)}>
@@ -619,7 +625,7 @@ export default function EventEditorPage() {
        * Left-side column
        */}
       {showLeftSidebar ? (
-        <aside className="fixed bottom-0 left-0 top-16 hidden w-80 overflow-y-auto border-r border-gray-200 xl:block">
+        <aside className="fixed left-0 top-16 h-16 right-0 xl:w-16 xl:h-full xl:w-80 overflow-y-auto border-r border-gray-200 xl:block">
           <LeftSidebar />
         </aside>
       ) : (
@@ -631,13 +637,7 @@ export default function EventEditorPage() {
       {/**
        * Main content
        */}
-      <main
-        className={classNames(
-          "fixed pt-16",
-          showLeftSidebar ? "left-80" : "left-0",
-          showRightSidebar ? "right-96" : "right-0"
-        )}
-      >
+      <main className="fixed pt-32 sm:w-2/3 xl:pt-16 xl:left-80 xl:right-96 xl:w-auto">
         <MainContent />
       </main>
 
@@ -645,7 +645,7 @@ export default function EventEditorPage() {
        * Right-side column
        */}
       {showRightSidebar && (
-        <aside className="fixed bottom-0 right-0 top-16 hidden w-96 overflow-y-auto border-l border-gray-200 xl:block">
+        <aside className="fixed bottom-0 right-0 top-16 w-1/3 xl:w-96 overflow-y-auto border-l border-gray-200 xl:block">
           <RightSidebar />
         </aside>
       )}
@@ -656,7 +656,7 @@ export default function EventEditorPage() {
       <Transition.Root show={startConfirmShow} as={Fragment}>
         <Dialog
           as="div"
-          className="relative z-50"
+          className="relative z-20"
           initialFocus={cancelButtonRef}
           onClose={setStartConfirmShow}
         >
@@ -672,7 +672,7 @@ export default function EventEditorPage() {
             <div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" />
           </Transition.Child>
 
-          <div className="fixed inset-0 z-10 w-screen overflow-y-auto">
+          <div className="fixed inset-0 z-50 w-screen overflow-y-auto">
             <div className="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
               <Transition.Child
                 as={Fragment}
