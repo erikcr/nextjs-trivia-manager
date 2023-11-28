@@ -11,6 +11,10 @@ import { createClient } from "@/utils/supabase/client";
 
 // Components
 import ThemeSwitcher from "@/components/ThemeSwitcher";
+import {
+  ArrowRightOnRectangleIcon,
+  BellIcon,
+} from "@heroicons/react/24/outline";
 
 const navigation = [
   { name: "Events", href: "/manage/events", display: true },
@@ -79,64 +83,62 @@ export default function ManageLayout({
   return (
     <div className="min-h-full">
       <div className="bg-gray-800 pb-32">
-        <>
-          <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
-            <div className="border-b border-gray-700">
-              <div className="flex h-16 items-center justify-between px-4 sm:px-0">
-                <div className="flex items-center">
-                  <div className="flex-shrink-0">
-                    <Image
-                      src={logoBrainyBrawls}
-                      alt=""
-                      className="h-8 w-8"
-                      unoptimized
-                    />
-                  </div>
-                  <div className="hidden md:block">
-                    <div className="ml-10 flex items-baseline space-x-4">
-                      {navigation.map((item) => {
-                        if (item.display) {
-                          return (
-                            <a
-                              key={item.name}
-                              href={item.href}
-                              className={classNames(
-                                item.href === pathname
-                                  ? "bg-gray-900 text-white"
-                                  : "text-gray-300 hover:bg-gray-700 hover:text-white",
-                                "rounded-md px-3 py-2 text-sm font-medium"
-                              )}
-                              aria-current={
-                                item.href === pathname ? "page" : undefined
-                              }
-                            >
-                              {item.name}
-                            </a>
-                          );
-                        }
-                      })}
-                    </div>
-                  </div>
+        <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
+          <div className="border-b border-gray-700">
+            <div className="flex h-16 items-center justify-between px-4 sm:px-0">
+              <div className="flex items-center">
+                <div className="flex-shrink-0">
+                  <Image
+                    src={logoBrainyBrawls}
+                    alt="Next.js Trivia Manager"
+                    className="h-8 w-8"
+                    unoptimized
+                  />
                 </div>
                 <div className="hidden md:block">
-                  <div className="ml-4 flex items-center md:ml-6">
-                    <ThemeSwitcher />
-
-                    <button
-                      type="button"
-                      className="relative rounded-full text-sm font-medium bg-gray-800 p-1 text-gray-400 hover:text-white"
-                      onClick={signOut}
-                    >
-                      <span className="absolute -inset-1.5" />
-                      <span className="sr-only">Sign out</span>
-                      Sign out
-                    </button>
+                  <div className="ml-10 flex items-baseline space-x-4">
+                    {navigation.map((item) => (
+                      <a
+                        key={item.name}
+                        href={item.href}
+                        className={classNames(
+                          item.href === pathname
+                            ? "bg-gray-900 text-white"
+                            : "text-gray-300 hover:bg-gray-700 hover:text-white",
+                          "rounded-md px-3 py-2 text-sm font-medium"
+                        )}
+                        aria-current={
+                          item.href === pathname ? "page" : undefined
+                        }
+                      >
+                        {item.name}
+                      </a>
+                    ))}
                   </div>
+                </div>
+              </div>
+              <div className="hidden md:block">
+                <div className="ml-4 flex items-center md:ml-6">
+                  <ThemeSwitcher />
+
+                  <button
+                    type="button"
+                    className="relative rounded-full bg-gray-800 p-1 text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800"
+                    onClick={signOut}
+                  >
+                    <span className="absolute -inset-1.5" />
+                    <span className="sr-only">View notifications</span>
+                    <ArrowRightOnRectangleIcon
+                      className="h-6 w-6"
+                      aria-hidden="true"
+                    />
+                  </button>
                 </div>
               </div>
             </div>
           </div>
-        </>
+        </div>
+
         <header className="py-10">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <h1 className="text-3xl font-bold tracking-tight text-white">

@@ -25,19 +25,37 @@ const ThemeSwitcher = () => {
 
     if (currentTheme === "dark") {
       return (
-        <SunIcon
-          className="w-6 h-6 text-yellow-500 "
-          role="button"
+        // <SunIcon
+        //   className="w-6 h-6 text-yellow-500 "
+        //   role="button"
+        //   onClick={() => setTheme("light")}
+        // />
+        <button
+          type="button"
+          className="relative rounded-full bg-gray-800 p-1 text-gray-400 hover:text-white"
           onClick={() => setTheme("light")}
-        />
+        >
+          <span className="absolute -inset-1.5" />
+          <span className="sr-only">Set theme light</span>
+          <SunIcon className="h-6 w-6" aria-hidden="true" />
+        </button>
       );
     } else {
       return (
-        <MoonIcon
-          className="w-6 h-6 text-gray-900 "
-          role="button"
+        // <MoonIcon
+        //   className="w-6 h-6 text-gray-900 "
+        //   role="button"
+        //   onClick={() => setTheme("dark")}
+        // />
+        <button
+          type="button"
+          className="relative rounded-full bg-gray-800 p-1 text-gray-400 hover:text-white"
           onClick={() => setTheme("dark")}
-        />
+        >
+          <span className="absolute -inset-1.5" />
+          <span className="sr-only">Set theme dark</span>
+          <MoonIcon className="h-6 w-6" aria-hidden="true" />
+        </button>
       );
     }
   };
