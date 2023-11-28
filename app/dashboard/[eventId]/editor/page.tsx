@@ -82,30 +82,6 @@ export default function EditorByIdPage() {
     }
   };
 
-  const addQuestion = async (formData: FormData) => {
-    setAddQuestionLoading(true);
-    const { data, error } = await supabase
-      .from("v001_questions_stag")
-      .insert([
-        {
-          question: formData.get("question"),
-          answer: formData.get("answer"),
-          points: formData.get("points"),
-          round_id: activeRound?.id,
-          owner: user?.id,
-        },
-      ])
-      .select();
-
-    if (!error) {
-      setNotifTitle("Question added");
-      setNotifType("success");
-      setNotifShow(true);
-      setQuestionSlideout(false);
-      getQuestions();
-    }
-  };
-
   const getRounds = async () => {
     const { data, error } = await supabase
       .from("v001_rounds_stag")
@@ -238,8 +214,9 @@ export default function EditorByIdPage() {
        */}
       <aside className="fixed bottom-0 right-0 top-16 w-1/3 xl:w-96 overflow-y-auto border-l border-gray-200 xl:block">
         <RightSidebar
-          addQuestion={addQuestion}
-          addQuestionLoading={addQuestionLoading}
+          user={user}
+          activeRound={activeRound}
+          getQuestions={getQuestions}
         />
       </aside>
 
@@ -347,60 +324,65 @@ function TopHeader({
   setStartConfirmShow: Function;
 }) {
   const pathname = usePathname();
+  const router = useRouter();
 
   // Navigation
   const navigation = [
     { name: "Editor", href: `/dashboard/${event?.id}/editor` },
-    {
-      name: "Settings",
-      href: `/dashboard/${event?.id}/settings`,
-    },
+    // {
+    //   name: "Settings",
+    //   href: `/dashboard/${event?.id}/settings`,
+    // },
   ];
 
   return (
-    <div className="min-h-full w-full">
-      <div className="mx-auto px-6">
-        <div className="flex h-16 justify-between">
-          <div className="flex">
-            <div className="flex flex-shrink-0 items-center">
-              <a href="/manage/events">
-                <Image
-                  src={logoBrainyBrawls}
-                  alt=""
-                  className="h-8 w-8"
-                  unoptimized
-                />
-              </a>
-            </div>
-            <div className="hidden sm:-my-px sm:ml-6 sm:flex sm:space-x-8">
-              {navigation.map((item) => (
-                <a
-                  key={item.name}
-                  href={item.href}
-                  className={classNames(
-                    pathname === item.href
-                      ? "border-primary text-gray-900"
-                      : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700",
-                    "inline-flex items-center border-b-2 px-1 pt-1 text-sm font-medium"
-                  )}
-                  aria-current={pathname === item.href ? "page" : undefined}
-                >
-                  {item.name}
-                </a>
-              ))}
-            </div>
+    <div className="w-full">
+      <div className="mx-auto px-4">
+        <nav
+          className="mx-auto flex items-center justify-between p-6 lg:px-8"
+          aria-label="Global"
+        >
+          <div className="flex lg:flex-1">
+            <a href="/manage/events" className="-m-1.5 p-1.5">
+              <span className="sr-only">Next.js Trivia Manager</span>
+              <Image
+                src={logoBrainyBrawls}
+                alt="Next.js Trivia Manager"
+                className="h-8 w-8"
+                unoptimized
+              />
+            </a>
+
+            {/* <p>{event?.name}</p> */}
           </div>
 
-          {event && (
-            <div className="flex">
-              <div className="inline-flex items-center px-1 pt-1 font-medium">
-                {event.name}
-              </div>
-            </div>
-          )}
+          <div className="flex lg:hidden">
+            <button
+              type="button"
+              className="-m-2.5 inline-flex items-center justify-center rounded-md p-2.5 text-gray-700"
+            >
+              <span className="sr-only">Open main menu</span>
+              <Bars3Icon className="h-6 w-6" aria-hidden="true" />
+            </button>
+          </div>
 
-          {event && (
-            <div className="hidden sm:ml-6 sm:flex sm:items-center">
+          <div className="hidden lg:flex lg:gap-x-12">
+            {navigation.map((item) => (
+              <button
+                key={item.name}
+                className={classNames(
+                  pathname === item.href ? "text-primary" : "",
+                  "text-md font-semibold leading-6 text-gray-900"
+                )}
+                onClick={() => router.push(item.href)}
+              >
+                {item.name}
+              </button>
+            ))}
+          </div>
+
+          <div className="hidden lg:flex lg:flex-1 lg:justify-end">
+            {event !== undefined && (
               <span
                 className={classNames(
                   event?.status === "PENDING"
@@ -411,25 +393,26 @@ function TopHeader({
                   "inline-flex items-center rounded-full px-2 mr-3 py-1 text-xs font-medium text-gray-600 ring-1 ring-inset"
                 )}
               >
-                {event.status}
+                {event?.status}
               </span>
+            )}
 
-              <button
-                type="button"
-                className="inline-flex items-center gap-x-1.5 rounded-md px-2.5 py-1.5 text-sm text-gray-900 hover:text-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
-                onClick={() => {
-                  setStartConfirmShow(true);
-                }}
-              >
-                START EVENT
-                <RocketLaunchIcon
-                  className="-mr-0.5 h-5 w-5"
-                  aria-hidden="true"
-                />
-              </button>
-            </div>
-          )}
-        </div>
+            <button
+              type="button"
+              disabled={event === undefined}
+              className="inline-flex items-center gap-x-1.5 rounded-md px-2.5 py-1.5 text-sm text-gray-900 hover:text-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+              onClick={() => {
+                setStartConfirmShow(true);
+              }}
+            >
+              START EVENT
+              <RocketLaunchIcon
+                className="-mr-0.5 h-5 w-5"
+                aria-hidden="true"
+              />
+            </button>
+          </div>
+        </nav>
       </div>
     </div>
   );
@@ -594,16 +577,55 @@ function MainContent({
 }
 
 function RightSidebar({
-  addQuestion,
-  addQuestionLoading,
+  user,
+  activeRound,
+  getQuestions,
 }: {
-  addQuestion: (formData: FormData) => void;
-  addQuestionLoading: boolean;
+  user: User | undefined;
+  activeRound: Tables<"v001_rounds_stag"> | undefined;
+  getQuestions: Function;
 }) {
+  const supabase = createClient();
+
+  const [addQuestionLoading, setAddQuestionLoading] = useState(false);
+  const formRef = useRef<HTMLFormElement>(null);
+
   const rightSidebarTabs = [
     { name: "Manual", href: "#", current: true },
-    { name: "TriviaAI", href: "#", current: false },
+    // { name: "TriviaAI", href: "#", current: false },
   ];
+
+  const addQuestion = async (formData: FormData) => {
+    const { data, error } = await supabase
+      .from("v001_questions_stag")
+      .insert([
+        {
+          question: formData.get("question"),
+          answer: formData.get("answer"),
+          points: formData.get("points"),
+          round_id: activeRound?.id,
+          owner: user?.id,
+        },
+      ])
+      .select();
+
+    if (!error) {
+      getQuestions();
+      setAddQuestionLoading(false);
+
+      formRef.current?.reset();
+    }
+  };
+
+  if (!activeRound) {
+    return (
+      <div>
+        <nav className="-mb-px flex justify-center pt-8 space-x-4 px-4 sm:px-6">
+          <p>Select a round.</p>
+        </nav>
+      </div>
+    );
+  }
 
   return (
     <div className="hidden sm:block">
@@ -629,26 +651,24 @@ function RightSidebar({
         </nav>
       </div>
 
-      <form action={addQuestion}>
+      <form action={addQuestion} ref={formRef}>
         <div className="space-y-12 px-4 sm:px-6">
           <div className="pb-12">
             {/* Question */}
-            <div className="space-y-2 sm:grid sm:grid-cols-3 sm:gap-4 sm:space-y-0 sm:py-5">
-              <div>
-                <label
-                  htmlFor="question"
-                  className="block text-sm font-medium leading-6 text-gray-900 sm:mt-1.5"
-                >
-                  Question <span className="text-red-600">*</span>
-                </label>
-              </div>
+            <div className="space-y-2 sm:gap-4 sm:space-y-0 sm:py-5">
+              <label
+                htmlFor="question"
+                className="block text-sm font-medium leading-6 text-gray-900 sm:mt-1.5 sm:mb-2"
+              >
+                Question <span className="text-red-600">*</span>
+              </label>
               <div className="sm:col-span-2">
                 <textarea
                   required
                   disabled={addQuestionLoading}
                   name="question"
                   id="question"
-                  rows={3}
+                  rows={5}
                   className="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
                   defaultValue={""}
                 />

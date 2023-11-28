@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import Image from "next/image";
+import { ArrowRightOnRectangleIcon } from "@heroicons/react/24/outline";
 
 import logoBrainyBrawls from "@/public/logos/brainybrawls.svg";
 
@@ -11,12 +12,8 @@ import { createClient } from "@/utils/supabase/client";
 
 // Components
 import ThemeSwitcher from "@/components/ThemeSwitcher";
-import {
-  ArrowRightOnRectangleIcon,
-  BellIcon,
-} from "@heroicons/react/24/outline";
 
-const navigation = [
+const navigation: any[] = [
   { name: "Events", href: "/manage/events", display: true },
   // { name: "Calendar", href: "/manage/calendar", display: true },
   // { name: "Settings", href: "/manage/settings", display: true },
@@ -82,7 +79,7 @@ export default function ManageLayout({
 
   return (
     <div className="min-h-full">
-      <div className="bg-gray-800 pb-32">
+      <div className="bg-primary pb-32">
         <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
           <div className="border-b border-gray-700">
             <div className="flex h-16 items-center justify-between px-4 sm:px-0">
@@ -91,13 +88,13 @@ export default function ManageLayout({
                   <Image
                     src={logoBrainyBrawls}
                     alt="Next.js Trivia Manager"
-                    className="h-8 w-8"
+                    className="h-8 w-8 text-gray-800"
                     unoptimized
                   />
                 </div>
                 <div className="hidden md:block">
                   <div className="ml-10 flex items-baseline space-x-4">
-                    {navigation.map((item) => (
+                    {/* {navigation.map((item) => (
                       <a
                         key={item.name}
                         href={item.href}
@@ -113,7 +110,7 @@ export default function ManageLayout({
                       >
                         {item.name}
                       </a>
-                    ))}
+                    ))} */}
                   </div>
                 </div>
               </div>
@@ -123,11 +120,11 @@ export default function ManageLayout({
 
                   <button
                     type="button"
-                    className="relative rounded-full bg-gray-800 p-1 text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800"
+                    className="relative rounded-full p-1 text-gray-800 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800"
                     onClick={signOut}
                   >
                     <span className="absolute -inset-1.5" />
-                    <span className="sr-only">View notifications</span>
+                    <span className="sr-only">Sign out</span>
                     <ArrowRightOnRectangleIcon
                       className="h-6 w-6"
                       aria-hidden="true"
@@ -141,7 +138,7 @@ export default function ManageLayout({
 
         <header className="py-10">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <h1 className="text-3xl font-bold tracking-tight text-white">
+            <h1 className="text-3xl font-bold tracking-tight text-gray-800">
               {navigation.find((item) => item.href === pathname)?.name}
             </h1>
           </div>

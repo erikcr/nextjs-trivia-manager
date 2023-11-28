@@ -429,7 +429,7 @@ function TopHeader({
 
             <button
               type="button"
-              disabled={event !== undefined}
+              disabled={event === undefined}
               className="inline-flex items-center gap-x-1.5 rounded-md px-2.5 py-1.5 text-sm text-gray-900 hover:text-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
               onClick={() => setEndConfirmShow(true)}
             >

@@ -32,7 +32,7 @@ const ThemeSwitcher = () => {
         // />
         <button
           type="button"
-          className="relative rounded-full bg-gray-800 p-1 text-gray-400 hover:text-white"
+          className="relative rounded-full p-1 text-gray-400 hover:text-white"
           onClick={() => setTheme("light")}
         >
           <span className="absolute -inset-1.5" />
@@ -49,7 +49,7 @@ const ThemeSwitcher = () => {
         // />
         <button
           type="button"
-          className="relative rounded-full bg-gray-800 p-1 text-gray-400 hover:text-white"
+          className="relative rounded-full p-1 text-gray-800 hover:text-white"
           onClick={() => setTheme("dark")}
         >
           <span className="absolute -inset-1.5" />

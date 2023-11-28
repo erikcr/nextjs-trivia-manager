@@ -3,7 +3,7 @@
 import { Fragment, useEffect, useState } from "react";
 import Link from "next/link";
 import { parseISO, format } from "date-fns";
-import { Dialog, Transition } from "@headlessui/react";
+import { Dialog, Disclosure, Transition } from "@headlessui/react";
 import { XMarkIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
 
 // Supabase
@@ -148,57 +148,129 @@ export default function EventsPage() {
         )}
 
         {!eLoading &&
-          allEvents?.map((item) => (
-            <Link
-              key={item.id}
-              href={
-                item.status === "PENDING"
-                  ? `/dashboard/${item.id}/editor`
-                  : item.status === "ONGOING"
-                  ? `/dashboard/${item.id}/responses`
-                  : `/dashboard/${item.id}/complete`
-              }
-            >
-              <li
+          allEvents
+            ?.filter((item) => item.status !== "COMPLETE")
+            .map((item) => (
+              <Link
                 key={item.id}
-                className="overflow-hidden rounded-xl border border-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600"
+                href={
+                  item.status === "PENDING"
+                    ? `/dashboard/${item.id}/editor`
+                    : item.status === "ONGOING"
+                    ? `/dashboard/${item.id}/responses`
+                    : `/dashboard/${item.id}/complete`
+                }
               >
-                <div className="flex items-center gap-x-4 border-b border-gray-900/5 bg-gray-100 dark:bg-gray-600 p-6">
-                  <div className="text-sm font-medium leading-6 text-gray-900 dark:text-gray-200">
-                    {item.name}
+                <li
+                  key={item.id}
+                  className="overflow-hidden rounded-xl border border-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600"
+                >
+                  <div className="flex items-center gap-x-4 border-b border-gray-900/5 bg-gray-100 dark:bg-gray-600 p-6">
+                    <div className="text-sm font-medium leading-6 text-gray-900 dark:text-gray-200">
+                      {item.name}
+                    </div>
+                    <span
+                      className={classNames(
+                        item?.status === "PENDING"
+                          ? "bg-blue-100"
+                          : item?.status === "ONGOING"
+                          ? "bg-green-100"
+                          : "bg-gray-100",
+                        "inline-flex items-center rounded-full px-2 mr-3 py-1 text-xs font-medium text-gray-600 ring-1 ring-inset"
+                      )}
+                    >
+                      {item.status}
+                    </span>
                   </div>
-                  <span
-                    className={classNames(
-                      item?.status === "PENDING"
-                        ? "bg-blue-100"
-                        : item?.status === "ONGOING"
-                        ? "bg-green-100"
-                        : "bg-gray-100",
-                      "inline-flex items-center rounded-full px-2 mr-3 py-1 text-xs font-medium text-gray-600 ring-1 ring-inset"
-                    )}
-                  >
-                    {item.status}
-                  </span>
-                </div>
-                <dl className="-my-3 divide-y divide-gray-100 dark:divide-gray-600 px-6 py-4 text-sm leading-6">
-                  <div className="flex justify-between gap-x-4 py-3">
-                    <dt className="text-gray-500 dark:text-gray-300">Date</dt>
-                    <dd className="text-gray-700 dark:text-gray-400">
-                      <time dateTime={item.date_of_event}>
-                        {format(parseISO(item.date_of_event), "LLLL d, yyyy")}
-                      </time>
-                    </dd>
+                  <dl className="-my-3 divide-y divide-gray-100 dark:divide-gray-600 px-6 py-4 text-sm leading-6">
+                    <div className="flex justify-between gap-x-4 py-3">
+                      <dt className="text-gray-500 dark:text-gray-300">Date</dt>
+                      <dd className="text-gray-700 dark:text-gray-400">
+                        <time dateTime={item.date_of_event}>
+                          {format(parseISO(item.date_of_event), "LLLL d, yyyy")}
+                        </time>
+                      </dd>
+                    </div>
+                    <div className="flex justify-between gap-x-4 py-3">
+                      <dt className="text-gray-500 dark:text-gray-300">
+                        Venue
+                      </dt>
+                      <dd className="text-gray-700 dark:text-gray-400">
+                        {item.venue}
+                      </dd>
+                    </div>
+                  </dl>
+                </li>
+              </Link>
+            ))}
+      </ul>
+
+      <div className="border-t border-gray-200 pb-5 mt-10">
+        <h3 className="text-base font-semibold leading-6 text-gray-900 pt-3">
+          Completed events
+        </h3>
+      </div>
+
+      <ul
+        role="list"
+        className="grid grid-cols-1 gap-x-6 gap-y-8 md:grid-cols-2 lg:grid-cols-3 xl:gap-x-8"
+      >
+        {!eLoading &&
+          allEvents
+            ?.filter((item) => item.status === "COMPLETE")
+            .map((item) => (
+              <Link
+                key={item.id}
+                href={
+                  item.status === "PENDING"
+                    ? `/dashboard/${item.id}/editor`
+                    : item.status === "ONGOING"
+                    ? `/dashboard/${item.id}/responses`
+                    : `/dashboard/${item.id}/complete`
+                }
+              >
+                <li
+                  key={item.id}
+                  className="overflow-hidden rounded-xl border border-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600"
+                >
+                  <div className="flex items-center gap-x-4 border-b border-gray-900/5 bg-gray-100 dark:bg-gray-600 p-6">
+                    <div className="text-sm font-medium leading-6 text-gray-900 dark:text-gray-200">
+                      {item.name}
+                    </div>
+                    <span
+                      className={classNames(
+                        item?.status === "PENDING"
+                          ? "bg-blue-100"
+                          : item?.status === "ONGOING"
+                          ? "bg-green-100"
+                          : "bg-gray-100",
+                        "inline-flex items-center rounded-full px-2 mr-3 py-1 text-xs font-medium text-gray-600 ring-1 ring-inset"
+                      )}
+                    >
+                      {item.status}
+                    </span>
                   </div>
-                  <div className="flex justify-between gap-x-4 py-3">
-                    <dt className="text-gray-500 dark:text-gray-300">Venue</dt>
-                    <dd className="text-gray-700 dark:text-gray-400">
-                      {item.venue}
-                    </dd>
-                  </div>
-                </dl>
-              </li>
-            </Link>
-          ))}
+                  <dl className="-my-3 divide-y divide-gray-100 dark:divide-gray-600 px-6 py-4 text-sm leading-6">
+                    <div className="flex justify-between gap-x-4 py-3">
+                      <dt className="text-gray-500 dark:text-gray-300">Date</dt>
+                      <dd className="text-gray-700 dark:text-gray-400">
+                        <time dateTime={item.date_of_event}>
+                          {format(parseISO(item.date_of_event), "LLLL d, yyyy")}
+                        </time>
+                      </dd>
+                    </div>
+                    <div className="flex justify-between gap-x-4 py-3">
+                      <dt className="text-gray-500 dark:text-gray-300">
+                        Venue
+                      </dt>
+                      <dd className="text-gray-700 dark:text-gray-400">
+                        {item.venue}
+                      </dd>
+                    </div>
+                  </dl>
+                </li>
+              </Link>
+            ))}
       </ul>
 
       {/**

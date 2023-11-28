@@ -38,7 +38,6 @@ export default function RoundSlideout({
   const [notifType, setNotifType] = useState("");
 
   const addRound = async (formData: FormData) => {
-    setAddRoundLoading(true);
     const { data, error } = await supabase
       .from("v001_rounds_stag")
       .insert([
@@ -109,7 +108,10 @@ export default function RoundSlideout({
                   <Dialog.Panel className="bg-gray-100 pointer-events-auto w-screen max-w-2xl">
                     <form
                       className="flex h-full flex-col overflow-y-scroll shadow-xl"
-                      action={addRound}
+                      action={(e) => {
+                        setAddRoundLoading(true);
+                        addRound(e);
+                      }}
                     >
                       <div className="flex-1">
                         <div className="bg-gray-50 px-4 py-6 sm:px-6">
