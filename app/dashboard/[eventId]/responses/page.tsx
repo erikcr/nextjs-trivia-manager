@@ -76,7 +76,7 @@ export default function EventResponsesPage() {
   const [showRightSidebar, setShowRightSidebar] = useState(true);
 
   // Modal
-  const [endConfirmShow, setEndConfirmShow] = useState(true);
+  const [endConfirmShow, setEndConfirmShow] = useState(false);
   const cancelButtonRef = useRef(null);
 
   const getRounds = async () => {
