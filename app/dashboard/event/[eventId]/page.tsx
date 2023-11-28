@@ -43,10 +43,10 @@ export default function EventEditorPage() {
 
   // Navigation
   const navigation = [
-    { name: "Editor", href: `/dashboard/event/${eventId}` },
+    { name: "Editor", href: `/dashboard/${eventId}/editor` },
     {
       name: "Settings",
-      href: `/dashboard/event/${eventId}/settings`,
+      href: `/dashboard/${eventId}/settings`,
     },
   ];
 
@@ -88,6 +88,7 @@ export default function EventEditorPage() {
 
   const toggleStartConfirm = (status: boolean) => {
     console.log(`${Date.now()} is ${status}`);
+    setStartConfirmShow(true);
   };
 
   const getRounds = async () => {
@@ -448,7 +449,10 @@ export default function EventEditorPage() {
             </div>
           </div>
 
-          <nav className="flex flex-1 flex-row md:flex-col" aria-label="Sidebar">
+          <nav
+            className="flex flex-1 flex-row md:flex-col"
+            aria-label="Sidebar"
+          >
             <ul role="list" className="-mx-2 space-y-1">
               {rounds?.map((item) => (
                 <li key={item.id} onClick={() => setActiveRound(item)}>
@@ -594,16 +598,6 @@ export default function EventEditorPage() {
   return (
     <>
       {/**
-       * Action notification
-       */}
-      <Notification
-        title={notifTitle}
-        type={notifType}
-        show={notifShow}
-        setShow={setNotifShow}
-      />
-
-      {/**
        * Round slideout
        */}
       <RoundSlideout
@@ -617,7 +611,7 @@ export default function EventEditorPage() {
       {/**
        * Top header
        */}
-      <div className="fixed top-0 left-0 right-0 z-40 flex h-16 shrink-0 items-center gap-x-4 border-b border-gray-200">
+      <div className="fixed top-0 left-0 right-0 flex h-16 shrink-0 items-center gap-x-4 border-b border-gray-200">
         <TopHeader />
       </div>
 
@@ -656,7 +650,7 @@ export default function EventEditorPage() {
       <Transition.Root show={startConfirmShow} as={Fragment}>
         <Dialog
           as="div"
-          className="relative z-20"
+          className="relative"
           initialFocus={cancelButtonRef}
           onClose={setStartConfirmShow}
         >
@@ -672,7 +666,7 @@ export default function EventEditorPage() {
             <div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" />
           </Transition.Child>
 
-          <div className="fixed inset-0 z-50 w-screen overflow-y-auto">
+          <div className="fixed inset-0 w-screen overflow-y-auto">
             <div className="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
               <Transition.Child
                 as={Fragment}
@@ -731,6 +725,18 @@ export default function EventEditorPage() {
           </div>
         </Dialog>
       </Transition.Root>
+
+      {/**
+       * Action notification
+       */}
+      {notifShow && (
+        <Notification
+          title={notifTitle}
+          type={notifType}
+          show={notifShow}
+          setShow={setNotifShow}
+        />
+      )}
     </>
   );
 }

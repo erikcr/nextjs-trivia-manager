@@ -153,9 +153,9 @@ export default function EventsPage() {
               key={item.id}
               href={
                 item.status === "PENDING"
-                  ? `/dashboard/event/${item.id}`
+                  ? `/dashboard/${item.id}/editor`
                   : item.status === "ONGOING"
-                  ? `/dashboard/event/${item.id}/responses`
+                  ? `/dashboard/${item.id}/responses`
                   : ""
               }
             >
