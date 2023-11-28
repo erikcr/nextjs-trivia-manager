@@ -2,6 +2,7 @@
 
 import { Fragment, useEffect, useRef, useState } from "react";
 import { useParams, usePathname, useRouter } from "next/navigation";
+import Image from "next/image";
 import { Dialog, Transition } from "@headlessui/react";
 import {
   Bars3Icon,
@@ -10,6 +11,8 @@ import {
   CheckIcon,
   XMarkIcon,
 } from "@heroicons/react/24/outline";
+
+import logoBrainyBrawls from "@/public/logos/brainybrawls.svg";
 
 // Supabase
 import { PostgrestError, User } from "@supabase/supabase-js";
@@ -357,15 +360,11 @@ function TopHeader({
           <div className="flex">
             <div className="flex flex-shrink-0 items-center">
               <a href="/manage/events">
-                <img
-                  className="block h-8 w-auto lg:hidden"
-                  src="https://tailwindui.com/img/logos/mark.svg?color=amber&shade=600"
-                  alt="Your Company"
-                />
-                <img
-                  className="hidden h-8 w-auto lg:block"
-                  src="https://tailwindui.com/img/logos/mark.svg?color=amber&shade=600"
-                  alt="Your Company"
+                <Image
+                  src={logoBrainyBrawls}
+                  alt=""
+                  className="h-8 w-8"
+                  unoptimized
                 />
               </a>
             </div>

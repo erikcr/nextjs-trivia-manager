@@ -2,13 +2,15 @@
 
 import { useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
+import Image from "next/image";
+
+import logoBrainyBrawls from "@/public/logos/brainybrawls.svg";
 
 // Supabase
 import { createClient } from "@/utils/supabase/client";
 
 // Components
 import ThemeSwitcher from "@/components/ThemeSwitcher";
-import Image from "next/image";
 
 const navigation = [
   { name: "Events", href: "/manage/events", display: true },
@@ -82,14 +84,14 @@ export default function ManageLayout({
             <div className="border-b border-gray-700">
               <div className="flex h-16 items-center justify-between px-4 sm:px-0">
                 <div className="flex items-center">
-                  {/* <div className="flex-shrink-0">
+                  <div className="flex-shrink-0">
                     <Image
-                      width={32}
-                      height={32}
-                      src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=500"
-                      alt="Your Company"
+                      src={logoBrainyBrawls}
+                      alt=""
+                      className="h-8 w-8"
+                      unoptimized
                     />
-                  </div> */}
+                  </div>
                   <div className="hidden md:block">
                     <div className="ml-10 flex items-baseline space-x-4">
                       {navigation.map((item) => {
