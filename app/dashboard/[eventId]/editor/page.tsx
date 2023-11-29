@@ -182,14 +182,14 @@ export default function EditorByIdPage() {
       {/**
        * Top header
        */}
-      <div className="fixed top-0 left-0 right-0 flex h-16 shrink-0 items-center gap-x-4 border-b border-gray-200">
+      <div className="fixed left-0 top-0 right-0 flex h-16 shrink-0 items-center gap-x-4 border-b border-gray-200">
         <TopHeader event={event} setStartConfirmShow={setStartConfirmShow} />
       </div>
 
       {/**
        * Left-side column
        */}
-      <aside className="fixed left-0 top-16 h-16 right-0 xl:w-16 xl:h-full xl:w-80 overflow-y-auto border-r border-gray-200 xl:block">
+      <aside className="fixed left-0 top-16 h-16 w-full xl:h-full xl:w-80 overflow-y-auto border-b xl:border-r border-gray-200 xl:block">
         <LeftSidebar
           rounds={rounds}
           activeRound={activeRound}
@@ -201,7 +201,7 @@ export default function EditorByIdPage() {
       {/**
        * Main content
        */}
-      <main className="fixed pt-32 sm:w-2/3 xl:pt-16 xl:left-80 xl:right-96 xl:w-auto">
+      <main className="fixed top-32 sm:w-2/3 xl:top-16 xl:left-80 xl:right-96 xl:w-auto">
         <MainContent
           questions={questions}
           qLoading={qLoading}
@@ -212,7 +212,7 @@ export default function EditorByIdPage() {
       {/**
        * Right-side column
        */}
-      <aside className="fixed bottom-0 right-0 top-16 w-1/3 xl:w-96 overflow-y-auto border-l border-gray-200 xl:block">
+      <aside className="fixed top-32 right-0 h-full w-1/3 xl:w-96 xl:top-16 border-l border-gray-200 xl:block">
         <RightSidebar
           user={user}
           activeRound={activeRound}
@@ -337,83 +337,78 @@ function TopHeader({
 
   return (
     <div className="w-full">
-      <div className="mx-auto px-4">
-        <nav
-          className="mx-auto flex items-center justify-between p-6 lg:px-8"
-          aria-label="Global"
-        >
-          <div className="flex lg:flex-1">
-            <a href="/manage/events" className="-m-1.5 p-1.5">
-              <span className="sr-only">Next.js Trivia Manager</span>
-              <Image
-                src={logoBrainyBrawls}
-                alt="Next.js Trivia Manager"
-                className="h-8 w-8"
-                unoptimized
-              />
-            </a>
+      <nav
+        className="mx-auto flex items-center justify-between p-6 lg:px-8"
+        aria-label="Global"
+      >
+        <div className="flex lg:flex-1">
+          <a href="/manage/events" className="-m-1.5 p-1.5">
+            <span className="sr-only">Next.js Trivia Manager</span>
+            <Image
+              src={logoBrainyBrawls}
+              alt="Next.js Trivia Manager"
+              className="h-8 w-8"
+              unoptimized
+            />
+          </a>
 
-            {/* <p>{event?.name}</p> */}
-          </div>
+          {/* <p>{event?.name}</p> */}
+        </div>
 
-          <div className="flex lg:hidden">
+        <div className="flex lg:hidden">
+          <button
+            type="button"
+            className="-m-2.5 inline-flex items-center justify-center rounded-md p-2.5 text-gray-700"
+          >
+            <span className="sr-only">Open main menu</span>
+            <Bars3Icon className="h-6 w-6" aria-hidden="true" />
+          </button>
+        </div>
+
+        <div className="hidden lg:flex lg:gap-x-12">
+          {navigation.map((item) => (
             <button
-              type="button"
-              className="-m-2.5 inline-flex items-center justify-center rounded-md p-2.5 text-gray-700"
+              key={item.name}
+              className={classNames(
+                pathname === item.href ? "text-primary" : "",
+                "text-md font-semibold leading-6 text-gray-900"
+              )}
+              onClick={() => router.push(item.href)}
             >
-              <span className="sr-only">Open main menu</span>
-              <Bars3Icon className="h-6 w-6" aria-hidden="true" />
+              {item.name}
             </button>
-          </div>
+          ))}
+        </div>
 
-          <div className="hidden lg:flex lg:gap-x-12">
-            {navigation.map((item) => (
-              <button
-                key={item.name}
-                className={classNames(
-                  pathname === item.href ? "text-primary" : "",
-                  "text-md font-semibold leading-6 text-gray-900"
-                )}
-                onClick={() => router.push(item.href)}
-              >
-                {item.name}
-              </button>
-            ))}
-          </div>
-
-          <div className="hidden lg:flex lg:flex-1 lg:justify-end">
-            {event !== undefined && (
-              <span
-                className={classNames(
-                  event?.status === "PENDING"
-                    ? "bg-blue-100"
-                    : event?.status === "ONGOING"
-                    ? "bg-green-100"
-                    : "bg-gray-100",
-                  "inline-flex items-center rounded-full px-2 mr-3 py-1 text-xs font-medium text-gray-600 ring-1 ring-inset"
-                )}
-              >
-                {event?.status}
-              </span>
-            )}
-
-            <button
-              type="button"
-              disabled={event === undefined}
-              className="inline-flex items-center gap-x-1.5 rounded-md px-2.5 py-1.5 text-sm text-gray-900 hover:text-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
-              onClick={() => {
-                setStartConfirmShow(true);
-              }}
+        <div className="hidden lg:flex lg:flex-1 lg:justify-end">
+          {event !== undefined && (
+            <span
+              className={classNames(
+                event?.status === "PENDING"
+                  ? "bg-blue-100"
+                  : event?.status === "ONGOING"
+                  ? "bg-green-100"
+                  : "bg-gray-100",
+                "inline-flex items-center rounded-full px-2 mr-3 py-1 text-xs font-medium text-gray-600 ring-1 ring-inset"
+              )}
             >
-              START EVENT
-              <RocketLaunchIcon
-                className="-mr-0.5 h-5 w-5"
-                aria-hidden="true"
-              />
-            </button>
-          </div>
-        </nav>
-      </div>
+              {event?.status}
+            </span>
+          )}
+
+          <button
+            type="button"
+            disabled={event === undefined}
+            className="inline-flex items-center gap-x-1.5 rounded-md px-2.5 py-1.5 text-sm text-gray-900 hover:text-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+            onClick={() => {
+              setStartConfirmShow(true);
+            }}
+          >
+            START EVENT
+            <RocketLaunchIcon className="-mr-0.5 h-5 w-5" aria-hidden="true" />
+          </button>
+        </div>
+      </nav>
     </div>
   );
 }
@@ -432,59 +427,93 @@ function LeftSidebar({
   const leftSidebarTabs = [{ name: "Rounds", href: "#", current: true }];
 
   return (
-    <div className="hidden sm:block">
-      <div className="border-b border-gray-300">
-        <nav className="-mb-px flex space-x-4 px-4 sm:px-6" aria-label="Tabs">
-          {leftSidebarTabs.map((tab) => (
-            <p
-              key={tab.name}
-              className={classNames(
-                tab.current
-                  ? "border-primary text-primary"
-                  : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700",
-                "whitespace-nowrap border-b py-4 px-1 text-sm font-medium"
-              )}
-              aria-current={tab.current ? "page" : undefined}
-            >
-              {tab.name}
-            </p>
-          ))}
-        </nav>
-      </div>
-
-      <div className="mx-6 my-3">
-        <div
-          className="-mx-2 space-y-1 mb-2"
-          onClick={() => {
-            setRoundSlideoutOpen(true);
-          }}
-        >
-          <div className="text-gray-900 border-2 border-dashed border-gray-300 hover:border-gray-400 group flex justify-between gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold">
-            <div>Add round</div>
-          </div>
+    <>
+      <div className="hidden xl:block">
+        <div className="hidden border-b border-gray-300 xl:block">
+          <nav className="-mb-px flex space-x-4 px-4" aria-label="Tabs">
+            {leftSidebarTabs.map((tab) => (
+              <p
+                key={tab.name}
+                className={classNames(
+                  tab.current
+                    ? "border-primary text-primary"
+                    : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700",
+                  "whitespace-nowrap border-b py-4 px-1 text-sm font-medium"
+                )}
+                aria-current={tab.current ? "page" : undefined}
+              >
+                {tab.name}
+              </p>
+            ))}
+          </nav>
         </div>
 
-        <nav className="flex flex-1 flex-row md:flex-col" aria-label="Sidebar">
-          <ul role="list" className="-mx-2 space-y-1">
+        <div className="mx-6 my-3 xl:block">
+          <div
+            className="-mx-2 space-y-1 mb-2"
+            onClick={() => {
+              setRoundSlideoutOpen(true);
+            }}
+          >
+            <div className="text-gray-900 border-2 border-dashed border-gray-300 hover:border-gray-400 group flex justify-between gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold">
+              <div>Add round</div>
+            </div>
+          </div>
+
+          <nav
+            className="flex flex-1 flex-row md:flex-col"
+            aria-label="Sidebar"
+          >
+            <ul role="list" className="-mx-2 space-y-1">
+              {rounds?.map((item) => (
+                <li key={item.id} onClick={() => setActiveRound(item)}>
+                  <div
+                    // href={item.href}
+                    className={classNames(
+                      item.id === activeRound?.id
+                        ? "bg-gray-200 text-primary"
+                        : "text-gray-700 hover:text-primary hover:bg-gray-100",
+                      "group flex gap-x-3 rounded-md p-2 pl-3 text-sm leading-6 font-semibold"
+                    )}
+                  >
+                    {item.name}
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </nav>
+        </div>
+      </div>
+
+      <div className="flex flex-col h-full bg-green-100 m-auto p-auto xl:hidden">
+        <div className="flex overflow-x-scroll hide-scroll-bar">
+          <div className="flex flex-nowrap items-center">
             {rounds?.map((item) => (
-              <li key={item.id} onClick={() => setActiveRound(item)}>
-                <div
-                  // href={item.href}
-                  className={classNames(
-                    item.id === activeRound?.id
-                      ? "bg-gray-200 text-primary"
-                      : "text-gray-700 hover:text-primary hover:bg-gray-50",
-                    "group flex gap-x-3 rounded-md p-2 pl-3 text-sm leading-6 font-semibold"
-                  )}
-                >
+              <div key={item.id} className="inline-block px-3">
+                <div className="bg-red-100 h-12 max-w-xs overflow-hidden rounded-lg">
                   {item.name}
                 </div>
-              </li>
+              </div>
             ))}
-          </ul>
-        </nav>
+            {/* <div className="inline-block px-3">
+              <div className="w-64 h-64 max-w-xs overflow-hidden rounded-lg shadow-md bg-white hover:shadow-xl transition-shadow duration-300 ease-in-out"></div>
+            </div>
+            <div className="inline-block px-3">
+              <div className="w-64 h-64 max-w-xs overflow-hidden rounded-lg shadow-md bg-white hover:shadow-xl transition-shadow duration-300 ease-in-out"></div>
+            </div>
+            <div className="inline-block px-3">
+              <div className="w-64 h-64 max-w-xs overflow-hidden rounded-lg shadow-md bg-white hover:shadow-xl transition-shadow duration-300 ease-in-out"></div>
+            </div>
+            <div className="inline-block px-3">
+              <div className="w-64 h-64 max-w-xs overflow-hidden rounded-lg shadow-md bg-white hover:shadow-xl transition-shadow duration-300 ease-in-out"></div>
+            </div>
+            <div className="inline-block px-3">
+              <div className="w-64 h-64 max-w-xs overflow-hidden rounded-lg shadow-md bg-white hover:shadow-xl transition-shadow duration-300 ease-in-out"></div>
+            </div> */}
+          </div>
+        </div>
       </div>
-    </div>
+    </>
   );
 }
 
@@ -502,7 +531,7 @@ function MainContent({
       <div className="flow-root">
         <div className="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
           <div className="inline-block min-w-full py-2 align-middle">
-            <table className="min-w-full divide-y divide-gray-300">
+            <table className="min-w-full border-b divide-y divide-gray-300">
               <thead>
                 <tr>
                   <th
