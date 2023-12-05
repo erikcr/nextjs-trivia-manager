@@ -66,7 +66,6 @@ export default function EditorByIdPage() {
     useState<Tables<"v001_questions_stag">>();
   const [qError, setQError] = useState<PostgrestError>();
   const [addQuestionLoading, setAddQuestionLoading] = useState(false);
-  const [questionSlideout, setQuestionSlideout] = useState(false);
 
   // Notification
   const [notifShow, setNotifShow] = useState(false);
@@ -81,6 +80,7 @@ export default function EditorByIdPage() {
     const { data, error } = await supabase
       .from("v001_questions_stag")
       .select()
+      .order("id")
       .eq("round_id", activeRound?.id)
       .eq("owner", user?.id);
 
@@ -213,7 +213,7 @@ export default function EditorByIdPage() {
         <MainContent
           questions={questions}
           qLoading={qLoading}
-          setQuestionSlideout={setQuestionSlideout}
+          setQuestionToEdit={setQuestionToEdit}
         />
       </main>
 
@@ -225,6 +225,8 @@ export default function EditorByIdPage() {
           user={user}
           activeRound={activeRound}
           getQuestions={getQuestions}
+          questionToEdit={questionToEdit}
+          setQuestionToEdit={setQuestionToEdit}
         />
       </aside>
 
@@ -528,11 +530,11 @@ function LeftSidebar({
 function MainContent({
   questions,
   qLoading,
-  setQuestionSlideout,
+  setQuestionToEdit,
 }: {
   questions: Tables<"v001_questions_stag">[] | undefined;
   qLoading: boolean;
-  setQuestionSlideout: Function;
+  setQuestionToEdit: Function;
 }) {
   return (
     <div className="px-4 sm:px-6 lg:px-8">
@@ -597,7 +599,7 @@ function MainContent({
                       <button
                         type="button"
                         className="text-primary hover:text-primary-hover"
-                        onClick={() => setQuestionSlideout(true)}
+                        onClick={() => setQuestionToEdit(item)}
                       >
                         Edit
                       </button>
@@ -617,10 +619,14 @@ function RightSidebar({
   user,
   activeRound,
   getQuestions,
+  questionToEdit,
+  setQuestionToEdit,
 }: {
   user: User | null;
   activeRound: Tables<"v001_rounds_stag"> | undefined;
   getQuestions: Function;
+  questionToEdit: Tables<"v001_questions_stag"> | undefined;
+  setQuestionToEdit: Function;
 }) {
   const supabase = createClient();
 
@@ -637,8 +643,9 @@ function RightSidebar({
   });
 
   const rightSidebarTabs = [
-    { name: "Add", href: "#" },
-    { name: "TriviaAI", href: "#" },
+    { name: "Edit", isVisible: questionToEdit },
+    { name: "Add", isVisible: true },
+    { name: "TriviaAI", isVisible: true },
   ];
 
   const removeQuestionFromAI = async () => {
@@ -668,6 +675,36 @@ function RightSidebar({
       removeQuestionFromAI();
     }
   };
+
+  const updateQuestion = async (formData: FormData) => {
+    const { data, error } = await supabase
+      .from("v001_questions_stag")
+      .update([
+        {
+          question: formData.get("question"),
+          answer: formData.get("answer"),
+          points: formData.get("points"),
+        },
+      ])
+      .eq("id", questionToEdit?.id)
+      .eq("owner", user?.id)
+      .select();
+
+    if (!error) {
+      getQuestions();
+      setAddQuestionLoading(false);
+
+      removeQuestionFromAI();
+    }
+  };
+
+  useEffect(() => {
+    if (questionToEdit) {
+      setActiveTab("Edit");
+    } else {
+      setActiveTab("Add");
+    }
+  }, [questionToEdit]);
 
   useEffect(() => {
     messages.map((item) => {
@@ -703,6 +740,7 @@ function RightSidebar({
                 tab.name === activeTab
                   ? "border-primary text-primary"
                   : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700",
+                tab.isVisible ? "" : "hidden",
                 "whitespace-nowrap border-b py-4 px-1 text-sm font-medium"
               )}
               aria-current={tab.name === activeTab ? "page" : undefined}
@@ -715,6 +753,101 @@ function RightSidebar({
           ))}
         </nav>
       </div>
+
+      {activeTab === "Edit" && (
+        <form action={updateQuestion} ref={formRef}>
+          <div className="space-y-12 px-4 sm:px-6">
+            <div className="pb-12">
+              {/* Question */}
+              <div className="space-y-2 sm:gap-4 sm:space-y-0 sm:py-3">
+                <label
+                  htmlFor="question"
+                  className="block text-sm font-medium leading-6 text-gray-900 sm:mt-1.5 sm:mb-2"
+                >
+                  Question <span className="text-red-600">*</span>
+                </label>
+                <div className="sm:col-span-2">
+                  <textarea
+                    required
+                    disabled={addQuestionLoading}
+                    name="question"
+                    id="question"
+                    rows={5}
+                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
+                    defaultValue={questionToEdit?.question}
+                  />
+                </div>
+              </div>
+
+              {/* Answer */}
+              <div className="space-y-2 sm:grid sm:grid-cols-3 sm:gap-4 sm:space-y-0 sm:py-5">
+                <div>
+                  <label
+                    htmlFor="answer"
+                    className="block text-sm font-medium leading-6 text-gray-900 sm:mt-1.5"
+                  >
+                    Answer <span className="text-red-600">*</span>
+                  </label>
+                </div>
+                <div className="sm:col-span-2">
+                  <input
+                    required
+                    id="answer"
+                    name="answer"
+                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
+                    defaultValue={questionToEdit?.answer}
+                  />
+                </div>
+              </div>
+
+              {/* Points */}
+              <div className="space-y-2 sm:grid sm:grid-cols-3 sm:gap-4 sm:space-y-0 sm:py-5">
+                <div>
+                  <label
+                    htmlFor="points"
+                    className="block text-sm font-medium leading-6 text-gray-900 sm:mt-1.5"
+                  >
+                    Points <span className="text-red-600">*</span>
+                  </label>
+                </div>
+                <div className="sm:col-span-2">
+                  <input
+                    required
+                    type="number"
+                    name="points"
+                    id="points"
+                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
+                    defaultValue={questionToEdit?.points}
+                  />
+                </div>
+              </div>
+
+              {/* Action buttons */}
+              <div className="flex-shrink-0 py-5">
+                <div className="flex justify-end space-x-3">
+                  <button
+                    disabled={addQuestionLoading}
+                    className="rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
+                    onClick={() => {
+                      setQuestionToEdit(undefined);
+                      setActiveTab("Add");
+                    }}
+                  >
+                    <>Cancel</>
+                  </button>
+
+                  <button
+                    type="submit"
+                    className="inline-flex justify-center rounded-md bg-primary px-3 py-2 text-sm font-semibold text-white hover:bg-primary-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+                  >
+                    <>Save</>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </form>
+      )}
 
       {activeTab === "Add" && (
         <form action={addQuestion} ref={formRef}>
