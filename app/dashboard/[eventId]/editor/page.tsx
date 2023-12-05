@@ -1,6 +1,6 @@
 "use client";
 
-import { Fragment, useEffect, useRef, useState } from "react";
+import { FormEvent, Fragment, useEffect, useRef, useState } from "react";
 import { useParams, usePathname, useRouter } from "next/navigation";
 import Image from "next/image";
 import { Dialog, Transition } from "@headlessui/react";
@@ -11,6 +11,7 @@ import {
   CheckIcon,
   XMarkIcon,
 } from "@heroicons/react/24/outline";
+import { useChat } from "ai/react";
 
 import logoBrainyBrawls from "@/public/logos/brainybrawls.svg";
 
@@ -26,6 +27,11 @@ import RoundSlideout from "@/components/slideouts/RoundSlideout";
 function classNames(...classes: any[]) {
   return classes.filter(Boolean).join(" ");
 }
+
+type TriviaItem = {
+  question: string;
+  answer: string;
+};
 
 export default function EditorByIdPage() {
   const { eventId } = useParams();
@@ -56,6 +62,8 @@ export default function EditorByIdPage() {
   // Questions
   const [questions, setQuestions] = useState<Tables<"v001_questions_stag">[]>();
   const [qLoading, setQLoading] = useState(true);
+  const [questionToEdit, setQuestionToEdit] =
+    useState<Tables<"v001_questions_stag">>();
   const [qError, setQError] = useState<PostgrestError>();
   const [addQuestionLoading, setAddQuestionLoading] = useState(false);
   const [questionSlideout, setQuestionSlideout] = useState(false);
@@ -616,13 +624,28 @@ function RightSidebar({
 }) {
   const supabase = createClient();
 
+  const [activeTab, setActiveTab] = useState("Add");
   const [addQuestionLoading, setAddQuestionLoading] = useState(false);
+  const [aiResponse, setAiResponse] = useState<TriviaItem[]>([]);
+  const [aiResponseLoading, setAiResponseLoading] = useState(false);
+
   const formRef = useRef<HTMLFormElement>(null);
+  const aiFormRef = useRef<HTMLFormElement>(null);
+
+  const { messages, input, handleInputChange, handleSubmit } = useChat({
+    api: "/api/chat/langchain",
+  });
 
   const rightSidebarTabs = [
-    { name: "Manual", href: "#", current: true },
-    // { name: "TriviaAI", href: "#", current: false },
+    { name: "Add", href: "#" },
+    { name: "TriviaAI", href: "#" },
   ];
+
+  const removeQuestionFromAI = async () => {
+    aiFormRef.current?.reset();
+    const newAiResponse = aiResponse.slice(1);
+    setAiResponse(newAiResponse);
+  };
 
   const addQuestion = async (formData: FormData) => {
     const { data, error } = await supabase
@@ -642,9 +665,19 @@ function RightSidebar({
       getQuestions();
       setAddQuestionLoading(false);
 
-      formRef.current?.reset();
+      removeQuestionFromAI();
     }
   };
+
+  useEffect(() => {
+    messages.map((item) => {
+      if (item.role === "assistant") {
+        let content = JSON.parse(item.content);
+        setAiResponse(content.message);
+        setAiResponseLoading(false);
+      }
+    });
+  }, [messages]);
 
   if (!activeRound) {
     return (
@@ -667,12 +700,15 @@ function RightSidebar({
             <p
               key={tab.name}
               className={classNames(
-                tab.current
+                tab.name === activeTab
                   ? "border-primary text-primary"
                   : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700",
                 "whitespace-nowrap border-b py-4 px-1 text-sm font-medium"
               )}
-              aria-current={tab.current ? "page" : undefined}
+              aria-current={tab.name === activeTab ? "page" : undefined}
+              onClick={() => {
+                setActiveTab(tab.name);
+              }}
             >
               {tab.name}
             </p>
@@ -680,89 +716,232 @@ function RightSidebar({
         </nav>
       </div>
 
-      <form action={addQuestion} ref={formRef}>
-        <div className="space-y-12 px-4 sm:px-6">
-          <div className="pb-12">
-            {/* Question */}
-            <div className="space-y-2 sm:gap-4 sm:space-y-0 sm:py-5">
-              <label
-                htmlFor="question"
-                className="block text-sm font-medium leading-6 text-gray-900 sm:mt-1.5 sm:mb-2"
-              >
-                Question <span className="text-red-600">*</span>
-              </label>
-              <div className="sm:col-span-2">
-                <textarea
-                  required
-                  disabled={addQuestionLoading}
-                  name="question"
-                  id="question"
-                  rows={5}
-                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
-                  defaultValue={""}
-                />
-              </div>
-            </div>
-
-            {/* Answer */}
-            <div className="space-y-2 sm:grid sm:grid-cols-3 sm:gap-4 sm:space-y-0 sm:py-5">
-              <div>
+      {activeTab === "Add" && (
+        <form action={addQuestion} ref={formRef}>
+          <div className="space-y-12 px-4 sm:px-6">
+            <div className="pb-12">
+              {/* Question */}
+              <div className="space-y-2 sm:gap-4 sm:space-y-0 sm:py-3">
                 <label
-                  htmlFor="answer"
-                  className="block text-sm font-medium leading-6 text-gray-900 sm:mt-1.5"
+                  htmlFor="question"
+                  className="block text-sm font-medium leading-6 text-gray-900 sm:mt-1.5 sm:mb-2"
                 >
-                  Answer <span className="text-red-600">*</span>
+                  Question <span className="text-red-600">*</span>
                 </label>
+                <div className="sm:col-span-2">
+                  <textarea
+                    required
+                    disabled={addQuestionLoading}
+                    name="question"
+                    id="question"
+                    rows={5}
+                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
+                    defaultValue={""}
+                  />
+                </div>
               </div>
-              <div className="sm:col-span-2">
-                <input
-                  required
-                  disabled={addQuestionLoading}
-                  id="answer"
-                  name="answer"
-                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
-                />
-              </div>
-            </div>
 
-            {/* Points */}
-            <div className="space-y-2 sm:grid sm:grid-cols-3 sm:gap-4 sm:space-y-0 sm:py-5">
-              <div>
-                <label
-                  htmlFor="points"
-                  className="block text-sm font-medium leading-6 text-gray-900 sm:mt-1.5"
-                >
-                  Points <span className="text-red-600">*</span>
-                </label>
+              {/* Answer */}
+              <div className="space-y-2 sm:grid sm:grid-cols-3 sm:gap-4 sm:space-y-0 sm:py-5">
+                <div>
+                  <label
+                    htmlFor="answer"
+                    className="block text-sm font-medium leading-6 text-gray-900 sm:mt-1.5"
+                  >
+                    Answer <span className="text-red-600">*</span>
+                  </label>
+                </div>
+                <div className="sm:col-span-2">
+                  <input
+                    required
+                    disabled={addQuestionLoading}
+                    id="answer"
+                    name="answer"
+                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
+                  />
+                </div>
               </div>
-              <div className="sm:col-span-2">
-                <input
-                  required
-                  disabled={addQuestionLoading}
-                  type="number"
-                  name="points"
-                  id="points"
-                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
-                  defaultValue={1}
-                />
-              </div>
-            </div>
 
-            {/* Action buttons */}
-            <div className="flex-shrink-0 py-5">
-              <div className="flex justify-end space-x-3">
-                <button
-                  disabled={addQuestionLoading}
-                  type="submit"
-                  className="inline-flex justify-center rounded-md bg-primary px-3 py-2 text-sm font-semibold text-white hover:bg-primary-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
-                >
-                  <>Add</>
-                </button>
+              {/* Points */}
+              <div className="space-y-2 sm:grid sm:grid-cols-3 sm:gap-4 sm:space-y-0 sm:py-5">
+                <div>
+                  <label
+                    htmlFor="points"
+                    className="block text-sm font-medium leading-6 text-gray-900 sm:mt-1.5"
+                  >
+                    Points <span className="text-red-600">*</span>
+                  </label>
+                </div>
+                <div className="sm:col-span-2">
+                  <input
+                    required
+                    disabled={addQuestionLoading}
+                    type="number"
+                    name="points"
+                    id="points"
+                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
+                    defaultValue={1}
+                  />
+                </div>
+              </div>
+
+              {/* Action buttons */}
+              <div className="flex-shrink-0 py-5">
+                <div className="flex justify-end space-x-3">
+                  <button
+                    disabled={addQuestionLoading}
+                    type="submit"
+                    className="inline-flex justify-center rounded-md bg-primary px-3 py-2 text-sm font-semibold text-white hover:bg-primary-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+                  >
+                    <>Add</>
+                  </button>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      </form>
+        </form>
+      )}
+
+      {activeTab === "TriviaAI" && (
+        <>
+          <div className="px-4 sm:px-6">
+            {aiResponseLoading === true ? (
+              <div>Loading...</div>
+            ) : (
+              <>
+                {aiResponse.length === 0 ? (
+                  <form
+                    onSubmit={(e) => {
+                      setAiResponseLoading(true);
+                      handleSubmit(e);
+                    }}
+                  >
+                    <div className="mt-3">
+                      <input
+                        type="text"
+                        name="topic"
+                        id="topic"
+                        className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                        placeholder="A trivia topic"
+                        value={input}
+                        onChange={handleInputChange}
+                      />
+                    </div>
+
+                    {/* Action buttons */}
+                    <div className="flex-shrink-0 py-5">
+                      <div className="flex justify-end space-x-3">
+                        <button
+                          disabled={addQuestionLoading}
+                          type="submit"
+                          className="rounded-md bg-primary px-3 py-2 text-sm font-semibold text-white hover:bg-primary-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+                        >
+                          <>Submit</>
+                        </button>
+                      </div>
+                    </div>
+                  </form>
+                ) : (
+                  <>
+                    <form action={addQuestion} ref={aiFormRef}>
+                      <div className="space-y-12">
+                        <div>
+                          {/* Question */}
+                          <div className="space-y-2 sm:gap-4 sm:space-y-0 sm:py-3">
+                            <label
+                              htmlFor="question"
+                              className="block text-sm font-medium leading-6 text-gray-900 sm:mt-1.5 sm:mb-2"
+                            >
+                              Question <span className="text-red-600">*</span>
+                            </label>
+                            <div className="sm:col-span-2">
+                              <textarea
+                                required
+                                disabled={addQuestionLoading}
+                                name="question"
+                                id="question"
+                                rows={5}
+                                className="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
+                                defaultValue={aiResponse[0].question}
+                              />
+                            </div>
+                          </div>
+
+                          {/* Answer */}
+                          <div className="space-y-2 sm:grid sm:grid-cols-3 sm:gap-4 sm:space-y-0 sm:py-5">
+                            <div>
+                              <label
+                                htmlFor="answer"
+                                className="block text-sm font-medium leading-6 text-gray-900 sm:mt-1.5"
+                              >
+                                Answer <span className="text-red-600">*</span>
+                              </label>
+                            </div>
+                            <div className="sm:col-span-2">
+                              <input
+                                required
+                                disabled={addQuestionLoading}
+                                id="answer"
+                                name="answer"
+                                className="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
+                                defaultValue={aiResponse[0].answer}
+                              />
+                            </div>
+                          </div>
+
+                          {/* Points */}
+                          <div className="space-y-2 sm:grid sm:grid-cols-3 sm:gap-4 sm:space-y-0 sm:py-5">
+                            <div>
+                              <label
+                                htmlFor="points"
+                                className="block text-sm font-medium leading-6 text-gray-900 sm:mt-1.5"
+                              >
+                                Points <span className="text-red-600">*</span>
+                              </label>
+                            </div>
+                            <div className="sm:col-span-2">
+                              <input
+                                required
+                                disabled={addQuestionLoading}
+                                type="number"
+                                name="points"
+                                id="points"
+                                className="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
+                                defaultValue={1}
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Action buttons */}
+                      <div className="flex-shrink-0 py-5">
+                        <div className="flex justify-end space-x-3">
+                          <button
+                            disabled={addQuestionLoading}
+                            className="rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
+                            onClick={() => removeQuestionFromAI()}
+                          >
+                            <>Remove</>
+                          </button>
+
+                          <button
+                            disabled={addQuestionLoading}
+                            type="submit"
+                            className="rounded-md bg-primary px-3 py-2 text-sm font-semibold text-white hover:bg-primary-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+                          >
+                            <>Add</>
+                          </button>
+                        </div>
+                      </div>
+                    </form>
+                  </>
+                )}
+              </>
+            )}
+          </div>
+        </>
+      )}
     </div>
   );
 }
