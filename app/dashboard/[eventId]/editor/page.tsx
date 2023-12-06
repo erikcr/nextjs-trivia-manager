@@ -653,9 +653,7 @@ function RightSidebar({
   const [addQuestionLoading, setAddQuestionLoading] = useState(false);
   const [aiResponse, setAiResponse] = useState<TriviaItem[]>([]);
   const [aiResponseLoading, setAiResponseLoading] = useState(false);
-  const [questionToAdd, setQuestionToAdd] = useState<
-    Tables<"v001_questions_stag"> | undefined
-  >();
+  const [questionToAdd, setQuestionToAdd] = useState<TriviaItem>();
 
   const addFormRef = useRef<HTMLFormElement>(null);
 
@@ -666,7 +664,6 @@ function RightSidebar({
   const rightSidebarTabs = [
     { name: "Edit", isVisible: questionToEdit },
     { name: "Add", isVisible: true },
-    { name: "TriviaAI", isVisible: true },
   ];
 
   const removeQuestionFromAI = async () => {
@@ -692,8 +689,7 @@ function RightSidebar({
     if (!error) {
       getQuestions();
       setAddQuestionLoading(false);
-
-      removeQuestionFromAI();
+      addFormRef.current?.reset;
     }
   };
 
@@ -955,7 +951,7 @@ function RightSidebar({
             </div>
           </form>
 
-          <>
+          {/* <>
             <label className="block text-sm font-medium leading-6 text-gray-900">
               Generate ideas with TriviaAI
             </label>
@@ -1014,17 +1010,19 @@ function RightSidebar({
                       <>Next</>
                     </button>
                     <button
-                      disabled={addQuestionLoading}
-                      type="submit"
-                      className="inline-flex justify-center rounded-md bg-primary px-3 py-2 text-sm font-semibold text-white hover:bg-primary-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+                      className="inline-flex justify-center rounded-md bg-blue-800 px-3 py-2 text-sm font-semibold text-white hover:bg-primary-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+                      onClick={() => {
+                        setQuestionToAdd(aiResponse[0]);
+                        removeQuestionFromAI();
+                      }}
                     >
-                      <>Add</>
+                      <>Edit</>
                     </button>
                   </div>
                 </div>
               </>
             )}
-          </>
+          </> */}
         </div>
       )}
     </div>
