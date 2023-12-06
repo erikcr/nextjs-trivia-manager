@@ -1,7 +1,7 @@
 "use client";
 
 import { Fragment, useState } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { Dialog, Transition, Menu } from "@headlessui/react";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 
@@ -27,6 +27,8 @@ export default function RoundSlideout({
   setRoundSlideoutOpen: Function;
 }) {
   const { eventId } = useParams();
+  const router = useRouter();
+
   const supabase = createClient();
 
   // Rounds

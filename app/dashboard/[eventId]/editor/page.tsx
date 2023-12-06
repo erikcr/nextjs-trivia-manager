@@ -1,15 +1,12 @@
 "use client";
 
+import { Fragment, MutableRefObject, useEffect, useRef, useState } from "react";
 import {
-  FormEvent,
-  FormEventHandler,
-  Fragment,
-  MutableRefObject,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
-import { useParams, usePathname, useRouter } from "next/navigation";
+  useParams,
+  useSearchParams,
+  usePathname,
+  useRouter,
+} from "next/navigation";
 import Image from "next/image";
 import { Dialog, Transition } from "@headlessui/react";
 import {
@@ -41,6 +38,9 @@ type TriviaItem = {
 
 export default function EditorByIdPage() {
   const { eventId } = useParams();
+  const searchParams = useSearchParams();
+  const roundFromUrl = searchParams.get("round");
+
   const router = useRouter();
 
   const supabase = createClient();
@@ -106,7 +106,13 @@ export default function EditorByIdPage() {
 
     if (data) {
       setRounds(data);
-      setActiveRound(data[0]);
+
+      const round = data.find((i) => i.id === Number(roundFromUrl));
+      if (round) {
+        setActiveRound(round);
+      } else {
+        setActiveRound(data[0]);
+      }
       setRLoading(false);
 
       if (!data.length) {
