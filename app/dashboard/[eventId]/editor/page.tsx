@@ -241,7 +241,7 @@ export default function EditorByIdPage() {
           getQuestions={getQuestions}
           questionToEdit={questionToEdit}
           setQuestionToEdit={setQuestionToEdit}
-          questionToEditFormRef={questionToEditFormRef}
+          // questionToEditFormRef={questionToEditFormRef}
         />
       </aside>
 
