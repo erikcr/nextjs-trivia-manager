@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 // Supabase
 import { User } from "@supabase/supabase-js";
@@ -16,6 +16,8 @@ function classNames(...classes: any[]) {
 
 export default function SettingsPage() {
   const supabase = createClient();
+
+  const passwordForm = useRef<HTMLFormElement>(null);
 
   // User
   const [user, setUser] = useState<User | null>(null);
@@ -38,6 +40,25 @@ export default function SettingsPage() {
       setNotifDesc("Click the link sent to your new email to confirm change.");
       setNotifType("success");
       setNotifShow(true);
+    }
+  };
+
+  const updatePassword = async (formData: FormData) => {
+    const password = formData.get("password") as string;
+
+    const { data, error } = await supabase.auth.updateUser({
+      password,
+    });
+
+    console.log(error);
+
+    if (data) {
+      setNotifTitle("Password updated");
+      setNotifDesc("");
+      setNotifType("success");
+      setNotifShow(true);
+
+      passwordForm.current?.reset();
     }
   };
 
@@ -105,7 +126,11 @@ export default function SettingsPage() {
             </p>
           </div>
 
-          <form className="md:col-span-2">
+          <form
+            action={updatePassword}
+            ref={passwordForm}
+            className="md:col-span-2"
+          >
             <div className="grid grid-cols-1 gap-x-6 gap-y-8 sm:max-w-xl sm:grid-cols-6">
               <div className="col-span-full">
                 <label
@@ -173,7 +198,7 @@ export default function SettingsPage() {
           </form>
         </div>
 
-        <div className="grid max-w-7xl grid-cols-1 gap-x-8 gap-y-10 px-4 py-16 sm:px-6 md:grid-cols-3 lg:px-8">
+        {/* <div className="grid max-w-7xl grid-cols-1 gap-x-8 gap-y-10 px-4 py-16 sm:px-6 md:grid-cols-3 lg:px-8">
           <div>
             <h2 className="text-base font-semibold leading-7 dark:text-white">
               Delete account
@@ -193,7 +218,7 @@ export default function SettingsPage() {
               Yes, delete my account
             </button>
           </form>
-        </div>
+        </div> */}
       </div>
 
       {/**
