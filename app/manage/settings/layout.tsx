@@ -1,18 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
-import { Dialog, Switch } from "@headlessui/react";
-import { Bars3Icon } from "@heroicons/react/20/solid";
-import {
-  BellIcon,
-  CreditCardIcon,
-  CubeIcon,
-  FingerPrintIcon,
-  UserCircleIcon,
-  UsersIcon,
-  XMarkIcon,
-} from "@heroicons/react/24/outline";
+import { UserCircleIcon } from "@heroicons/react/24/outline";
+
+// Supabase
+import { User } from "@supabase/supabase-js";
+import { createClient } from "@/utils/supabase/client";
 
 const secondaryNavigation = [
   {
@@ -20,11 +14,11 @@ const secondaryNavigation = [
     href: "/manage/settings",
     icon: UserCircleIcon,
   },
-  {
-    name: "Security",
-    href: "/manage/settings/security",
-    icon: FingerPrintIcon,
-  },
+  // {
+  //   name: "Security",
+  //   href: "/manage/settings/security",
+  //   icon: FingerPrintIcon,
+  // },
 ];
 
 function classNames(...classes: any[]) {
@@ -33,10 +27,25 @@ function classNames(...classes: any[]) {
 
 export default function SettingsLayout() {
   const pathname = usePathname();
+  const supabase = createClient();
+
+  // User
+  const [user, setUser] = useState<User | null>(null);
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [automaticTimezoneEnabled, setAutomaticTimezoneEnabled] =
     useState(true);
+
+  const getUser = async () => {
+    const { data } = await supabase.auth.getUser();
+    if (data) {
+      setUser(data.user);
+    }
+  };
+
+  useEffect(() => {
+    getUser();
+  });
 
   return (
     <div className="mx-auto max-w-7xl py-8 lg:flex lg:gap-x-4 lg:px-16">
@@ -52,16 +61,16 @@ export default function SettingsLayout() {
                   href={item.href}
                   className={classNames(
                     pathname === item.href
-                      ? "bg-gray-50 text-indigo-600"
-                      : "text-gray-700 hover:text-indigo-600 hover:bg-gray-50",
+                      ? "bg-gray-50 text-primary"
+                      : "text-gray-700 hover:text-primary hover:bg-gray-50",
                     "group flex gap-x-3 rounded-md py-2 pl-2 pr-3 text-sm leading-6 font-semibold"
                   )}
                 >
                   <item.icon
                     className={classNames(
                       pathname === item.href
-                        ? "text-indigo-600"
-                        : "text-gray-400 group-hover:text-indigo-600",
+                        ? "text-primary"
+                        : "text-gray-400 group-hover:text-primary",
                       "h-6 w-6 shrink-0"
                     )}
                     aria-hidden="true"
@@ -91,10 +100,10 @@ export default function SettingsLayout() {
                   Full name
                 </dt>
                 <dd className="mt-1 flex justify-between gap-x-6 sm:mt-0 sm:flex-auto">
-                  <div className="text-gray-900">Tom Cook</div>
+                  <div className="text-gray-900"></div>
                   <button
                     type="button"
-                    className="font-semibold text-indigo-600 hover:text-indigo-500"
+                    className="font-semibold text-primary hover:text-primary-hover"
                   >
                     Update
                   </button>
@@ -105,24 +114,10 @@ export default function SettingsLayout() {
                   Email address
                 </dt>
                 <dd className="mt-1 flex justify-between gap-x-6 sm:mt-0 sm:flex-auto">
-                  <div className="text-gray-900">tom.cook@example.com</div>
+                  <div className="text-gray-900">{user?.email}</div>
                   <button
                     type="button"
-                    className="font-semibold text-indigo-600 hover:text-indigo-500"
-                  >
-                    Update
-                  </button>
-                </dd>
-              </div>
-              <div className="pt-6 sm:flex">
-                <dt className="font-medium text-gray-900 sm:w-64 sm:flex-none sm:pr-6">
-                  Title
-                </dt>
-                <dd className="mt-1 flex justify-between gap-x-6 sm:mt-0 sm:flex-auto">
-                  <div className="text-gray-900">Human Resources Manager</div>
-                  <button
-                    type="button"
-                    className="font-semibold text-indigo-600 hover:text-indigo-500"
+                    className="font-semibold text-primary hover:text-primary-hover"
                   >
                     Update
                   </button>
@@ -131,7 +126,7 @@ export default function SettingsLayout() {
             </dl>
           </div>
 
-          <div>
+          {/* <div>
             <h2 className="text-base font-semibold leading-7 text-gray-900">
               Language and dates
             </h2>
@@ -149,7 +144,7 @@ export default function SettingsLayout() {
                   <div className="text-gray-900">English</div>
                   <button
                     type="button"
-                    className="font-semibold text-indigo-600 hover:text-indigo-500"
+                    className="font-semibold text-primary hover:text-primary-hover"
                   >
                     Update
                   </button>
@@ -163,7 +158,7 @@ export default function SettingsLayout() {
                   <div className="text-gray-900">DD-MM-YYYY</div>
                   <button
                     type="button"
-                    className="font-semibold text-indigo-600 hover:text-indigo-500"
+                    className="font-semibold text-primary hover:text-primary-hover"
                   >
                     Update
                   </button>
@@ -183,9 +178,9 @@ export default function SettingsLayout() {
                     onChange={setAutomaticTimezoneEnabled}
                     className={classNames(
                       automaticTimezoneEnabled
-                        ? "bg-indigo-600"
+                        ? "bg-primary"
                         : "bg-gray-200",
-                      "flex w-8 cursor-pointer rounded-full p-px ring-1 ring-inset ring-gray-900/5 transition-colors duration-200 ease-in-out focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                      "flex w-8 cursor-pointer rounded-full p-px ring-1 ring-inset ring-gray-900/5 transition-colors duration-200 ease-in-out focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
                     )}
                   >
                     <span
@@ -201,7 +196,7 @@ export default function SettingsLayout() {
                 </dd>
               </Switch.Group>
             </dl>
-          </div>
+          </div> */}
         </div>
       </main>
     </div>
