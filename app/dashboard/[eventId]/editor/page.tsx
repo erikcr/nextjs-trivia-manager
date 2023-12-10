@@ -695,7 +695,7 @@ function RightSidebar({
     if (!error) {
       getQuestions();
       setAddQuestionLoading(false);
-      addFormRef.current?.reset;
+      addFormRef.current?.reset();
     }
   };
 
