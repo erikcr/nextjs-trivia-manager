@@ -205,11 +205,13 @@ export default function EventsPage() {
             ))}
       </ul>
 
-      <div className="border-t border-gray-200 pb-5 mt-10">
-        <h3 className="text-base font-semibold leading-6 text-gray-900 pt-3">
-          Completed events
-        </h3>
-      </div>
+      {allEvents?.filter((item) => item.status === "COMPLETE") && (
+        <div className="border-t border-gray-200 pb-5 mt-10">
+          <h3 className="text-base font-semibold leading-6 text-gray-900 pt-3">
+            Completed events
+          </h3>
+        </div>
+      )}
 
       <ul
         role="list"
