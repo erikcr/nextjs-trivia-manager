@@ -16,7 +16,7 @@ import ThemeSwitcher from "@/components/ThemeSwitcher";
 const navigation: any[] = [
   { name: "Events", href: "/manage/events", display: true },
   // { name: "Calendar", href: "/manage/calendar", display: true },
-  // { name: "Settings", href: "/manage/settings", display: true },
+  { name: "Settings", href: "/manage/settings", display: true },
 ];
 
 function classNames(...classes: any[]) {
@@ -85,12 +85,14 @@ export default function ManageLayout({
             <div className="flex h-16 items-center justify-between px-4 sm:px-0">
               <div className="flex items-center">
                 <div className="flex-shrink-0">
-                  <Image
-                    src={logoBrainyBrawls}
-                    alt="Next.js Trivia Manager"
-                    className="h-8 w-8 text-gray-800"
-                    unoptimized
-                  />
+                  <button onClick={() => router.push("/manage/events")}>
+                    <Image
+                      src={logoBrainyBrawls}
+                      alt="Next.js Trivia Manager"
+                      className="h-8 w-8 text-gray-800"
+                      unoptimized
+                    />
+                  </button>
                 </div>
                 <div className="hidden md:block">
                   <div className="ml-10 flex items-baseline space-x-4">
@@ -129,6 +131,19 @@ export default function ManageLayout({
                       className="h-6 w-6"
                       aria-hidden="true"
                     />
+                  </button>
+
+                  <button
+                    className="inline-block h-8 w-8 ml-2 overflow-hidden rounded-full bg-gray-100"
+                    onClick={() => router.push("/manage/settings")}
+                  >
+                    <svg
+                      className="h-full w-full text-gray-300"
+                      fill="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path d="M24 20.993V24H0v-2.996A14.977 14.977 0 0112.004 15c4.904 0 9.26 2.354 11.996 5.993zM16.002 8.999a4 4 0 11-8 0 4 4 0 018 0z" />
+                    </svg>
                   </button>
                 </div>
               </div>
