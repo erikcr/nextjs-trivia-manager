@@ -3,11 +3,15 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { Dialog } from "@headlessui/react";
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 import { ChevronRightIcon } from "@heroicons/react/20/solid";
 
 import { createClient } from "@/utils/supabase/client";
+
+import logoBrainyBrawls from "@/public/logos/brainybrawls-dark.svg";
+import appScreenshot from "@/public/app-screenshot.png"
 
 const navigation: any[] = [];
 
@@ -37,15 +41,15 @@ export default function Example() {
           className="flex items-center justify-between p-6 lg:px-8"
           aria-label="Global"
         >
-          <div className="flex lg:flex-1">
-            <a href="#" className="-m-1.5 p-1.5">
-              <span className="sr-only">Brainy Brawls</span>
-              <img
-                className="h-8 w-auto"
-                src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=600"
-                alt=""
+          <div className="flex-shrink-0">
+            <button onClick={() => router.push("/")}>
+              <Image
+                src={logoBrainyBrawls}
+                alt="Next.js Trivia Manager"
+                className="h-8 w-8 text-gray-800"
+                unoptimized
               />
-            </a>
+            </button>
           </div>
           <div className="flex lg:hidden">
             <button
@@ -95,14 +99,14 @@ export default function Example() {
           <div className="fixed inset-0 z-50" />
           <Dialog.Panel className="fixed inset-y-0 right-0 z-50 w-full overflow-y-auto px-6 py-6 sm:max-w-sm sm:ring-1 sm:ring-gray-900/10">
             <div className="flex items-center justify-between">
-              <a href="#" className="-m-1.5 p-1.5">
-                <span className="sr-only">Your Company</span>
-                <img
-                  className="h-8 w-auto"
-                  src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=600"
-                  alt=""
+              <button onClick={() => router.push("/")}>
+                <Image
+                  src={logoBrainyBrawls}
+                  alt="Next.js Trivia Manager"
+                  className="h-8 w-8 text-gray-800"
+                  unoptimized
                 />
-              </a>
+              </button>
               <button
                 type="button"
                 className="-m-2.5 rounded-md p-2.5 text-gray-700"
@@ -192,7 +196,7 @@ export default function Example() {
             <div className="mt-10 flex items-center gap-x-6">
               <a
                 href="/auth/login"
-                className="rounded-md bg-indigo-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                className="rounded-md bg-primary px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-primary-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
               >
                 Get started
               </a>
@@ -224,8 +228,8 @@ export default function Example() {
                 transform="translate(24 24)"
                 clipPath="url(#2ade4387-9c63-4fc4-b754-10e687a0d332)"
               >
-                <img
-                  src="https://tailwindui.com/img/component-images/mobile-app-screenshot.png"
+                <Image
+                  src={appScreenshot}
                   alt=""
                 />
               </foreignObject>
