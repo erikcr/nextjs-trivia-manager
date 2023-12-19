@@ -93,7 +93,10 @@ export default function EventResponsesPage() {
 
     if (data) {
       setRounds(data);
-      setActiveRound(data[0]);
+      setActiveRound(data[data.length - 1]);
+
+      const lastOngoing = data.findLast((item) => item.status === "ONGOING");
+      setActiveRound(lastOngoing);
       setRLoading(false);
 
       if (!data.length) {
@@ -114,14 +117,8 @@ export default function EventResponsesPage() {
       setQuestions(data);
       setActiveQuestion(data[data.length - 1]);
 
-      const firstPending = data.find((item) => item.status === "PENDING");
-      if (firstPending) {
-        setActiveQuestion(firstPending);
-      }
-      if (!firstPending) {
-        const firstOngoing = data.find((item) => item.status === "ONGOING");
-        setActiveQuestion(firstOngoing);
-      }
+      const lastOngoing = data.findLast((item) => item.status === "ONGOING");
+      setActiveQuestion(lastOngoing);
       setQLoading(false);
     }
   };
@@ -176,6 +173,22 @@ export default function EventResponsesPage() {
   useEffect(() => {
     if (activeQuestion) {
       getResponses();
+
+      supabase
+        .channel("responses-changes")
+        .on(
+          "postgres_changes",
+          {
+            event: "*",
+            schema: "public",
+            table: "v001_responses_stag",
+            filter: `question_id=eq.${activeQuestion?.id}`,
+          },
+          () => {
+            getResponses();
+          }
+        )
+        .subscribe();
     }
   }, [activeQuestion]);
 
@@ -457,7 +470,7 @@ function LeftSidebar({
   const supabase = createClient();
 
   const updateRoundOngoing = async () => {
-    console.log(activeRound?.id)
+    console.log(activeRound?.id);
     const { data, error } = await supabase
       .from("v001_rounds_stag")
       .update({ status: "ONGOING" })
@@ -661,19 +674,19 @@ function RightSidebar({
       <div className="border-b border-gray-300">
         <nav className="-mb-px flex justify-end space-x-4 px-4 sm:px-6">
           {activeQuestion?.status === "COMPLETE" ? (
-            <p className="hover:text-primary py-4 px-1 text-sm font-medium">
+            <p className="py-4 px-1 text-sm font-medium">
               Submissions closed
             </p>
           ) : activeQuestion?.status === "ONGOING" ? (
             <button
-              className="py-4 px-1 text-sm font-medium"
+              className="text-primary hover:text-primary-hover py-4 px-1 text-sm font-medium"
               onClick={activateNextQuestion}
             >
               Close question
             </button>
           ) : (
             <button
-              className="py-4 px-1 text-sm font-medium"
+              className="text-primary hover:text-primary-hover py-4 px-1 text-sm font-medium"
               onClick={updateQuestionOngoing}
             >
               Activate question
@@ -696,6 +709,7 @@ function RightSidebar({
                   key={item.id}
                   item={item}
                   getResponses={getResponses}
+                  activeQuestion={activeQuestion}
                 />
               ))}
           </ul>
@@ -714,6 +728,7 @@ function RightSidebar({
                   key={item.id}
                   item={item}
                   getResponses={getResponses}
+                  activeQuestion={activeQuestion}
                 />
               ))}
           </ul>
@@ -732,6 +747,7 @@ function RightSidebar({
                   key={item.id}
                   item={item}
                   getResponses={getResponses}
+                  activeQuestion={activeQuestion}
                 />
               ))}
           </ul>
@@ -744,9 +760,11 @@ function RightSidebar({
 function ResponseItem({
   item,
   getResponses,
+  activeQuestion,
 }: {
   item: Tables<"v001_responses_stag">;
   getResponses: Function;
+  activeQuestion: Tables<"v001_questions_stag"> | undefined;
 }) {
   const supabase = createClient();
 
@@ -775,23 +793,25 @@ function ResponseItem({
         <div className="flex -space-x-0.5">
           <dt className="sr-only">Commenters</dt>
         </div>
-        <div className="flex w-16 gap-x-2.5">
-          <dt>
-            <span className="sr-only">Total comments</span>
-            <CheckCircleIcon
-              className="h-6 w-6 text-green-600"
-              aria-hidden="true"
-              onClick={() => approveResponse(item.id, true)}
-            />
-          </dt>
-          <dd className="text-sm leading-6 text-gray-900">
-            <XCircleIcon
-              className="h-6 w-6 text-red-600"
-              aria-hidden="true"
-              onClick={() => approveResponse(item.id, false)}
-            />
-          </dd>
-        </div>
+        {activeQuestion?.status !== "COMPLETE" && (
+          <div className="flex w-16 gap-x-2.5">
+            <dt>
+              <span className="sr-only">Total comments</span>
+              <CheckCircleIcon
+                className="h-6 w-6 text-green-600"
+                aria-hidden="true"
+                onClick={() => approveResponse(item.id, true)}
+              />
+            </dt>
+            <dd className="text-sm leading-6 text-gray-900">
+              <XCircleIcon
+                className="h-6 w-6 text-red-600"
+                aria-hidden="true"
+                onClick={() => approveResponse(item.id, false)}
+              />
+            </dd>
+          </div>
+        )}
       </dl>
     </li>
   );
