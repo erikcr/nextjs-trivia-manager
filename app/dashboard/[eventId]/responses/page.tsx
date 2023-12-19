@@ -235,6 +235,7 @@ export default function EventResponsesPage() {
           rounds={rounds}
           activeRound={activeRound}
           setActiveRound={setActiveRound}
+          getRounds={getRounds}
         />
       </aside>
 
@@ -446,13 +447,70 @@ function LeftSidebar({
   rounds,
   activeRound,
   setActiveRound,
+  getRounds,
 }: {
   rounds: Tables<"v001_rounds_stag">[] | undefined;
   activeRound: Tables<"v001_rounds_stag"> | undefined;
   setActiveRound: Function;
+  getRounds: Function;
 }) {
+  const supabase = createClient();
+
+  const updateRoundOngoing = async () => {
+    console.log(activeRound?.id)
+    const { data, error } = await supabase
+      .from("v001_rounds_stag")
+      .update({ status: "ONGOING" })
+      .eq("id", activeRound?.id)
+      .select();
+
+    if (data) {
+      getRounds();
+    } else if (error) {
+      console.log(error);
+    }
+  };
+
+  const activateNextRound = async () => {
+    const { data, error } = await supabase
+      .from("v001_rounds_stag")
+      .update({ status: "COMPLETE" })
+      .eq("id", activeRound?.id)
+      .select();
+
+    if (data) {
+      getRounds();
+    } else if (error) {
+      console.log(error);
+    }
+  };
+
   return (
     <div className="hidden sm:block">
+      <div className="border-b border-gray-300">
+        <nav className="-mb-px flex justify-end space-x-4 px-4 sm:px-6">
+          {activeRound?.status === "COMPLETE" ? (
+            <p className="hover:text-primary py-4 px-1 text-sm font-medium">
+              Round closed
+            </p>
+          ) : activeRound?.status === "ONGOING" ? (
+            <button
+              className="py-4 px-1 text-sm font-medium"
+              onClick={activateNextRound}
+            >
+              Close round
+            </button>
+          ) : (
+            <button
+              className="py-4 px-1 text-sm font-medium"
+              onClick={updateRoundOngoing}
+            >
+              Start round
+            </button>
+          )}
+        </nav>
+      </div>
+
       <div className="mx-6 my-3">
         <nav className="flex flex-1 flex-col" aria-label="Sidebar">
           <ul role="list" className="-mx-2 space-y-1">
@@ -464,10 +522,23 @@ function LeftSidebar({
                     item.id === activeRound?.id
                       ? "bg-gray-200 text-primary"
                       : "text-gray-700 hover:text-primary hover:bg-gray-100",
-                    "group flex gap-x-3 rounded-md p-2 pl-3 text-sm leading-6 font-semibold"
+                    "group justify-between flex gap-x-3 rounded-md p-2 pl-3 text-sm leading-6 font-semibold"
                   )}
                 >
                   {item.name}
+
+                  <span
+                    className={classNames(
+                      item.status === "ONGOING"
+                        ? "bg-green-100"
+                        : item.status === "PENDING"
+                        ? "bg-blue-100"
+                        : "bg-gray-100",
+                      "inline-flex items-center rounded-full px-2 py-1 text-xs font-medium text-gray-600 ring-1 ring-inset"
+                    )}
+                  >
+                    {item.status}
+                  </span>
                 </div>
               </li>
             ))}
