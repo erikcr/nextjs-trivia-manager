@@ -26,15 +26,20 @@ function classNames(...classes: any[]) {
 
 export default function EventOngoingPage() {
   const { eventId, roundId } = useParams();
-  const router = useRouter();
-
   const supabase = createClient();
+
+  /**
+   * State params
+   */
 
   // User
   const [user, setUser] = useState<User | null>(null);
 
   // Event
   const [event, setEvent] = useState<Tables<"v001_events_stag">>();
+
+  // Rounds
+  const [activeRound, setActiveRound] = useState<Tables<"v001_rounds_stag">>();
 
   // Questions
   const [questions, setQuestions] = useState<Tables<"v001_questions_stag">[]>();
@@ -49,6 +54,11 @@ export default function EventOngoingPage() {
   // Header button status
   const [topHeaderButton, setTopHeaderButton] = useState("");
 
+  /**
+   * Action functions
+   */
+
+  // Responses functions
   const getResponses = async () => {
     const { data, error } = await supabase
       .from("v001_responses_stag")
@@ -57,6 +67,35 @@ export default function EventOngoingPage() {
 
     if (data) {
       setResponses(data);
+    }
+  };
+
+  const approveResponse = async (responseId: number, isCorrect: boolean) => {
+    const { data, error } = await supabase
+      .from("v001_responses_stag")
+      .update({ is_correct: isCorrect })
+      .eq("id", responseId);
+
+    if (!error) {
+      getResponses();
+    }
+  };
+
+  useEffect(() => {
+    if (activeQuestion) {
+      getResponses();
+    }
+  }, [activeQuestion]);
+
+  // Questions functions
+  const updateQuestionOngoing = async () => {
+    const { data, error } = await supabase
+      .from("v001_questions_stag")
+      .update({ status: "ONGOING" })
+      .eq("id", nextQuestion?.id);
+
+    if (error) {
+      console.log(error);
     }
   };
 
@@ -86,34 +125,9 @@ export default function EventOngoingPage() {
     }
   };
 
-  const getEvent = async () => {
-    const { data, error } = await supabase
-      .from("v001_events_stag")
-      .select()
-      .eq("id", eventId)
-      .eq("owner", user?.id);
-
-    if (data) {
-      setEvent(data[0]);
-
-      getQuestions();
-    }
-  };
-
-  const getUser = async () => {
-    const { data } = await supabase.auth.getUser();
-    if (data) {
-      setUser(data.user);
-    }
-  };
-
   useEffect(() => {
-    if (activeQuestion) {
-      getResponses();
-    }
-  }, [activeQuestion]);
+    getQuestions();
 
-  useEffect(() => {
     supabase
       .channel("active-round-question-changes")
       .on(
@@ -129,13 +143,67 @@ export default function EventOngoingPage() {
         }
       )
       .subscribe();
+  }, [activeRound]);
+
+  // Rounds functions
+  const closeRound = async () => {
+    questions?.map(async (item) => {
+      const { data, error } = await supabase
+        .from("v001_questions_stag")
+        .update({ status: "COMPLETE" })
+        .eq("id", item.id);
+    });
+
+    const { data, error } = await supabase
+      .from("v001_rounds_stag")
+      .update({ status: "COMPLETE" })
+      .eq("id", roundId);
+  };
+
+  const getRound = async () => {
+    const { data, error } = await supabase
+      .from("v001_rounds_stag")
+      .select()
+      .eq("round_id", roundId)
+      .eq("owner", user?.id);
+
+    if (data) {
+      setActiveRound(data[0]);
+    }
+  };
+
+  useEffect(() => {
+    if (event) {
+      getRound();
+    }
   }, [event]);
+
+  // Event functions
+  const getEvent = async () => {
+    const { data, error } = await supabase
+      .from("v001_events_stag")
+      .select()
+      .eq("id", eventId)
+      .eq("owner", user?.id);
+
+    if (data) {
+      setEvent(data[0]);
+    }
+  };
 
   useEffect(() => {
     if (user) {
       getEvent();
     }
   }, [user]);
+
+  // User functions
+  const getUser = async () => {
+    const { data } = await supabase.auth.getUser();
+    if (data) {
+      setUser(data.user);
+    }
+  };
 
   useEffect(() => {
     getUser();
@@ -147,73 +215,26 @@ export default function EventOngoingPage() {
        * Top header
        */}
       <div className="fixed top-0 left-0 right-0 z-40 flex h-16 shrink-0 items-center gap-x-4 border-b border-gray-400">
-        <TopHeader
-          event={event}
-          topHeaderButton={topHeaderButton}
-          nextQuestion={nextQuestion}
-          questions={questions}
-        />
+        <TopHeader />
       </div>
 
       {/**
        * Main content
        */}
       <main className="fixed top-16 bottom-0 left-0 w-2/3 border-r border-gray-400">
-        <MainContent
-          questions={questions}
-          activeQuestion={activeQuestion}
-          setActiveQuestion={setActiveQuestion}
-        />
+        <MainContent />
       </main>
 
       {/**
        * Right-side column
        */}
       <aside className="fixed top-16 bottom-0 right-0 w-1/3">
-        <RightSidebar
-          activeQuestion={activeQuestion}
-          // setActiveQuestion={setActiveQuestion}
-          // getQuestions={getQuestions}
-          responses={responses}
-          // getResponses={getResponses}
-        />
+        <RightSidebar />
       </aside>
     </>
   );
 
-  function TopHeader({
-    event,
-    topHeaderButton,
-    nextQuestion,
-    questions,
-  }: {
-    event: Tables<"v001_events_stag"> | undefined;
-    topHeaderButton: string;
-    nextQuestion: Tables<"v001_questions_stag"> | undefined;
-    questions: Tables<"v001_questions_stag">[] | undefined;
-  }) {
-    const pathname = usePathname();
-
-    const updateQuestionOngoing = async () => {
-      const { data, error } = await supabase
-        .from("v001_questions_stag")
-        .update({ status: "ONGOING" })
-        .eq("id", nextQuestion?.id);
-
-      if (error) {
-        console.log(error);
-      }
-    };
-
-    const closeRound = async () => {
-      questions?.map(async (item) => {
-        const { data, error } = await supabase
-          .from("v001_questions_stag")
-          .update({ status: "COMPLETE" })
-          .eq("id", item.id);
-      });
-    };
-
+  function TopHeader() {
     return (
       <div className="w-full">
         <div className="mx-auto px-4">
@@ -245,7 +266,7 @@ export default function EventOngoingPage() {
                 onClick={
                   topHeaderButton === "ACTIVATE_NEXT_QUESTION"
                     ? updateQuestionOngoing
-                    : () => {}
+                    : closeRound
                 }
               >
                 {topHeaderButton.replaceAll("_", " ")}
@@ -257,15 +278,7 @@ export default function EventOngoingPage() {
     );
   }
 
-  function MainContent({
-    questions,
-    activeQuestion,
-    setActiveQuestion,
-  }: {
-    questions: Tables<"v001_questions_stag">[] | undefined;
-    activeQuestion: Tables<"v001_questions_stag"> | undefined;
-    setActiveQuestion: Function;
-  }) {
+  function MainContent() {
     return (
       <div className="hidden sm:block">
         <ul role="list" className="border-b divide-y divide-gray-200">
@@ -324,64 +337,65 @@ export default function EventOngoingPage() {
       </div>
     );
   }
-}
 
-function RightSidebar({
-  activeQuestion,
-  responses,
-}: {
-  activeQuestion: Tables<"v001_questions_stag"> | undefined;
-  responses: Tables<"v001_responses_stag">[] | undefined;
-}) {
-  if (!activeQuestion) {
+  function RightSidebar() {
+    if (!activeQuestion) {
+      return (
+        <div>
+          <nav className="-mb-px flex justify-center pt-8 space-x-4 px-4 sm:px-6">
+            <p>Select a question.</p>
+          </nav>
+        </div>
+      );
+    }
+
     return (
-      <div>
-        <nav className="-mb-px flex justify-center pt-8 space-x-4 px-4 sm:px-6">
-          <p>Select a question.</p>
-        </nav>
-      </div>
+      <ul role="list" className="divide-y divide-gray-100 px-6">
+        {activeRound?.status}
+
+        {responses?.map((item) => (
+          <li
+            key={item.id}
+            className="flex flex-wrap items-center justify-between gap-x-6 gap-y-4 py-2 sm:flex-nowrap"
+          >
+            <div>
+              <p className="text-sm font-semibold leading-6 text-gray-900">
+                {item.submitted_answer}
+              </p>
+            </div>
+            <dl className="flex w-full flex-none items-center justify-between px-4 py-4 sm:w-auto">
+              <div
+                className={classNames(
+                  activeRound?.status !== "COMPLETE"
+                    ? "flex w-16 gap-x-2.5"
+                    : "hidden bg-red-300"
+                )}
+              >
+                <dt>
+                  <CheckCircleIcon
+                    className={classNames(
+                      item.is_correct === true ? "text-green-600" : "",
+                      "h-6 w-6 text-gray-600 hover:text-green-600"
+                    )}
+                    aria-hidden="true"
+                    onClick={() => approveResponse(item.id, true)}
+                  />
+                </dt>
+                <dd className="text-sm leading-6 text-gray-900">
+                  <XCircleIcon
+                    className={classNames(
+                      item.is_correct === false ? "text-red-600" : "",
+                      "h-6 w-6 text-gray-600 hover:text-red-600"
+                    )}
+                    aria-hidden="true"
+                    onClick={() => approveResponse(item.id, false)}
+                  />
+                </dd>
+              </div>
+            </dl>
+          </li>
+        ))}
+      </ul>
     );
   }
-
-  return (
-    <ul role="list" className="divide-y divide-gray-100 px-6">
-      {responses?.map((item) => (
-        <li
-          key={item.id}
-          className="flex flex-wrap items-center justify-between gap-x-6 gap-y-4 py-2 sm:flex-nowrap"
-        >
-          <div>
-            <p className="text-sm font-semibold leading-6 text-gray-900">
-              {item.submitted_answer}
-            </p>
-          </div>
-          <dl className="flex w-full flex-none items-center justify-between px-4 py-4 sm:w-auto">
-            <div className="flex w-16 gap-x-2.5">
-              <dt>
-                <span className="sr-only">Total comments</span>
-                <CheckCircleIcon
-                  className={classNames(
-                    item.is_correct === true ? "text-green-600" : "",
-                    "h-6 w-6 text-gray-600 hover:text-green-600"
-                  )}
-                  aria-hidden="true"
-                  // onClick={() => approveResponse(item.id, true)}
-                />
-              </dt>
-              <dd className="text-sm leading-6 text-gray-900">
-                <XCircleIcon
-                  className={classNames(
-                    item.is_correct === false ? "text-red-600" : "",
-                    "h-6 w-6 text-gray-600 hover:text-red-600"
-                  )}
-                  aria-hidden="true"
-                  // onClick={() => approveResponse(item.id, false)}
-                />
-              </dd>
-            </div>
-          </dl>
-        </li>
-      ))}
-    </ul>
-  );
 }
