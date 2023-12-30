@@ -42,10 +42,31 @@ export default function EventOngoingPage() {
 
   // Questions
   const [questions, setQuestions] = useState<Tables<"v001_questions_stag">[]>();
+  const [activeQuestion, setActiveQuestion] =
+    useState<Tables<"v001_questions_stag">>();
+  const [nextQuestion, setNextQuestion] =
+    useState<Tables<"v001_questions_stag">>();
+
+  // Header button status
+  const [topHeaderButton, setTopHeaderButton] = useState("");
+  const [topHeaderButtonAction, setTopHeaderButtonAction] =
+    useState<Promise<void>>();
 
   // Modal
-  const [endConfirmShow, setEndConfirmShow] = useState(false);
   const cancelButtonRef = useRef(null);
+
+  const updateQuestionOngoing = async (questionId: number) => {
+    console.log(`update ${questionId}`);
+    const { data, error } = await supabase
+      .from("v001_questions_stag")
+      .update({ status: "ONGOING" })
+      .eq("id", questionId)
+      .select();
+
+    if (error) {
+      console.log(error);
+    }
+  };
 
   const getQuestions = async () => {
     const { data, error } = await supabase
@@ -57,6 +78,15 @@ export default function EventOngoingPage() {
 
     if (data) {
       setQuestions(data);
+      setActiveQuestion(data[0]);
+
+      const activeQuestion = data.findLast((item) => item.status === "PENDING");
+      const nextQuestion = data.find((item) => item.status === "PENDING");
+      if (nextQuestion) {
+        setNextQuestion(nextQuestion);
+        setTopHeaderButton("ACTIVATE_QUESTION");
+        // setTopHeaderButtonAction(() => updateQuestionOngoing(nextQuestion.id));
+      }
     }
   };
 
@@ -97,7 +127,7 @@ export default function EventOngoingPage() {
        * Top header
        */}
       <div className="fixed top-0 left-0 right-0 z-40 flex h-16 shrink-0 items-center gap-x-4 border-b border-gray-400">
-        <TopHeader event={event} setEndConfirmShow={setEndConfirmShow} />
+        <TopHeader event={event} topHeaderButton={topHeaderButton} />
       </div>
 
       {/**
@@ -106,8 +136,8 @@ export default function EventOngoingPage() {
       <main className="fixed top-16 bottom-0 left-0 w-2/3 border-r border-gray-400">
         <MainContent
           questions={questions}
-          // activeQuestion={activeQuestion}
-          // setActiveQuestion={setActiveQuestion}
+          activeQuestion={activeQuestion}
+          setActiveQuestion={setActiveQuestion}
         />
       </main>
     </>
@@ -115,10 +145,10 @@ export default function EventOngoingPage() {
 
   function TopHeader({
     event,
-    setEndConfirmShow,
+    topHeaderButton,
   }: {
     event: Tables<"v001_events_stag"> | undefined;
-    setEndConfirmShow: Function;
+    topHeaderButton: string;
   }) {
     const pathname = usePathname();
 
@@ -150,9 +180,9 @@ export default function EventOngoingPage() {
                 type="button"
                 disabled={event === undefined}
                 className="inline-flex items-center gap-x-1.5 px-2.5 py-1.5 text-sm text-gray-900 hover:text-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
-                onClick={() => setEndConfirmShow(true)}
+                // onClick={() => setEndConfirmShow(true)}
               >
-                END EVENT
+                {topHeaderButton.replace("_", " ")}
               </button>
             </div>
           </nav>
@@ -163,12 +193,12 @@ export default function EventOngoingPage() {
 
   function MainContent({
     questions,
-  }: // activeQuestion,
-  // setActiveQuestion,
-  {
+    activeQuestion,
+    setActiveQuestion,
+  }: {
     questions: Tables<"v001_questions_stag">[] | undefined;
-    // activeQuestion: Tables<"v001_questions_stag"> | undefined;
-    // setActiveQuestion: Function;
+    activeQuestion: Tables<"v001_questions_stag"> | undefined;
+    setActiveQuestion: Function;
   }) {
     return (
       <div className="hidden sm:block">
@@ -177,10 +207,10 @@ export default function EventOngoingPage() {
             <li
               key={item.id}
               className={classNames(
-              //   activeQuestion?.id === item.id ? "bg-gray-100" : "",
-                "relative flex justify-between gap-x-6 px-4 py-2 hover:bg-gray-100 sm:px-6"
+                activeQuestion?.id === item.id ? "bg-gray-100" : "",
+                "relative flex justify-between gap-x-6 px-4 py-2 sm:px-6 hover:bg-gray-100"
               )}
-              // onClick={() => setActiveQuestion(item)}
+              onClick={() => setActiveQuestion(item)}
             >
               <div className="flex min-w-0 gap-x-4">
                 <div className="min-w-0 flex-auto">
@@ -194,7 +224,7 @@ export default function EventOngoingPage() {
                 </div>
               </div>
               <div className="flex shrink-0 items-center gap-x-4">
-                <div className="hidden sm:flex sm:flex-col sm:items-end">
+                <div className="hidden lg:flex lg:flex-1 lg:justify-end">
                   <span
                     className={classNames(
                       item.status === "ONGOING"
@@ -208,6 +238,14 @@ export default function EventOngoingPage() {
                     {item.status}
                   </span>
                 </div>
+                <ChevronRightIcon
+                  className={classNames(
+                    activeQuestion?.id === item.id
+                      ? "text-gray-600"
+                      : "text-gray-100",
+                    "h-4 w-4"
+                  )}
+                />
               </div>
             </li>
           ))}
