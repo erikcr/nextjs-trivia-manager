@@ -5,19 +5,15 @@ import { useParams, usePathname, useRouter } from "next/navigation";
 import Image from "next/image";
 import { Dialog, Transition } from "@headlessui/react";
 import {
-  ChevronRightIcon,
-  RocketLaunchIcon,
-  ArrowRightOnRectangleIcon,
   CheckCircleIcon,
+  ChevronRightIcon,
   XCircleIcon,
-  CheckIcon,
-  Bars3Icon,
 } from "@heroicons/react/24/outline";
 
 import logoBrainyBrawls from "@/public/logos/brainybrawls.svg";
 
 // Supabase
-import { PostgrestError, User } from "@supabase/supabase-js";
+import { User } from "@supabase/supabase-js";
 import { createClient } from "@/utils/supabase/client";
 import { Tables } from "@/types/database.types";
 
@@ -47,24 +43,20 @@ export default function EventOngoingPage() {
   const [nextQuestion, setNextQuestion] =
     useState<Tables<"v001_questions_stag">>();
 
+  // Responses
+  const [responses, setResponses] = useState<Tables<"v001_responses_stag">[]>();
+
   // Header button status
   const [topHeaderButton, setTopHeaderButton] = useState("");
-  const [topHeaderButtonAction, setTopHeaderButtonAction] =
-    useState<Promise<void>>();
 
-  // Modal
-  const cancelButtonRef = useRef(null);
-
-  const updateQuestionOngoing = async (questionId: number) => {
-    console.log(`update ${questionId}`);
+  const getResponses = async () => {
     const { data, error } = await supabase
-      .from("v001_questions_stag")
-      .update({ status: "ONGOING" })
-      .eq("id", questionId)
-      .select();
+      .from("v001_responses_stag")
+      .select("*, v001_teams_stag( name )")
+      .eq("question_id", activeQuestion?.id);
 
-    if (error) {
-      console.log(error);
+    if (data) {
+      setResponses(data);
     }
   };
 
@@ -78,14 +70,18 @@ export default function EventOngoingPage() {
 
     if (data) {
       setQuestions(data);
-      setActiveQuestion(data[0]);
 
-      const activeQuestion = data.findLast((item) => item.status === "PENDING");
+      const activeQuestion = data.findLast((item) => item.status === "ONGOING");
+      if (activeQuestion) {
+        setActiveQuestion(activeQuestion);
+      }
+
       const nextQuestion = data.find((item) => item.status === "PENDING");
       if (nextQuestion) {
         setNextQuestion(nextQuestion);
-        setTopHeaderButton("ACTIVATE_QUESTION");
-        // setTopHeaderButtonAction(() => updateQuestionOngoing(nextQuestion.id));
+        setTopHeaderButton("ACTIVATE_NEXT_QUESTION");
+      } else {
+        setTopHeaderButton("CLOSE_ROUND");
       }
     }
   };
@@ -112,6 +108,30 @@ export default function EventOngoingPage() {
   };
 
   useEffect(() => {
+    if (activeQuestion) {
+      getResponses();
+    }
+  }, [activeQuestion]);
+
+  useEffect(() => {
+    supabase
+      .channel("active-round-question-changes")
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "v001_questions_stag",
+          filter: `round_id=eq.${roundId}`,
+        },
+        () => {
+          getQuestions();
+        }
+      )
+      .subscribe();
+  }, [event]);
+
+  useEffect(() => {
     if (user) {
       getEvent();
     }
@@ -127,7 +147,12 @@ export default function EventOngoingPage() {
        * Top header
        */}
       <div className="fixed top-0 left-0 right-0 z-40 flex h-16 shrink-0 items-center gap-x-4 border-b border-gray-400">
-        <TopHeader event={event} topHeaderButton={topHeaderButton} />
+        <TopHeader
+          event={event}
+          topHeaderButton={topHeaderButton}
+          nextQuestion={nextQuestion}
+          questions={questions}
+        />
       </div>
 
       {/**
@@ -140,17 +165,54 @@ export default function EventOngoingPage() {
           setActiveQuestion={setActiveQuestion}
         />
       </main>
+
+      {/**
+       * Right-side column
+       */}
+      <aside className="fixed top-16 bottom-0 right-0 w-1/3">
+        <RightSidebar
+          activeQuestion={activeQuestion}
+          // setActiveQuestion={setActiveQuestion}
+          // getQuestions={getQuestions}
+          responses={responses}
+          // getResponses={getResponses}
+        />
+      </aside>
     </>
   );
 
   function TopHeader({
     event,
     topHeaderButton,
+    nextQuestion,
+    questions,
   }: {
     event: Tables<"v001_events_stag"> | undefined;
     topHeaderButton: string;
+    nextQuestion: Tables<"v001_questions_stag"> | undefined;
+    questions: Tables<"v001_questions_stag">[] | undefined;
   }) {
     const pathname = usePathname();
+
+    const updateQuestionOngoing = async () => {
+      const { data, error } = await supabase
+        .from("v001_questions_stag")
+        .update({ status: "ONGOING" })
+        .eq("id", nextQuestion?.id);
+
+      if (error) {
+        console.log(error);
+      }
+    };
+
+    const closeRound = async () => {
+      questions?.map(async (item) => {
+        const { data, error } = await supabase
+          .from("v001_questions_stag")
+          .update({ status: "COMPLETE" })
+          .eq("id", item.id);
+      });
+    };
 
     return (
       <div className="w-full">
@@ -180,9 +242,13 @@ export default function EventOngoingPage() {
                 type="button"
                 disabled={event === undefined}
                 className="inline-flex items-center gap-x-1.5 px-2.5 py-1.5 text-sm text-gray-900 hover:text-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
-                // onClick={() => setEndConfirmShow(true)}
+                onClick={
+                  topHeaderButton === "ACTIVATE_NEXT_QUESTION"
+                    ? updateQuestionOngoing
+                    : () => {}
+                }
               >
-                {topHeaderButton.replace("_", " ")}
+                {topHeaderButton.replaceAll("_", " ")}
               </button>
             </div>
           </nav>
@@ -208,9 +274,14 @@ export default function EventOngoingPage() {
               key={item.id}
               className={classNames(
                 activeQuestion?.id === item.id ? "bg-gray-100" : "",
-                "relative flex justify-between gap-x-6 px-4 py-2 sm:px-6 hover:bg-gray-100"
+                item.status !== "PENDING" ? "hover:bg-gray-100" : "",
+                "relative flex justify-between gap-x-6 px-4 py-2 sm:px-6"
               )}
-              onClick={() => setActiveQuestion(item)}
+              onClick={
+                item.status !== "PENDING"
+                  ? () => setActiveQuestion(item)
+                  : () => {}
+              }
             >
               <div className="flex min-w-0 gap-x-4">
                 <div className="min-w-0 flex-auto">
@@ -253,4 +324,64 @@ export default function EventOngoingPage() {
       </div>
     );
   }
+}
+
+function RightSidebar({
+  activeQuestion,
+  responses,
+}: {
+  activeQuestion: Tables<"v001_questions_stag"> | undefined;
+  responses: Tables<"v001_responses_stag">[] | undefined;
+}) {
+  if (!activeQuestion) {
+    return (
+      <div>
+        <nav className="-mb-px flex justify-center pt-8 space-x-4 px-4 sm:px-6">
+          <p>Select a question.</p>
+        </nav>
+      </div>
+    );
+  }
+
+  return (
+    <ul role="list" className="divide-y divide-gray-100 px-6">
+      {responses?.map((item) => (
+        <li
+          key={item.id}
+          className="flex flex-wrap items-center justify-between gap-x-6 gap-y-4 py-2 sm:flex-nowrap"
+        >
+          <div>
+            <p className="text-sm font-semibold leading-6 text-gray-900">
+              {item.submitted_answer}
+            </p>
+          </div>
+          <dl className="flex w-full flex-none items-center justify-between px-4 py-4 sm:w-auto">
+            <div className="flex w-16 gap-x-2.5">
+              <dt>
+                <span className="sr-only">Total comments</span>
+                <CheckCircleIcon
+                  className={classNames(
+                    item.is_correct === true ? "text-green-600" : "",
+                    "h-6 w-6 text-gray-600 hover:text-green-600"
+                  )}
+                  aria-hidden="true"
+                  // onClick={() => approveResponse(item.id, true)}
+                />
+              </dt>
+              <dd className="text-sm leading-6 text-gray-900">
+                <XCircleIcon
+                  className={classNames(
+                    item.is_correct === false ? "text-red-600" : "",
+                    "h-6 w-6 text-gray-600 hover:text-red-600"
+                  )}
+                  aria-hidden="true"
+                  // onClick={() => approveResponse(item.id, false)}
+                />
+              </dd>
+            </div>
+          </dl>
+        </li>
+      ))}
+    </ul>
+  );
 }
