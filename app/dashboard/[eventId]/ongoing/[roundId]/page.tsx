@@ -89,6 +89,10 @@ export default function EventOngoingPage() {
 
   // Questions functions
   const updateQuestionOngoing = async () => {
+    if (activeRound?.status === "PENDING") {
+      startRound();
+    }
+
     const { data, error } = await supabase
       .from("v001_questions_stag")
       .update({ status: "ONGOING" })
@@ -126,7 +130,9 @@ export default function EventOngoingPage() {
   };
 
   useEffect(() => {
-    getQuestions();
+    if (activeRound) {
+      getQuestions();
+    }
 
     supabase
       .channel("active-round-question-changes")
@@ -146,6 +152,13 @@ export default function EventOngoingPage() {
   }, [activeRound]);
 
   // Rounds functions
+  const startRound = async () => {
+    const { data, error } = await supabase
+      .from("v001_rounds_stag")
+      .update({ status: "ONGOING" })
+      .eq("id", roundId);
+  };
+
   const closeRound = async () => {
     questions?.map(async (item) => {
       const { data, error } = await supabase
@@ -164,7 +177,7 @@ export default function EventOngoingPage() {
     const { data, error } = await supabase
       .from("v001_rounds_stag")
       .select()
-      .eq("round_id", roundId)
+      .eq("id", roundId)
       .eq("owner", user?.id);
 
     if (data) {
@@ -343,7 +356,17 @@ export default function EventOngoingPage() {
       return (
         <div>
           <nav className="-mb-px flex justify-center pt-8 space-x-4 px-4 sm:px-6">
-            <p>Select a question.</p>
+            <p>Activate the first question.</p>
+          </nav>
+        </div>
+      );
+    }
+
+    if (!responses?.length) {
+      return (
+        <div>
+          <nav className="-mb-px flex justify-center pt-8 space-x-4 px-4 sm:px-6">
+            <p>Waiting for responses.</p>
           </nav>
         </div>
       );
@@ -351,8 +374,6 @@ export default function EventOngoingPage() {
 
     return (
       <ul role="list" className="divide-y divide-gray-100 px-6">
-        {activeRound?.status}
-
         {responses?.map((item) => (
           <li
             key={item.id}
