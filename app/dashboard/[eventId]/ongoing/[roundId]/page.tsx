@@ -128,13 +128,21 @@ export default function EventOngoingPage() {
       } else if (ongoingQuestions) {
         setTopHeaderButton("CLOSE_ROUND");
       } else {
-        setTopHeaderButton("");
+        const roundsComplete = rounds?.every(
+          (item) => item.status === "COMPLETE"
+        );
+
+        if (roundsComplete && event?.status !== "COMPLETE") {
+          setTopHeaderButton("END_EVENT");
+        } else {
+          setTopHeaderButton("");
+        }
       }
     }
   };
 
   useEffect(() => {
-    if (activeRound) {
+    if (rounds) {
       getQuestions();
     }
 
@@ -153,7 +161,7 @@ export default function EventOngoingPage() {
         }
       )
       .subscribe();
-  }, [activeRound]);
+  }, [rounds]);
 
   // Rounds functions
   const startRound = async () => {
@@ -195,10 +203,35 @@ export default function EventOngoingPage() {
   useEffect(() => {
     if (event) {
       getRounds();
+
+      supabase
+        .channel("active-round-changes")
+        .on(
+          "postgres_changes",
+          {
+            event: "*",
+            schema: "public",
+            table: "v001_rounds_stag",
+            filter: `id=eq.${roundId}`,
+          },
+          () => {
+            getRounds();
+          }
+        )
+        .subscribe();
     }
   }, [event]);
 
   // Event functions
+  const endEvent = async () => {
+    const { data, error } = await supabase
+      .from("v001_events_stag")
+      .update({ status: "COMPLETE" })
+      .eq("id", eventId);
+
+    setTopHeaderButton("");
+  };
+
   const getEvent = async () => {
     const { data, error } = await supabase
       .from("v001_events_stag")
@@ -293,7 +326,9 @@ export default function EventOngoingPage() {
                 onClick={
                   topHeaderButton === "ACTIVATE_NEXT_QUESTION"
                     ? updateQuestionOngoing
-                    : closeRound
+                    : topHeaderButton === "CLOSE_ROUND"
+                    ? closeRound
+                    : endEvent
                 }
               >
                 {topHeaderButton.replaceAll("_", " ")}
@@ -394,7 +429,7 @@ export default function EventOngoingPage() {
       return (
         <div>
           <nav className="-mb-px flex justify-center pt-8 space-x-4 px-4 sm:px-6">
-            <p>Activate the first question.</p>
+            <p>Select a question.</p>
           </nav>
         </div>
       );
