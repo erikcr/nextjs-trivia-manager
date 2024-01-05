@@ -39,6 +39,7 @@ export default function EventOngoingPage() {
   const [event, setEvent] = useState<Tables<"v001_events_stag">>();
 
   // Rounds
+  const [rounds, setRounds] = useState<Tables<"v001_rounds_stag">[]>();
   const [activeRound, setActiveRound] = useState<Tables<"v001_rounds_stag">>();
 
   // Questions
@@ -173,21 +174,24 @@ export default function EventOngoingPage() {
       .eq("id", roundId);
   };
 
-  const getRound = async () => {
+  const getRounds = async () => {
     const { data, error } = await supabase
       .from("v001_rounds_stag")
       .select()
-      .eq("id", roundId)
-      .eq("owner", user?.id);
+      .eq("event_id", event?.id)
+      .eq("owner", user?.id)
+      .order("id");
 
     if (data) {
-      setActiveRound(data[0]);
+      const activeRound = data.find((i) => i.id === Number(roundId));
+      setActiveRound(activeRound);
+      setRounds(data);
     }
   };
 
   useEffect(() => {
     if (event) {
-      getRound();
+      getRounds();
     }
   }, [event]);
 
