@@ -121,11 +121,14 @@ export default function EventOngoingPage() {
       }
 
       const nextQuestion = data.find((item) => item.status === "PENDING");
+      const ongoingQuestions = data.find((item) => item.status === "ONGOING");
       if (nextQuestion) {
         setNextQuestion(nextQuestion);
         setTopHeaderButton("ACTIVATE_NEXT_QUESTION");
-      } else {
+      } else if (ongoingQuestions) {
         setTopHeaderButton("CLOSE_ROUND");
+      } else {
+        setTopHeaderButton("");
       }
     }
   };
@@ -236,16 +239,23 @@ export default function EventOngoingPage() {
       </div>
 
       {/**
+       * Secondary header
+       */}
+      <div className="fixed top-16 left-0 right-0 z-40 flex h-16 shrink-0 items-center gap-x-4 border-b border-gray-400">
+        <SecondaryHeader />
+      </div>
+
+      {/**
        * Main content
        */}
-      <main className="fixed top-16 bottom-0 left-0 w-2/3 border-r border-gray-400">
+      <main className="fixed top-32 bottom-0 left-0 w-2/3 border-r border-gray-400">
         <MainContent />
       </main>
 
       {/**
        * Right-side column
        */}
-      <aside className="fixed top-16 bottom-0 right-0 w-1/3">
+      <aside className="fixed top-32 bottom-0 right-0 w-1/3">
         <RightSidebar />
       </aside>
     </>
@@ -291,6 +301,30 @@ export default function EventOngoingPage() {
             </div>
           </nav>
         </div>
+      </div>
+    );
+  }
+
+  function SecondaryHeader() {
+    return (
+      <div className="pl-4">
+        <nav className="flex space-x-4" aria-label="Tabs">
+          {rounds?.map((item) => (
+            <a
+              key={item.name}
+              href={`/dashboard/${eventId}/ongoing/${item.id}`}
+              className={classNames(
+                item.id === Number(roundId)
+                  ? "bg-indigo-100 text-indigo-700"
+                  : "text-gray-500 hover:text-gray-700",
+                "rounded-md px-3 py-2 text-sm font-medium"
+              )}
+              aria-current={item.id === Number(roundId) ? "page" : undefined}
+            >
+              {item.name}
+            </a>
+          ))}
+        </nav>
       </div>
     );
   }
