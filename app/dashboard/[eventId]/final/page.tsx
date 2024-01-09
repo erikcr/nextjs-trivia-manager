@@ -15,7 +15,12 @@ import logoBrainyBrawls from "@/public/logos/brainybrawls.svg";
 // Supabase
 import { User } from "@supabase/supabase-js";
 import { createClient } from "@/utils/supabase/client";
-import { Tables } from "@/types/database.types";
+import {
+  Tables,
+  TeamsWithResponses,
+  TeamWithResponses,
+  ResponeWithQuestions,
+} from "@/types/database.types";
 
 function classNames(...classes: any[]) {
   return classes.filter(Boolean).join(" ");
@@ -34,6 +39,40 @@ export default function EventFinalPage() {
 
   // Event
   const [event, setEvent] = useState<Tables<"v001_events_stag">>();
+
+  // Teams
+  const [teams, setTeams] = useState<TeamsWithResponses>();
+  // const [activeTeam, setActiveTeam] = useState<TeamWithResponses>();
+
+  // Responses functions
+  const getTeamScore = (teamResponses: ResponeWithQuestions) => {
+    let score = 0;
+    teamResponses.map((i) => {
+      if (i.is_correct) {
+        console.log(i.v001_questions_stag.points);
+        score += i.v001_questions_stag.points;
+      }
+    });
+    return score;
+  };
+
+  // Teams functions
+  const getTeams = async () => {
+    const { data, error } = await supabase
+      .from("v001_teams_stag")
+      .select("*, v001_responses_stag ( *, v001_questions_stag ( * ) )")
+      .eq("event_id", eventId);
+
+    if (data) {
+      setTeams(data);
+    }
+  };
+
+  useEffect(() => {
+    if (event) {
+      getTeams();
+    }
+  }, [event]);
 
   // Event functions
   const getEvent = async () => {
@@ -85,9 +124,9 @@ export default function EventFinalPage() {
       {/**
        * Main content
        */}
-      {/* <main className="fixed top-32 bottom-0 left-0 w-2/3 border-r border-gray-400">
+      <main className="fixed top-16 bottom-0 left-0 w-2/3 border-r border-gray-400">
         <MainContent />
-      </main> */}
+      </main>
 
       {/**
        * Right-side column
@@ -125,6 +164,47 @@ export default function EventFinalPage() {
             <div className="hidden lg:flex lg:flex-1 lg:justify-end"></div>
           </nav>
         </div>
+      </div>
+    );
+  }
+
+  function MainContent() {
+    return (
+      <div className="hidden sm:block">
+        <ul role="list" className="border-b divide-y divide-gray-200">
+          {teams?.map((item) => (
+            <li
+              key={item.id}
+              className={classNames(
+                // activeTeam?.id === item.id ? "bg-gray-100" : "",
+                "relative flex justify-between gap-x-6 px-4 py-2 sm:px-6 hover:bg-gray-100"
+              )}
+              // onClick={() => setActiveTeam(item)}
+            >
+              <div className="flex min-w-0 gap-x-4">
+                <div className="min-w-0 flex-auto">
+                  <p className="text-sm font-semibold leading-6 text-gray-900">
+                    <span className="absolute inset-x-0 -top-px bottom-0" />
+                    {item.name}
+                  </p>
+                </div>
+              </div>
+              <div className="flex shrink-0 items-center gap-x-4">
+                <div className="hidden lg:flex lg:flex-1 lg:justify-end">
+                  <span>Score: {getTeamScore(item.v001_responses_stag)}</span>
+                </div>
+                <ChevronRightIcon
+                  className={classNames(
+                    // activeTeam?.id === item.id
+                    //   ? "text-gray-600"
+                    //   : "text-gray-100",
+                    "h-4 w-4"
+                  )}
+                />
+              </div>
+            </li>
+          ))}
+        </ul>
       </div>
     );
   }
