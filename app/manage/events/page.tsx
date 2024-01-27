@@ -156,9 +156,7 @@ export default function EventsPage() {
                 href={
                   item.status === "PENDING"
                     ? `/dashboard/${item.id}/editor`
-                    : item.status === "ONGOING"
-                    ? `/dashboard/${item.id}/responses`
-                    : `/dashboard/${item.id}/complete`
+                    : `/dashboard/${item.id}/ongoing`
                 }
               >
                 <li
@@ -224,13 +222,7 @@ export default function EventsPage() {
             .map((item) => (
               <Link
                 key={item.id}
-                href={
-                  item.status === "PENDING"
-                    ? `/dashboard/${item.id}/editor`
-                    : item.status === "ONGOING"
-                    ? `/dashboard/${item.id}/ongoing`
-                    : `/dashboard/${item.id}/final`
-                }
+                href={`/dashboard/${item.id}/final`}
               >
                 <li
                   key={item.id}
