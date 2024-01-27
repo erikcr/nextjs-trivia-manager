@@ -344,6 +344,13 @@ export default function EventOngoingPage() {
     return (
       <div className="pl-4">
         <nav className="flex space-x-4" aria-label="Tabs">
+          {!rounds && (
+            <div className="animate-pulse flex space-x-3">
+              <div className="rounded-md bg-slate-200 h-10 w-32"></div>
+              <div className="rounded-md bg-slate-200 h-10 w-24"></div>
+              <div className="rounded-md bg-slate-200 h-10 w-40"></div>
+            </div>
+          )}
           {rounds?.map((item) => (
             <a
               key={item.name}
