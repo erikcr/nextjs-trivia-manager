@@ -18,6 +18,7 @@ const teamsWithResponsesQuery = supabase
     v001_responses_stag (
       id,
       is_correct,
+      submitted_answer,
       v001_questions_stag (
         points
       )
@@ -33,19 +34,21 @@ const teamWithResponsesQuery = supabase
     v001_responses_stag (
       id,
       is_correct,
+      submitted_answer,
       v001_questions_stag (
         points
       )
     )
   `)
   .limit(1);
-export type TeamWithResponses = QueryData<typeof teamWithResponsesQuery>;
+export type TeamWithResponses = QueryData<typeof teamWithResponsesQuery>[0];
 
 const responseWithQuestionsQuery = supabase
   .from("v001_responses_stag")
   .select(`
     id,
     is_correct,
+    submitted_answer,
     v001_questions_stag (
       points
     )
