@@ -194,9 +194,9 @@ export default function EventFinalPage() {
                 </div>
                 <ChevronRightIcon
                   className={classNames(
-                    // activeTeam?.id === item.id
-                    //   ? "text-gray-600"
-                    //   : "text-gray-100",
+                    activeTeam?.id === item.id
+                      ? "text-gray-600"
+                      : "text-gray-100",
                     "h-4 w-4"
                   )}
                 />
