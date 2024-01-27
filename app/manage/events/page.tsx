@@ -228,7 +228,7 @@ export default function EventsPage() {
                   item.status === "PENDING"
                     ? `/dashboard/${item.id}/editor`
                     : item.status === "ONGOING"
-                    ? `/dashboard/${item.id}/responses`
+                    ? `/dashboard/${item.id}/ongoing`
                     : `/dashboard/${item.id}/final`
                 }
               >
