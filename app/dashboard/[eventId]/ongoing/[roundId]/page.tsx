@@ -375,6 +375,9 @@ export default function EventOngoingPage() {
     return (
       <div className="hidden sm:block">
         <ul role="list" className="border-b divide-y divide-gray-200">
+          {/** TODO:
+           * Add skeleton placeholders for questions list
+           */}
           {questions?.map((item) => (
             <li
               key={item.id}

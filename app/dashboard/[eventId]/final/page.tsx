@@ -49,6 +49,10 @@ export default function EventFinalPage() {
     let score = 0;
     teamResponses.map((i) => {
       if (i.is_correct) {
+        /** TODO
+         * Fix the database.types.ts definition for questions table
+         */
+        // @ts-ignore
         score += i.v001_questions_stag.points;
       }
     });
@@ -59,7 +63,7 @@ export default function EventFinalPage() {
   const getTeams = async () => {
     const { data, error } = await supabase
       .from("v001_teams_stag")
-      .select("*, v001_responses_stag ( *, v001_questions_stag ( * ) )")
+      .select("*, v001_responses_stag ( *, v001_questions_stag ( points ) )")
       .eq("event_id", eventId);
 
     if (data) {
