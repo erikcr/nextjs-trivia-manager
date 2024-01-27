@@ -229,7 +229,7 @@ export default function EventsPage() {
                     ? `/dashboard/${item.id}/editor`
                     : item.status === "ONGOING"
                     ? `/dashboard/${item.id}/responses`
-                    : `/dashboard/${item.id}/complete`
+                    : `/dashboard/${item.id}/final`
                 }
               >
                 <li
