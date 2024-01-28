@@ -351,15 +351,6 @@ function TopHeader({
   const pathname = usePathname();
   const router = useRouter();
 
-  // Navigation
-  const navigation = [
-    { name: "Editor", href: `/dashboard/${event?.id}/editor` },
-    // {
-    //   name: "Settings",
-    //   href: `/dashboard/${event?.id}/settings`,
-    // },
-  ];
-
   return (
     <div className="w-full">
       <nav
@@ -368,16 +359,18 @@ function TopHeader({
       >
         <div className="flex lg:flex-1">
           <a href="/manage/events" className="-m-1.5 p-1.5">
-            <span className="sr-only">Next.js Trivia Manager</span>
+            <span className="sr-only">Trivia Management Dashboard</span>
             <Image
               src={logoBrainyBrawls}
-              alt="Next.js Trivia Manager"
+              alt="Trivia Management Dashboard"
               className="h-8 w-8"
               unoptimized
             />
           </a>
+        </div>
 
-          {/* <p>{event?.name}</p> */}
+        <div className="flex lg:gap-x-12">
+          <p>{event?.name}</p>
         </div>
 
         <div className="flex lg:hidden">
@@ -388,21 +381,6 @@ function TopHeader({
             <span className="sr-only">Open main menu</span>
             <Bars3Icon className="h-6 w-6" aria-hidden="true" />
           </button>
-        </div>
-
-        <div className="hidden lg:flex lg:gap-x-12">
-          {navigation.map((item) => (
-            <button
-              key={item.name}
-              className={classNames(
-                pathname === item.href ? "text-primary" : "",
-                "text-md font-semibold leading-6 text-gray-900"
-              )}
-              onClick={() => router.push(item.href)}
-            >
-              {item.name}
-            </button>
-          ))}
         </div>
 
         <div className="hidden lg:flex lg:flex-1 lg:justify-end">
