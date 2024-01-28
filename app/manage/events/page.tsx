@@ -2,6 +2,7 @@
 
 import { Fragment, useEffect, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { parseISO, format } from "date-fns";
 import { Dialog, Disclosure, Transition } from "@headlessui/react";
 import { XMarkIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
@@ -19,6 +20,8 @@ function classNames(...classes: any[]) {
 }
 
 export default function EventsPage() {
+  const router = useRouter();
+
   const supabase = createClient();
 
   // User
@@ -66,12 +69,13 @@ export default function EventsPage() {
       .select();
 
     if (!error) {
-      getAllEvents();
       setNotifTitle("Event created");
       setNotifType("success");
       setNotifShow(true);
       setEventSlideout(false);
       setAddEventLoading(false);
+
+      router.push(`/dashboard/${data[0].id}/editor`);
     } else {
       console.log(error);
     }
@@ -220,10 +224,7 @@ export default function EventsPage() {
           allEvents
             ?.filter((item) => item.status === "COMPLETE")
             .map((item) => (
-              <Link
-                key={item.id}
-                href={`/dashboard/${item.id}/final`}
-              >
+              <Link key={item.id} href={`/dashboard/${item.id}/final`}>
                 <li
                   key={item.id}
                   className="overflow-hidden rounded-xl border border-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600"
