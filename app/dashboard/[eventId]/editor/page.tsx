@@ -202,47 +202,29 @@ export default function EditorByIdPage() {
       {/**
        * Top header
        */}
-      <div className="fixed left-0 top-0 right-0 flex h-16 shrink-0 items-center gap-x-4 border-b border-gray-200">
-        <TopHeader event={event} setStartConfirmShow={setStartConfirmShow} />
+      <div className="fixed top-0 left-0 right-0 z-40 flex h-16 shrink-0 items-center gap-x-4 border-b border-gray-400">
+        <TopHeader />
       </div>
 
       {/**
-       * Left-side column
+       * Secondary header
        */}
-      <aside className="fixed left-0 top-16 h-16 w-full xl:h-full xl:w-80 overflow-y-auto border-b xl:border-r border-gray-200 xl:block">
-        <LeftSidebar
-          rounds={rounds}
-          activeRound={activeRound}
-          setActiveRound={setActiveRound}
-          setRoundSlideoutOpen={setRoundSlideoutOpen}
-        />
-      </aside>
+      <div className="fixed top-16 left-0 right-0 z-40 flex h-16 shrink-0 items-center gap-x-4 border-b border-gray-400">
+        <SecondaryHeader />
+      </div>
 
       {/**
        * Main content
        */}
-      <main className="fixed h-full overflow-y top-32 sm:w-2/3 xl:top-16 xl:left-80 xl:right-96 xl:w-auto">
-        <MainContent
-          questions={questions}
-          qLoading={qLoading}
-          questionToEdit={questionToEdit}
-          setQuestionToEdit={setQuestionToEdit}
-          questionToEditFormRef={questionToEditFormRef}
-        />
+      <main className="fixed top-32 bottom-0 left-0 w-2/3 border-r border-gray-400">
+        <MainContent />
       </main>
 
       {/**
        * Right-side column
        */}
-      <aside className="fixed top-32 right-0 h-full w-1/3 xl:w-96 xl:top-16 border-l border-gray-200 xl:block">
-        <RightSidebar
-          user={user}
-          activeRound={activeRound}
-          getQuestions={getQuestions}
-          questionToEdit={questionToEdit}
-          setQuestionToEdit={setQuestionToEdit}
-          // questionToEditFormRef={questionToEditFormRef}
-        />
+      <aside className="fixed top-32 bottom-0 right-0 w-1/3">
+        <RightSidebar />
       </aside>
 
       {/**
@@ -339,166 +321,197 @@ export default function EditorByIdPage() {
       </Transition.Root>
     </>
   );
-}
 
-function TopHeader({
-  event,
-  setStartConfirmShow,
-}: {
-  event: Tables<"v001_events_stag"> | undefined;
-  setStartConfirmShow: Function;
-}) {
-  const pathname = usePathname();
-  const router = useRouter();
+  function TopHeader() {
+    return (
+      <div className="w-full">
+        <nav
+          className="mx-auto flex items-center justify-between p-6 lg:px-8"
+          aria-label="Global"
+        >
+          <div className="flex lg:flex-1">
+            <a href="/manage/events" className="-m-1.5 p-1.5">
+              <span className="sr-only">Trivia Management Dashboard</span>
+              <Image
+                src={logoBrainyBrawls}
+                alt="Trivia Management Dashboard"
+                className="h-8 w-8"
+                unoptimized
+              />
+            </a>
+          </div>
 
-  return (
-    <div className="w-full">
-      <nav
-        className="mx-auto flex items-center justify-between p-6 lg:px-8"
-        aria-label="Global"
-      >
-        <div className="flex lg:flex-1">
-          <a href="/manage/events" className="-m-1.5 p-1.5">
-            <span className="sr-only">Trivia Management Dashboard</span>
-            <Image
-              src={logoBrainyBrawls}
-              alt="Trivia Management Dashboard"
-              className="h-8 w-8"
-              unoptimized
-            />
-          </a>
-        </div>
+          <div className="flex lg:gap-x-12">
+            <p>{event?.name}</p>
+          </div>
 
-        <div className="flex lg:gap-x-12">
-          <p>{event?.name}</p>
-        </div>
-
-        <div className="flex lg:hidden">
-          <button
-            type="button"
-            className="-m-2.5 inline-flex items-center justify-center rounded-md p-2.5 text-gray-700"
-          >
-            <span className="sr-only">Open main menu</span>
-            <Bars3Icon className="h-6 w-6" aria-hidden="true" />
-          </button>
-        </div>
-
-        <div className="hidden lg:flex lg:flex-1 lg:justify-end">
-          {event !== undefined && (
-            <span
-              className={classNames(
-                event?.status === "PENDING"
-                  ? "bg-blue-100"
-                  : event?.status === "ONGOING"
-                  ? "bg-green-100"
-                  : "bg-gray-100",
-                "inline-flex items-center rounded-full px-2 mr-3 py-1 text-xs font-medium text-gray-600 ring-1 ring-inset"
-              )}
+          <div className="flex lg:hidden">
+            <button
+              type="button"
+              className="-m-2.5 inline-flex items-center justify-center rounded-md p-2.5 text-gray-700"
             >
-              {event?.status}
-            </span>
-          )}
+              <span className="sr-only">Open main menu</span>
+              <Bars3Icon className="h-6 w-6" aria-hidden="true" />
+            </button>
+          </div>
 
+          <div className="hidden lg:flex lg:flex-1 lg:justify-end">
+            {event !== undefined && (
+              <span
+                className={classNames(
+                  event?.status === "PENDING"
+                    ? "bg-blue-100"
+                    : event?.status === "ONGOING"
+                    ? "bg-green-100"
+                    : "bg-gray-100",
+                  "inline-flex items-center rounded-full px-2 mr-3 py-1 text-xs font-medium text-gray-600 ring-1 ring-inset"
+                )}
+              >
+                {event?.status}
+              </span>
+            )}
+
+            <button
+              type="button"
+              disabled={event === undefined}
+              className="inline-flex items-center gap-x-1.5 rounded-md px-2.5 py-1.5 text-sm text-gray-900 hover:text-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+              onClick={() => {
+                setStartConfirmShow(true);
+              }}
+            >
+              START EVENT
+              <RocketLaunchIcon
+                className="-mr-0.5 h-5 w-5"
+                aria-hidden="true"
+              />
+            </button>
+          </div>
+        </nav>
+      </div>
+    );
+  }
+
+  function SecondaryHeader() {
+    return (
+      <div className="pl-6">
+        <nav className="flex space-x-4" aria-label="Tabs">
           <button
             type="button"
-            disabled={event === undefined}
-            className="inline-flex items-center gap-x-1.5 rounded-md px-2.5 py-1.5 text-sm text-gray-900 hover:text-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
-            onClick={() => {
-              setStartConfirmShow(true);
-            }}
-          >
-            START EVENT
-            <RocketLaunchIcon className="-mr-0.5 h-5 w-5" aria-hidden="true" />
-          </button>
-        </div>
-      </nav>
-    </div>
-  );
-}
-
-function LeftSidebar({
-  rounds,
-  activeRound,
-  setActiveRound,
-  setRoundSlideoutOpen,
-}: {
-  rounds: Tables<"v001_rounds_stag">[] | undefined;
-  activeRound: Tables<"v001_rounds_stag"> | undefined;
-  setActiveRound: Function;
-  setRoundSlideoutOpen: Function;
-}) {
-  const leftSidebarTabs = [{ name: "Rounds", href: "#", current: true }];
-
-  return (
-    <>
-      <div className="hidden xl:block">
-        <div className="hidden border-b border-gray-300 xl:block">
-          <nav className="-mb-px flex space-x-4 px-4" aria-label="Tabs">
-            {leftSidebarTabs.map((tab) => (
-              <p
-                key={tab.name}
-                className={classNames(
-                  tab.current
-                    ? "border-primary text-primary"
-                    : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700",
-                  "whitespace-nowrap border-b py-4 px-1 text-sm font-medium"
-                )}
-                aria-current={tab.current ? "page" : undefined}
-              >
-                {tab.name}
-              </p>
-            ))}
-          </nav>
-        </div>
-
-        <div className="mx-6 my-3 xl:block">
-          <div
-            className="-mx-2 space-y-1 mb-2"
+            className="rounded-md px-8 py-2 mr-2 text-sm font-medium border-2 border-dashed border-gray-300 text-center hover:border-gray-400"
             onClick={() => {
               setRoundSlideoutOpen(true);
             }}
           >
-            <div className="text-gray-900 border-2 border-dashed border-gray-300 hover:border-gray-400 group flex justify-between gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold">
-              <div>Add round</div>
-            </div>
+            <span className="block text-sm font-semibold text-gray-900 dark:text-gray-400">
+              Add round
+            </span>
+          </button>
+
+          {rounds?.map((item) => (
+            <button
+              key={item.name}
+              className={classNames(
+                item.id === activeRound?.id
+                  ? "bg-primary text-white"
+                  : "text-gray-500 hover:text-gray-700",
+                "rounded-md px-3 py-2 text-sm font-medium"
+              )}
+              aria-current={item.id === activeRound?.id ? "page" : undefined}
+              onClick={() => {
+                setActiveRound(item);
+              }}
+            >
+              {item.name}
+            </button>
+          ))}
+        </nav>
+      </div>
+    );
+  }
+
+  function LeftSidebar({
+    rounds,
+    activeRound,
+    setActiveRound,
+    setRoundSlideoutOpen,
+  }: {
+    rounds: Tables<"v001_rounds_stag">[] | undefined;
+    activeRound: Tables<"v001_rounds_stag"> | undefined;
+    setActiveRound: Function;
+    setRoundSlideoutOpen: Function;
+  }) {
+    const leftSidebarTabs = [{ name: "Rounds", href: "#", current: true }];
+
+    return (
+      <>
+        <div className="hidden xl:block">
+          <div className="hidden border-b border-gray-300 xl:block">
+            <nav className="-mb-px flex space-x-4 px-4" aria-label="Tabs">
+              {leftSidebarTabs.map((tab) => (
+                <p
+                  key={tab.name}
+                  className={classNames(
+                    tab.current
+                      ? "border-primary text-primary"
+                      : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700",
+                    "whitespace-nowrap border-b py-4 px-1 text-sm font-medium"
+                  )}
+                  aria-current={tab.current ? "page" : undefined}
+                >
+                  {tab.name}
+                </p>
+              ))}
+            </nav>
           </div>
 
-          <nav
-            className="flex flex-1 flex-row md:flex-col"
-            aria-label="Sidebar"
-          >
-            <ul role="list" className="-mx-2 space-y-1">
+          <div className="mx-6 my-3 xl:block">
+            <div
+              className="-mx-2 space-y-1 mb-2"
+              onClick={() => {
+                setRoundSlideoutOpen(true);
+              }}
+            >
+              <div className="text-gray-900 border-2 border-dashed border-gray-300 hover:border-gray-400 group flex justify-between gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold">
+                <div>Add round</div>
+              </div>
+            </div>
+
+            <nav
+              className="flex flex-1 flex-row md:flex-col"
+              aria-label="Sidebar"
+            >
+              <ul role="list" className="-mx-2 space-y-1">
+                {rounds?.map((item) => (
+                  <li key={item.id} onClick={() => setActiveRound(item)}>
+                    <div
+                      // href={item.href}
+                      className={classNames(
+                        item.id === activeRound?.id
+                          ? "bg-gray-200 text-primary"
+                          : "text-gray-700 hover:text-primary hover:bg-gray-100",
+                        "group flex gap-x-3 rounded-md p-2 pl-3 text-sm leading-6 font-semibold"
+                      )}
+                    >
+                      {item.name}
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+          </div>
+        </div>
+
+        <div className="flex flex-col h-full bg-green-100 m-auto p-auto xl:hidden">
+          <div className="flex overflow-x-scroll hide-scroll-bar">
+            <div className="flex flex-nowrap items-center">
               {rounds?.map((item) => (
-                <li key={item.id} onClick={() => setActiveRound(item)}>
-                  <div
-                    // href={item.href}
-                    className={classNames(
-                      item.id === activeRound?.id
-                        ? "bg-gray-200 text-primary"
-                        : "text-gray-700 hover:text-primary hover:bg-gray-100",
-                      "group flex gap-x-3 rounded-md p-2 pl-3 text-sm leading-6 font-semibold"
-                    )}
-                  >
+                <div key={item.id} className="inline-block px-3">
+                  <div className="bg-red-100 h-12 max-w-xs overflow-hidden rounded-lg">
                     {item.name}
                   </div>
-                </li>
-              ))}
-            </ul>
-          </nav>
-        </div>
-      </div>
-
-      <div className="flex flex-col h-full bg-green-100 m-auto p-auto xl:hidden">
-        <div className="flex overflow-x-scroll hide-scroll-bar">
-          <div className="flex flex-nowrap items-center">
-            {rounds?.map((item) => (
-              <div key={item.id} className="inline-block px-3">
-                <div className="bg-red-100 h-12 max-w-xs overflow-hidden rounded-lg">
-                  {item.name}
                 </div>
-              </div>
-            ))}
-            {/* <div className="inline-block px-3">
+              ))}
+              {/* <div className="inline-block px-3">
               <div className="w-64 h-64 max-w-xs overflow-hidden rounded-lg shadow-md bg-white hover:shadow-xl transition-shadow duration-300 ease-in-out"></div>
             </div>
             <div className="inline-block px-3">
@@ -513,429 +526,403 @@ function LeftSidebar({
             <div className="inline-block px-3">
               <div className="w-64 h-64 max-w-xs overflow-hidden rounded-lg shadow-md bg-white hover:shadow-xl transition-shadow duration-300 ease-in-out"></div>
             </div> */}
+            </div>
           </div>
         </div>
-      </div>
-    </>
-  );
-}
+      </>
+    );
+  }
 
-function MainContent({
-  questions,
-  qLoading,
-  questionToEdit,
-  setQuestionToEdit,
-  questionToEditFormRef,
-}: {
-  questions: Tables<"v001_questions_stag">[] | undefined;
-  qLoading: boolean;
-  questionToEdit: Tables<"v001_questions_stag"> | undefined;
-  setQuestionToEdit: Function;
-  questionToEditFormRef:
-    | MutableRefObject<HTMLFormElement | undefined>
-    | undefined;
-}) {
-  return (
-    <div className="h-full overflow-y px-4 sm:px-6 lg:px-8">
-      <div className="flow-root">
-        <div className="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
-          <div className="overflow-auto inline-block min-w-full py-2 align-middle">
-            <table className="min-w-full border-b divide-y divide-gray-300">
-              <thead>
-                <tr>
-                  <th
-                    scope="col"
-                    className="w-8/12 py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6 lg:pl-8"
-                  >
-                    Question
-                  </th>
-                  <th
-                    scope="col"
-                    className="w-2/12 px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
-                  >
-                    Answer
-                  </th>
-                  <th
-                    scope="col"
-                    className="relative py-3.5 pl-3 pr-4 text-right sm:pr-6 lg:pr-8 text-gray-50"
-                  >
-                    a
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-200">
-                {qLoading && (
-                  <tr className="animate-pulse">
-                    <td className="py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6 lg:pl-8">
-                      <div className="bg-gray-200 group flex justify-between gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold" />
-                    </td>
-                    <td className=" px-3 py-4 text-sm text-gray-500">
-                      <div className="bg-gray-200 group flex justify-between gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold" />
-                    </td>
-                    <td className="relative py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6 lg:pr-8"></td>
-                  </tr>
-                )}
-
-                {!qLoading && !questions?.length && (
-                  <tr>
-                    <td className="py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6 lg:pl-8">
-                      No questions yet.
-                    </td>
-                    <td className=" px-3 py-4 text-sm text-gray-500"></td>
-                    <td className="relative py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6 lg:pr-8"></td>
-                  </tr>
-                )}
-
-                {questions?.map((item) => (
-                  <tr key={item.id}>
-                    <td className="py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6 lg:pl-8">
-                      {item.question}
-                    </td>
-                    <td className=" px-3 py-4 text-sm text-gray-500">
-                      {item.answer}
-                    </td>
-                    <td className="relative py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6 lg:pr-8">
-                      <button
-                        type="button"
-                        className="text-primary hover:text-primary-hover"
-                        onClick={() => {
-                          if (questionToEdit)
-                            questionToEditFormRef?.current?.reset();
-                          setQuestionToEdit(item);
-                        }}
-                      >
-                        Edit
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function RightSidebar({
-  user,
-  activeRound,
-  getQuestions,
-  questionToEdit,
-  setQuestionToEdit,
-}: {
-  user: User | null;
-  activeRound: Tables<"v001_rounds_stag"> | undefined;
-  getQuestions: Function;
-  questionToEdit: Tables<"v001_questions_stag"> | undefined;
-  setQuestionToEdit: Function;
-}) {
-  const supabase = createClient();
-
-  const [activeTab, setActiveTab] = useState("Add");
-  const [addQuestionLoading, setAddQuestionLoading] = useState(false);
-  const [aiResponse, setAiResponse] = useState<TriviaItem[]>([]);
-  const [aiResponseLoading, setAiResponseLoading] = useState(false);
-  const [questionToAdd, setQuestionToAdd] = useState<TriviaItem>();
-
-  const addFormRef = useRef<HTMLFormElement>(null);
-
-  const { messages, input, handleInputChange, handleSubmit } = useChat({
-    api: "/api/chat/langchain",
-  });
-
-  const rightSidebarTabs = [
-    { name: "Edit", isVisible: questionToEdit },
-    { name: "Add", isVisible: true },
-  ];
-
-  const removeQuestionFromAI = async () => {
-    const newAiResponse = aiResponse.slice(1);
-    setAiResponse(newAiResponse);
-  };
-
-  const addQuestion = async (formData: FormData) => {
-    console.log("submit action triggered");
-    const { data, error } = await supabase
-      .from("v001_questions_stag")
-      .insert([
-        {
-          question: formData.get("question"),
-          answer: formData.get("answer"),
-          points: formData.get("points"),
-          round_id: activeRound?.id,
-          owner: user?.id,
-        },
-      ])
-      .select();
-
-    if (!error) {
-      getQuestions();
-      setAddQuestionLoading(false);
-      addFormRef.current?.reset();
-    }
-  };
-
-  const updateQuestion = async (formData: FormData) => {
-    const { data, error } = await supabase
-      .from("v001_questions_stag")
-      .update([
-        {
-          question: formData.get("question"),
-          answer: formData.get("answer"),
-          points: formData.get("points"),
-        },
-      ])
-      .eq("id", questionToEdit?.id)
-      .eq("owner", user?.id)
-      .select();
-
-    if (!error) {
-      getQuestions();
-      setQuestionToEdit(undefined);
-    } else {
-      console.log(error);
-    }
-  };
-
-  useEffect(() => {
-    if (questionToEdit) {
-      setActiveTab("Edit");
-    } else {
-      setActiveTab("Add");
-    }
-  }, [questionToEdit]);
-
-  useEffect(() => {
-    messages.map((item) => {
-      if (item.role === "assistant") {
-        let content = JSON.parse(item.content);
-        setAiResponse(content.message);
-        setAiResponseLoading(false);
-      }
-    });
-  }, [messages]);
-
-  if (!activeRound) {
+  function MainContent() {
     return (
-      <div>
-        <nav className="-mb-px flex justify-center pt-8 space-x-4 px-4 sm:px-6">
-          <p>Select a round.</p>
-        </nav>
+      <div className="h-full overflow-y px-4 sm:px-6 lg:px-8">
+        <div className="flow-root">
+          <div className="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
+            <div className="overflow-auto inline-block min-w-full py-2 align-middle">
+              <table className="min-w-full border-b divide-y divide-gray-300">
+                <thead>
+                  <tr>
+                    <th
+                      scope="col"
+                      className="w-8/12 py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6 lg:pl-8"
+                    >
+                      Question
+                    </th>
+                    <th
+                      scope="col"
+                      className="w-2/12 px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+                    >
+                      Answer
+                    </th>
+                    <th
+                      scope="col"
+                      className="relative py-3.5 pl-3 pr-4 text-right sm:pr-6 lg:pr-8 text-gray-50"
+                    >
+                      a
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-200">
+                  {qLoading && (
+                    <tr className="animate-pulse">
+                      <td className="py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6 lg:pl-8">
+                        <div className="bg-gray-200 group flex justify-between gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold" />
+                      </td>
+                      <td className=" px-3 py-4 text-sm text-gray-500">
+                        <div className="bg-gray-200 group flex justify-between gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold" />
+                      </td>
+                      <td className="relative py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6 lg:pr-8"></td>
+                    </tr>
+                  )}
+
+                  {!qLoading && !questions?.length && (
+                    <tr>
+                      <td className="py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6 lg:pl-8">
+                        No questions yet.
+                      </td>
+                      <td className=" px-3 py-4 text-sm text-gray-500"></td>
+                      <td className="relative py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6 lg:pr-8"></td>
+                    </tr>
+                  )}
+
+                  {questions?.map((item) => (
+                    <tr key={item.id}>
+                      <td className="py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6 lg:pl-8">
+                        {item.question}
+                      </td>
+                      <td className=" px-3 py-4 text-sm text-gray-500">
+                        {item.answer}
+                      </td>
+                      <td className="relative py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6 lg:pr-8">
+                        <button
+                          type="button"
+                          className="text-primary hover:text-primary-hover"
+                          onClick={() => {
+                            if (questionToEdit)
+                              questionToEditFormRef?.current?.reset();
+                            setQuestionToEdit(item);
+                          }}
+                        >
+                          Edit
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
       </div>
     );
   }
 
-  return (
-    <div className="hidden sm:block">
-      <div className="border-b border-gray-300">
-        <nav
-          className="-mb-px flex space-x-4 px-4 sm:px-6 justify-end"
-          aria-label="Tabs"
-        >
-          {rightSidebarTabs.map((tab) => (
-            <p
-              key={tab.name}
-              className={classNames(
-                tab.name === activeTab
-                  ? "border-primary text-primary"
-                  : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700",
-                tab.isVisible ? "" : "hidden",
-                "whitespace-nowrap border-b py-4 px-1 text-sm font-medium"
-              )}
-              aria-current={tab.name === activeTab ? "page" : undefined}
-              onClick={() => {
-                setActiveTab(tab.name);
-              }}
-            >
-              {tab.name}
-            </p>
-          ))}
-        </nav>
-      </div>
+  function RightSidebar() {
+    const supabase = createClient();
 
-      {activeTab === "Edit" && (
-        <form action={updateQuestion}>
-          <div className="space-y-12 px-4 sm:px-6">
-            <div className="pb-12">
-              {/* Question */}
-              <div className="space-y-2 sm:gap-4 sm:space-y-0 sm:py-3">
-                <label
-                  htmlFor="question"
-                  className="block text-sm font-medium leading-6 text-gray-900 sm:mt-1.5 sm:mb-2"
-                >
-                  Question <span className="text-red-600">*</span>
-                </label>
-                <div className="sm:col-span-2">
-                  <textarea
-                    required
-                    disabled={addQuestionLoading}
-                    name="question"
-                    id="question"
-                    rows={5}
-                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
-                    defaultValue={questionToEdit?.question}
-                  />
-                </div>
-              </div>
+    const [activeTab, setActiveTab] = useState("Add");
+    const [addQuestionLoading, setAddQuestionLoading] = useState(false);
+    const [aiResponse, setAiResponse] = useState<TriviaItem[]>([]);
+    const [aiResponseLoading, setAiResponseLoading] = useState(false);
+    const [questionToAdd, setQuestionToAdd] = useState<TriviaItem>();
 
-              {/* Answer */}
-              <div className="space-y-2 sm:grid sm:grid-cols-3 sm:gap-4 sm:space-y-0 sm:py-5">
-                <div>
+    const addFormRef = useRef<HTMLFormElement>(null);
+
+    const { messages, input, handleInputChange, handleSubmit } = useChat({
+      api: "/api/chat/langchain",
+    });
+
+    const rightSidebarTabs = [
+      { name: "Edit", isVisible: questionToEdit },
+      { name: "Add", isVisible: true },
+    ];
+
+    const removeQuestionFromAI = async () => {
+      const newAiResponse = aiResponse.slice(1);
+      setAiResponse(newAiResponse);
+    };
+
+    const addQuestion = async (formData: FormData) => {
+      console.log("submit action triggered");
+      const { data, error } = await supabase
+        .from("v001_questions_stag")
+        .insert([
+          {
+            question: formData.get("question"),
+            answer: formData.get("answer"),
+            points: formData.get("points"),
+            round_id: activeRound?.id,
+            owner: user?.id,
+          },
+        ])
+        .select();
+
+      if (!error) {
+        getQuestions();
+        setAddQuestionLoading(false);
+        addFormRef.current?.reset();
+      }
+    };
+
+    const updateQuestion = async (formData: FormData) => {
+      const { data, error } = await supabase
+        .from("v001_questions_stag")
+        .update([
+          {
+            question: formData.get("question"),
+            answer: formData.get("answer"),
+            points: formData.get("points"),
+          },
+        ])
+        .eq("id", questionToEdit?.id)
+        .eq("owner", user?.id)
+        .select();
+
+      if (!error) {
+        getQuestions();
+        setQuestionToEdit(undefined);
+      } else {
+        console.log(error);
+      }
+    };
+
+    useEffect(() => {
+      if (questionToEdit) {
+        setActiveTab("Edit");
+      } else {
+        setActiveTab("Add");
+      }
+    }, [questionToEdit]);
+
+    useEffect(() => {
+      messages.map((item) => {
+        if (item.role === "assistant") {
+          let content = JSON.parse(item.content);
+          setAiResponse(content.message);
+          setAiResponseLoading(false);
+        }
+      });
+    }, [messages]);
+
+    if (!activeRound) {
+      return (
+        <div>
+          <nav className="-mb-px flex justify-center pt-8 space-x-4 px-4 sm:px-6">
+            <p>Select a round.</p>
+          </nav>
+        </div>
+      );
+    }
+
+    return (
+      <div className="hidden sm:block">
+        <div className="border-b border-gray-300">
+          <nav
+            className="-mb-px flex space-x-4 px-4 sm:px-6 justify-end"
+            aria-label="Tabs"
+          >
+            {rightSidebarTabs.map((tab) => (
+              <p
+                key={tab.name}
+                className={classNames(
+                  tab.name === activeTab
+                    ? "border-primary text-primary"
+                    : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700",
+                  tab.isVisible ? "" : "hidden",
+                  "whitespace-nowrap border-b py-4 px-1 text-sm font-medium"
+                )}
+                aria-current={tab.name === activeTab ? "page" : undefined}
+                onClick={() => {
+                  setActiveTab(tab.name);
+                }}
+              >
+                {tab.name}
+              </p>
+            ))}
+          </nav>
+        </div>
+
+        {activeTab === "Edit" && (
+          <form action={updateQuestion}>
+            <div className="space-y-12 px-4 sm:px-6">
+              <div className="pb-12">
+                {/* Question */}
+                <div className="space-y-2 sm:gap-4 sm:space-y-0 sm:py-3">
                   <label
-                    htmlFor="answer"
-                    className="block text-sm font-medium leading-6 text-gray-900 sm:mt-1.5"
+                    htmlFor="question"
+                    className="block text-sm font-medium leading-6 text-gray-900 sm:mt-1.5 sm:mb-2"
                   >
-                    Answer <span className="text-red-600">*</span>
+                    Question <span className="text-red-600">*</span>
                   </label>
+                  <div className="sm:col-span-2">
+                    <textarea
+                      required
+                      disabled={addQuestionLoading}
+                      name="question"
+                      id="question"
+                      rows={5}
+                      className="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
+                      defaultValue={questionToEdit?.question}
+                    />
+                  </div>
                 </div>
-                <div className="sm:col-span-2">
-                  <input
-                    required
-                    id="answer"
-                    name="answer"
-                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
-                    defaultValue={questionToEdit?.answer}
-                  />
-                </div>
-              </div>
 
-              {/* Points */}
-              <div className="space-y-2 sm:grid sm:grid-cols-3 sm:gap-4 sm:space-y-0 sm:py-5">
-                <div>
-                  <label
-                    htmlFor="points"
-                    className="block text-sm font-medium leading-6 text-gray-900 sm:mt-1.5"
-                  >
-                    Points <span className="text-red-600">*</span>
-                  </label>
+                {/* Answer */}
+                <div className="space-y-2 sm:grid sm:grid-cols-3 sm:gap-4 sm:space-y-0 sm:py-5">
+                  <div>
+                    <label
+                      htmlFor="answer"
+                      className="block text-sm font-medium leading-6 text-gray-900 sm:mt-1.5"
+                    >
+                      Answer <span className="text-red-600">*</span>
+                    </label>
+                  </div>
+                  <div className="sm:col-span-2">
+                    <input
+                      required
+                      id="answer"
+                      name="answer"
+                      className="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
+                      defaultValue={questionToEdit?.answer}
+                    />
+                  </div>
                 </div>
-                <div className="sm:col-span-2">
-                  <input
-                    required
-                    type="number"
-                    name="points"
-                    id="points"
-                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
-                    defaultValue={questionToEdit?.points}
-                  />
-                </div>
-              </div>
 
-              {/* Action buttons */}
-              <div className="flex-shrink-0 py-5">
-                <div className="flex justify-end space-x-3">
-                  <button
-                    disabled={addQuestionLoading}
-                    className="rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
-                    onClick={() => {
-                      setQuestionToEdit(undefined);
-                      setActiveTab("Add");
-                    }}
-                  >
-                    <>Cancel</>
-                  </button>
+                {/* Points */}
+                <div className="space-y-2 sm:grid sm:grid-cols-3 sm:gap-4 sm:space-y-0 sm:py-5">
+                  <div>
+                    <label
+                      htmlFor="points"
+                      className="block text-sm font-medium leading-6 text-gray-900 sm:mt-1.5"
+                    >
+                      Points <span className="text-red-600">*</span>
+                    </label>
+                  </div>
+                  <div className="sm:col-span-2">
+                    <input
+                      required
+                      type="number"
+                      name="points"
+                      id="points"
+                      className="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
+                      defaultValue={questionToEdit?.points}
+                    />
+                  </div>
+                </div>
 
-                  <button
-                    type="submit"
-                    className="inline-flex justify-center rounded-md bg-primary px-3 py-2 text-sm font-semibold text-white hover:bg-primary-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
-                  >
-                    <>Save</>
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </form>
-      )}
+                {/* Action buttons */}
+                <div className="flex-shrink-0 py-5">
+                  <div className="flex justify-end space-x-3">
+                    <button
+                      disabled={addQuestionLoading}
+                      className="rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
+                      onClick={() => {
+                        setQuestionToEdit(undefined);
+                        setActiveTab("Add");
+                      }}
+                    >
+                      <>Cancel</>
+                    </button>
 
-      {activeTab === "Add" && (
-        <div className="space-y-1 px-4 sm:px-6">
-          <form action={addQuestion} ref={addFormRef}>
-            <div className="pb-">
-              {/* Question */}
-              <div className="space-y-2 sm:gap-4 sm:space-y-0 sm:py-3">
-                <label
-                  htmlFor="question"
-                  className="block text-sm font-medium leading-6 text-gray-900 sm:mt-1.5 sm:mb-2"
-                >
-                  Question <span className="text-red-600">*</span>
-                </label>
-                <div className="sm:col-span-2">
-                  <textarea
-                    required
-                    disabled={addQuestionLoading}
-                    name="question"
-                    id="question"
-                    rows={5}
-                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
-                    defaultValue={questionToAdd ? questionToAdd.question : ""}
-                  />
-                </div>
-              </div>
-
-              {/* Answer */}
-              <div className="space-y-2 sm:grid sm:grid-cols-3 sm:gap-4 sm:space-y-0 sm:py-5">
-                <div>
-                  <label
-                    htmlFor="answer"
-                    className="block text-sm font-medium leading-6 text-gray-900 sm:mt-1.5"
-                  >
-                    Answer <span className="text-red-600">*</span>
-                  </label>
-                </div>
-                <div className="sm:col-span-2">
-                  <input
-                    required
-                    disabled={addQuestionLoading}
-                    id="answer"
-                    name="answer"
-                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
-                    defaultValue={questionToAdd ? questionToAdd.answer : ""}
-                  />
-                </div>
-              </div>
-
-              {/* Points */}
-              <div className="space-y-2 sm:grid sm:grid-cols-3 sm:gap-4 sm:space-y-0 sm:py-5">
-                <div>
-                  <label
-                    htmlFor="points"
-                    className="block text-sm font-medium leading-6 text-gray-900 sm:mt-1.5"
-                  >
-                    Points <span className="text-red-600">*</span>
-                  </label>
-                </div>
-                <div className="sm:col-span-2">
-                  <input
-                    required
-                    disabled={addQuestionLoading}
-                    type="number"
-                    name="points"
-                    id="points"
-                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
-                    defaultValue={1}
-                  />
-                </div>
-              </div>
-
-              {/* Action buttons */}
-              <div className="flex-shrink-0 py-5">
-                <div className="flex justify-end space-x-3">
-                  <button
-                    disabled={addQuestionLoading}
-                    type="submit"
-                    className="inline-flex justify-center rounded-md bg-primary px-3 py-2 text-sm font-semibold text-white hover:bg-primary-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
-                  >
-                    <>Add</>
-                  </button>
+                    <button
+                      type="submit"
+                      className="inline-flex justify-center rounded-md bg-primary px-3 py-2 text-sm font-semibold text-white hover:bg-primary-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+                    >
+                      <>Save</>
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
           </form>
+        )}
 
-          {/* <>
+        {activeTab === "Add" && (
+          <div className="space-y-1 px-4 sm:px-6">
+            <form action={addQuestion} ref={addFormRef}>
+              <div className="pb-">
+                {/* Question */}
+                <div className="space-y-2 sm:gap-4 sm:space-y-0 sm:py-3">
+                  <label
+                    htmlFor="question"
+                    className="block text-sm font-medium leading-6 text-gray-900 sm:mt-1.5 sm:mb-2"
+                  >
+                    Question <span className="text-red-600">*</span>
+                  </label>
+                  <div className="sm:col-span-2">
+                    <textarea
+                      required
+                      disabled={addQuestionLoading}
+                      name="question"
+                      id="question"
+                      rows={5}
+                      className="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
+                      defaultValue={questionToAdd ? questionToAdd.question : ""}
+                    />
+                  </div>
+                </div>
+
+                {/* Answer */}
+                <div className="space-y-2 sm:grid sm:grid-cols-3 sm:gap-4 sm:space-y-0 sm:py-5">
+                  <div>
+                    <label
+                      htmlFor="answer"
+                      className="block text-sm font-medium leading-6 text-gray-900 sm:mt-1.5"
+                    >
+                      Answer <span className="text-red-600">*</span>
+                    </label>
+                  </div>
+                  <div className="sm:col-span-2">
+                    <input
+                      required
+                      disabled={addQuestionLoading}
+                      id="answer"
+                      name="answer"
+                      className="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
+                      defaultValue={questionToAdd ? questionToAdd.answer : ""}
+                    />
+                  </div>
+                </div>
+
+                {/* Points */}
+                <div className="space-y-2 sm:grid sm:grid-cols-3 sm:gap-4 sm:space-y-0 sm:py-5">
+                  <div>
+                    <label
+                      htmlFor="points"
+                      className="block text-sm font-medium leading-6 text-gray-900 sm:mt-1.5"
+                    >
+                      Points <span className="text-red-600">*</span>
+                    </label>
+                  </div>
+                  <div className="sm:col-span-2">
+                    <input
+                      required
+                      disabled={addQuestionLoading}
+                      type="number"
+                      name="points"
+                      id="points"
+                      className="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
+                      defaultValue={1}
+                    />
+                  </div>
+                </div>
+
+                {/* Action buttons */}
+                <div className="flex-shrink-0 py-5">
+                  <div className="flex justify-end space-x-3">
+                    <button
+                      disabled={addQuestionLoading}
+                      type="submit"
+                      className="inline-flex justify-center rounded-md bg-primary px-3 py-2 text-sm font-semibold text-white hover:bg-primary-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+                    >
+                      <>Add</>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </form>
+
+            {/* <>
             <label className="block text-sm font-medium leading-6 text-gray-900">
               Generate ideas with TriviaAI
             </label>
@@ -1007,8 +994,9 @@ function RightSidebar({
               </>
             )}
           </> */}
-        </div>
-      )}
-    </div>
-  );
+          </div>
+        )}
+      </div>
+    );
+  }
 }
