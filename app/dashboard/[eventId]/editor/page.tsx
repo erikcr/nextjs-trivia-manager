@@ -1,10 +1,9 @@
 "use client";
 
-import { Fragment, MutableRefObject, useEffect, useRef, useState } from "react";
+import { Fragment, useEffect, useRef, useState } from "react";
 import {
   useParams,
   useSearchParams,
-  usePathname,
   useRouter,
 } from "next/navigation";
 import Image from "next/image";
@@ -594,17 +593,21 @@ export default function EditorByIdPage() {
                         {item.answer}
                       </td>
                       <td className="relative py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6 lg:pr-8">
-                        <button
-                          type="button"
-                          className="text-primary hover:text-primary-hover"
-                          onClick={() => {
-                            if (questionToEdit)
-                              questionToEditFormRef?.current?.reset();
-                            setQuestionToEdit(item);
-                          }}
-                        >
-                          Edit
-                        </button>
+                        {questionToEdit?.id === item.id ? (
+                          <p>Editing</p>
+                        ) : (
+                          <button
+                            type="button"
+                            className="text-primary hover:text-primary-hover"
+                            onClick={() => {
+                              if (questionToEdit)
+                                questionToEditFormRef?.current?.reset();
+                              setQuestionToEdit(item);
+                            }}
+                          >
+                            Edit
+                          </button>
+                        )}
                       </td>
                     </tr>
                   ))}
@@ -631,11 +634,6 @@ export default function EditorByIdPage() {
     const { messages, input, handleInputChange, handleSubmit } = useChat({
       api: "/api/chat/langchain",
     });
-
-    const rightSidebarTabs = [
-      { name: "Edit", isVisible: questionToEdit },
-      { name: "Add", isVisible: true },
-    ];
 
     const removeQuestionFromAI = async () => {
       const newAiResponse = aiResponse.slice(1);
@@ -716,32 +714,6 @@ export default function EditorByIdPage() {
 
     return (
       <div className="hidden sm:block">
-        <div className="border-b border-gray-300">
-          <nav
-            className="-mb-px flex space-x-4 px-4 sm:px-6 justify-end"
-            aria-label="Tabs"
-          >
-            {rightSidebarTabs.map((tab) => (
-              <p
-                key={tab.name}
-                className={classNames(
-                  tab.name === activeTab
-                    ? "border-primary text-primary"
-                    : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700",
-                  tab.isVisible ? "" : "hidden",
-                  "whitespace-nowrap border-b py-4 px-1 text-sm font-medium"
-                )}
-                aria-current={tab.name === activeTab ? "page" : undefined}
-                onClick={() => {
-                  setActiveTab(tab.name);
-                }}
-              >
-                {tab.name}
-              </p>
-            ))}
-          </nav>
-        </div>
-
         {activeTab === "Edit" && (
           <form action={updateQuestion}>
             <div className="space-y-12 px-4 sm:px-6">
