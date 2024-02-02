@@ -125,8 +125,11 @@ export default function EditorByIdPage() {
       .delete()
       .eq("id", roundId);
 
-    setActiveRound(undefined);
-    getRounds();
+    if (!error) {
+      setActiveRound(undefined);
+      setQuestions(undefined);
+      getRounds();
+    }
   };
 
   const startEvent = async () => {
