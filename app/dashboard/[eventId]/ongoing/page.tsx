@@ -107,6 +107,11 @@ export default function EventOngoingPage() {
     }
   };
 
+  /**
+   * TODO
+   * There is a bug that doesn't allow the event to end if a round doesn't have any questions
+   * Best option is probably to not allow an event to start if a round has 0 questions
+   */
   const getQuestions = async () => {
     const { data, error } = await supabase
       .from("v001_questions_stag")
