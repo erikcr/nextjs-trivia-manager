@@ -126,7 +126,7 @@ export default function EditorByIdPage() {
 
     if (data) {
       setEvent(data[0]);
-      router.push(`/dashboard/${event?.id}/responses`);
+      router.push(`/dashboard/${event?.id}/ongoing`);
     } else if (error) {
       console.log(error);
     }

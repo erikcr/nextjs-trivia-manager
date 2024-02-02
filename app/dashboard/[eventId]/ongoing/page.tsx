@@ -26,6 +26,9 @@ function classNames(...classes: any[]) {
 
 export default function EventOngoingPage() {
   const { eventId } = useParams();
+
+  const router = useRouter();
+
   const supabase = createClient();
 
   /**
@@ -183,6 +186,9 @@ export default function EventOngoingPage() {
       .from("v001_rounds_stag")
       .update({ status: "COMPLETE" })
       .eq("id", activeRound?.id);
+
+    const nextRound = rounds?.find(i => i.status === "PENDING")
+    setActiveRound(nextRound);
   };
 
   const getRounds = async () => {
@@ -229,6 +235,8 @@ export default function EventOngoingPage() {
       .eq("id", eventId);
 
     setTopHeaderButton("");
+    
+    router.push(`/dashbaord/${event?.id}/final`)
   };
 
   const getEvent = async () => {
