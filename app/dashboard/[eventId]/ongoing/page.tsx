@@ -25,7 +25,7 @@ function classNames(...classes: any[]) {
 }
 
 export default function EventOngoingPage() {
-  const { eventId, roundId } = useParams();
+  const { eventId } = useParams();
   const supabase = createClient();
 
   /**
@@ -109,7 +109,7 @@ export default function EventOngoingPage() {
       .from("v001_questions_stag")
       .select()
       .order("id")
-      .eq("round_id", roundId)
+      .eq("round_id", activeRound?.id)
       .eq("owner", user?.id);
 
     if (data) {
@@ -154,21 +154,21 @@ export default function EventOngoingPage() {
           event: "*",
           schema: "public",
           table: "v001_questions_stag",
-          filter: `round_id=eq.${roundId}`,
+          filter: `round_id=eq.${activeRound?.id}`,
         },
         () => {
           getQuestions();
         }
       )
       .subscribe();
-  }, [rounds]);
+  }, [activeRound]);
 
   // Rounds functions
   const startRound = async () => {
     const { data, error } = await supabase
       .from("v001_rounds_stag")
       .update({ status: "ONGOING" })
-      .eq("id", roundId);
+      .eq("id", activeRound?.id);
   };
 
   const closeRound = async () => {
@@ -182,7 +182,7 @@ export default function EventOngoingPage() {
     const { data, error } = await supabase
       .from("v001_rounds_stag")
       .update({ status: "COMPLETE" })
-      .eq("id", roundId);
+      .eq("id", activeRound?.id);
   };
 
   const getRounds = async () => {
@@ -194,8 +194,7 @@ export default function EventOngoingPage() {
       .order("id");
 
     if (data) {
-      const activeRound = data.find((i) => i.id === Number(roundId));
-      setActiveRound(activeRound);
+      setActiveRound(data[0]);
       setRounds(data);
     }
   };
@@ -212,7 +211,7 @@ export default function EventOngoingPage() {
             event: "*",
             schema: "public",
             table: "v001_rounds_stag",
-            filter: `id=eq.${roundId}`,
+            filter: `id=eq.${activeRound?.id}`,
           },
           () => {
             getRounds();
@@ -352,19 +351,19 @@ export default function EventOngoingPage() {
             </div>
           )}
           {rounds?.map((item) => (
-            <a
+            <button
               key={item.name}
-              href={`/dashboard/${eventId}/ongoing/${item.id}`}
               className={classNames(
-                item.id === Number(roundId)
+                item.id === Number(activeRound?.id)
                   ? "bg-primary text-white"
                   : "text-gray-500 hover:text-gray-700",
                 "rounded-md px-3 py-2 text-sm font-medium"
               )}
-              aria-current={item.id === Number(roundId) ? "page" : undefined}
+              aria-current={item.id === Number(activeRound?.id) ? "page" : undefined}
+              onClick={() => setActiveRound(item)}
             >
               {item.name}
-            </a>
+            </button>
           ))}
         </nav>
       </div>
