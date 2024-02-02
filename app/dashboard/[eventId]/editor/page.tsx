@@ -3,11 +3,12 @@
 import { Fragment, useEffect, useRef, useState } from "react";
 import { useParams, useSearchParams, useRouter } from "next/navigation";
 import Image from "next/image";
-import { Dialog, Transition } from "@headlessui/react";
+import { Dialog, Menu, Transition } from "@headlessui/react";
 import {
   Bars3Icon,
   RocketLaunchIcon,
   CheckIcon,
+  ChevronDownIcon,
 } from "@heroicons/react/24/outline";
 import { useChat } from "ai/react";
 
@@ -114,6 +115,18 @@ export default function EditorByIdPage() {
         setQLoading(false);
       }
     }
+  };
+
+  const deleteRound = async (roundId: Number) => {
+    await supabase.from("v001_questions_stag").delete().eq("round_id", roundId);
+
+    const { data, error } = await supabase
+      .from("v001_rounds_stag")
+      .delete()
+      .eq("id", roundId);
+
+    setActiveRound(undefined);
+    getRounds();
   };
 
   const startEvent = async () => {
@@ -388,28 +401,30 @@ export default function EditorByIdPage() {
 
   function SecondaryHeader() {
     return (
-      <div className="pl-6">
-        <nav className="flex space-x-4" aria-label="Tabs">
-          <button
-            type="button"
-            className="rounded-md px-8 py-2 mr-2 text-sm font-medium border-2 border-dashed border-gray-300 text-center hover:border-gray-400"
-            onClick={() => {
-              setRoundSlideoutOpen(true);
-            }}
-          >
-            <span className="block text-sm font-semibold text-gray-900 dark:text-gray-400">
-              Add round
-            </span>
-          </button>
+      <div className="pl-6 spacing-x-4">
+        <button
+          type="button"
+          className="rounded-md px-8 py-2 mr-4 text-sm font-medium border-2 border-dashed border-gray-300 text-center hover:border-gray-400"
+          onClick={() => {
+            setRoundSlideoutOpen(true);
+          }}
+        >
+          <span className="block text-sm font-semibold text-gray-900 dark:text-gray-400">
+            Add round
+          </span>
+        </button>
 
-          {rounds?.map((item) => (
+        {rounds?.map((item) => (
+          <div
+            key={item.name}
+            className="inline-flex rounded-md shadow-sm mr-4"
+          >
             <button
-              key={item.name}
               className={classNames(
                 item.id === activeRound?.id
                   ? "bg-primary text-white"
                   : "text-gray-700 hover:text-gray-900 bg-gray-200 hover:bg-gray-100",
-                "rounded-md px-3 py-2 text-sm font-medium"
+                "relative inline-flex items-center rounded-l-md px-3 py-2 text-sm font-medium"
               )}
               aria-current={item.id === activeRound?.id ? "page" : undefined}
               onClick={() => {
@@ -418,8 +433,43 @@ export default function EditorByIdPage() {
             >
               {item.name}
             </button>
-          ))}
-        </nav>
+            <Menu as="div" className="relative -ml-px block">
+              <Menu.Button className="relative inline-flex items-center rounded-r-md bg-white px-2 py-2 hover:bg-gray-50 focus:z-10">
+                <span className="sr-only">Open options</span>
+                <ChevronDownIcon className="h-5 w-5" aria-hidden="true" />
+              </Menu.Button>
+              <Transition
+                as={Fragment}
+                enter="transition ease-out duration-100"
+                enterFrom="transform opacity-0 scale-95"
+                enterTo="transform opacity-100 scale-100"
+                leave="transition ease-in duration-75"
+                leaveFrom="transform opacity-100 scale-100"
+                leaveTo="transform opacity-0 scale-95"
+              >
+                <Menu.Items className="absolute right-0 z-10 -mr-1 mt-2 w-56 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                  <div className="py-1">
+                    <Menu.Item key={item.name}>
+                      {({ active }) => (
+                        <p
+                          className={classNames(
+                            active
+                              ? "bg-gray-100 text-gray-900"
+                              : "text-gray-700",
+                            "block px-4 py-2 text-sm"
+                          )}
+                          onClick={() => deleteRound(item.id)}
+                        >
+                          Delete
+                        </p>
+                      )}
+                    </Menu.Item>
+                  </div>
+                </Menu.Items>
+              </Transition>
+            </Menu>
+          </div>
+        ))}
       </div>
     );
   }
