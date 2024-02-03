@@ -238,6 +238,235 @@ export interface Database {
           }
         ]
       }
+      v002_events_stag: {
+        Row: {
+          date_of_event: string
+          description: string | null
+          id: number
+          inserted_at: string
+          join_code: number
+          location: string | null
+          name: string
+          owner: string
+          status: Database["public"]["Enums"]["event_status"]
+          updated_at: string
+          venue: string | null
+        }
+        Insert: {
+          date_of_event: string
+          description?: string | null
+          id?: number
+          inserted_at?: string
+          join_code?: number
+          location?: string | null
+          name: string
+          owner: string
+          status?: Database["public"]["Enums"]["event_status"]
+          updated_at?: string
+          venue?: string | null
+        }
+        Update: {
+          date_of_event?: string
+          description?: string | null
+          id?: number
+          inserted_at?: string
+          join_code?: number
+          location?: string | null
+          name?: string
+          owner?: string
+          status?: Database["public"]["Enums"]["event_status"]
+          updated_at?: string
+          venue?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "v002_events_stag_owner_fkey"
+            columns: ["owner"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      v002_questions_stag: {
+        Row: {
+          answer: string
+          id: number
+          inserted_at: string
+          owner: string
+          points: number
+          question: string
+          round_id: number
+          status: Database["public"]["Enums"]["question_status"]
+          updated_at: string
+        }
+        Insert: {
+          answer: string
+          id?: number
+          inserted_at?: string
+          owner: string
+          points: number
+          question: string
+          round_id: number
+          status?: Database["public"]["Enums"]["question_status"]
+          updated_at?: string
+        }
+        Update: {
+          answer?: string
+          id?: number
+          inserted_at?: string
+          owner?: string
+          points?: number
+          question?: string
+          round_id?: number
+          status?: Database["public"]["Enums"]["question_status"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "v002_questions_stag_owner_fkey"
+            columns: ["owner"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "v002_questions_stag_round_id_fkey"
+            columns: ["round_id"]
+            isOneToOne: false
+            referencedRelation: "v002_rounds_stag"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      v002_responses_stag: {
+        Row: {
+          id: number
+          inserted_at: string
+          is_correct: boolean | null
+          question_id: number
+          submitted_answer: string
+          team_id: number
+          updated_at: string
+        }
+        Insert: {
+          id?: number
+          inserted_at?: string
+          is_correct?: boolean | null
+          question_id: number
+          submitted_answer: string
+          team_id: number
+          updated_at?: string
+        }
+        Update: {
+          id?: number
+          inserted_at?: string
+          is_correct?: boolean | null
+          question_id?: number
+          submitted_answer?: string
+          team_id?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "v002_responses_stag_question_id_fkey"
+            columns: ["question_id"]
+            isOneToOne: false
+            referencedRelation: "v002_questions_stag"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "v002_responses_stag_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "v002_teams_stag"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      v002_rounds_stag: {
+        Row: {
+          description: string | null
+          event_id: number
+          id: number
+          inserted_at: string
+          name: string
+          order_num: number
+          owner: string
+          status: Database["public"]["Enums"]["round_status"]
+          updated_at: string
+        }
+        Insert: {
+          description?: string | null
+          event_id: number
+          id?: number
+          inserted_at?: string
+          name: string
+          order_num: number
+          owner: string
+          status?: Database["public"]["Enums"]["round_status"]
+          updated_at?: string
+        }
+        Update: {
+          description?: string | null
+          event_id?: number
+          id?: number
+          inserted_at?: string
+          name?: string
+          order_num?: number
+          owner?: string
+          status?: Database["public"]["Enums"]["round_status"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "v002_rounds_stag_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "v002_events_stag"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "v002_rounds_stag_owner_fkey"
+            columns: ["owner"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      v002_teams_stag: {
+        Row: {
+          event_id: number
+          id: number
+          inserted_at: string
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          event_id: number
+          id?: number
+          inserted_at?: string
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          event_id?: number
+          id?: number
+          inserted_at?: string
+          name?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "v002_teams_stag_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "v002_events_stag"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
     }
     Views: {
       [_ in never]: never
