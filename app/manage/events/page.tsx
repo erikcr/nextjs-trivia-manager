@@ -4,8 +4,12 @@ import { Fragment, useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { parseISO, format } from "date-fns";
-import { Dialog, Disclosure, Transition } from "@headlessui/react";
-import { XMarkIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
+import { Dialog, Menu, Transition } from "@headlessui/react";
+import {
+  XMarkIcon,
+  ChevronRightIcon,
+  EllipsisHorizontalIcon,
+} from "@heroicons/react/24/outline";
 
 // Supabase
 import { User } from "@supabase/supabase-js";
@@ -50,6 +54,19 @@ export default function EventsPage() {
     if (data) {
       setAllEvents(data);
       setELoading(false);
+    }
+  };
+
+  const deleteEvent = async (eventId: Number) => {
+    const { data, error } = await supabase
+      .from("v001_events_stag")
+      .delete()
+      .eq("id", eventId);
+
+    if (data) {
+      getAllEvents();
+    } else if (error) {
+      console.log(error);
     }
   };
 
@@ -155,13 +172,13 @@ export default function EventsPage() {
           allEvents
             ?.filter((item) => item.status !== "COMPLETE")
             .map((item) => (
-              <Link
+              <div
                 key={item.id}
-                href={
-                  item.status === "PENDING"
-                    ? `/dashboard/${item.id}/editor`
-                    : `/dashboard/${item.id}/ongoing`
-                }
+                // href={
+                //   item.status === "PENDING"
+                //     ? `/dashboard/${item.id}/editor`
+                //     : `/dashboard/${item.id}/ongoing`
+                // }
               >
                 <li
                   key={item.id}
@@ -183,6 +200,42 @@ export default function EventsPage() {
                     >
                       {item.status}
                     </span>
+                    <Menu as="div" className="relative ml-auto">
+                      <Menu.Button className="-m-2.5 block p-2.5 text-gray-400 hover:text-gray-500">
+                        <span className="sr-only">Open options</span>
+                        <EllipsisHorizontalIcon
+                          className="h-5 w-5"
+                          aria-hidden="true"
+                        />
+                      </Menu.Button>
+                      <Transition
+                        as={Fragment}
+                        enter="transition ease-out duration-100"
+                        enterFrom="transform opacity-0 scale-95"
+                        enterTo="transform opacity-100 scale-100"
+                        leave="transition ease-in duration-75"
+                        leaveFrom="transform opacity-100 scale-100"
+                        leaveTo="transform opacity-0 scale-95"
+                      >
+                        <Menu.Items className="absolute right-0 z-10 mt-0.5 w-32 origin-top-right rounded-md bg-white py-2 shadow-lg ring-1 ring-gray-900/5 focus:outline-none">
+                          <Menu.Item>
+                            {({ active }) => (
+                              <p
+                                className={classNames(
+                                  active
+                                    ? "bg-gray-100 text-gray-900"
+                                    : "text-gray-700",
+                                  "block px-4 py-2 text-sm"
+                                )}
+                                onClick={() => deleteEvent(item.id)}
+                              >
+                                Delete
+                              </p>
+                            )}
+                          </Menu.Item>
+                        </Menu.Items>
+                      </Transition>
+                    </Menu>
                   </div>
                   <dl className="-my-3 divide-y divide-gray-100 dark:divide-gray-600 px-6 py-4 text-sm leading-6">
                     <div className="flex justify-between gap-x-4 py-3">
@@ -203,7 +256,7 @@ export default function EventsPage() {
                     </div>
                   </dl>
                 </li>
-              </Link>
+              </div>
             ))}
       </ul>
 
