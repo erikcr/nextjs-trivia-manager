@@ -4,6 +4,6 @@ interface SidebarItem {
   type: string;
   label?: string;
   destination?: string;
-  rounds?: Tables<"v001_rounds_stag">[];
+  rounds?: Tables<"v002_rounds_stag">[];
 }
 export interface SidebarList extends Array<SidebarItem> { }

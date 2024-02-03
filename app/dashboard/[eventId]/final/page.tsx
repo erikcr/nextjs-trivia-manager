@@ -38,7 +38,7 @@ export default function EventFinalPage() {
   const [user, setUser] = useState<User | null>(null);
 
   // Event
-  const [event, setEvent] = useState<Tables<"v001_events_stag">>();
+  const [event, setEvent] = useState<Tables<"v002_events_stag">>();
 
   // Teams
   const [teams, setTeams] = useState<TeamsWithResponses>();
@@ -53,7 +53,7 @@ export default function EventFinalPage() {
          * Fix the database.types.ts definition for questions table
          */
         // @ts-ignore
-        score += i.v001_questions_stag.points;
+        score += i.v002_questions_stag.points;
       }
     });
     return score;
@@ -62,8 +62,8 @@ export default function EventFinalPage() {
   // Teams functions
   const getTeams = async () => {
     const { data, error } = await supabase
-      .from("v001_teams_stag")
-      .select("*, v001_responses_stag ( *, v001_questions_stag ( points ) )")
+      .from("v002_teams_stag")
+      .select("*, v002_responses_stag ( *, v002_questions_stag ( points ) )")
       .eq("event_id", eventId);
 
     if (data) {
@@ -80,7 +80,7 @@ export default function EventFinalPage() {
   // Event functions
   const getEvent = async () => {
     const { data, error } = await supabase
-      .from("v001_events_stag")
+      .from("v002_events_stag")
       .select()
       .eq("id", eventId)
       .eq("owner", user?.id);
@@ -194,7 +194,7 @@ export default function EventFinalPage() {
               </div>
               <div className="flex shrink-0 items-center gap-x-4">
                 <div className="hidden lg:flex lg:flex-1 lg:justify-end">
-                  <span>Score: {getTeamScore(item.v001_responses_stag)}</span>
+                  <span>Score: {getTeamScore(item.v002_responses_stag)}</span>
                 </div>
                 <ChevronRightIcon
                   className={classNames(
@@ -225,7 +225,7 @@ export default function EventFinalPage() {
 
     return (
       <ul role="list" className="divide-y divide-gray-100 px-6">
-        {activeTeam?.v001_responses_stag?.map((item) => (
+        {activeTeam?.v002_responses_stag?.map((item) => (
           <li
             key={item.id}
             className="flex flex-wrap items-center justify-between gap-x-6 gap-y-4 py-2 sm:flex-nowrap"

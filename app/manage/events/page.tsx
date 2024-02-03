@@ -42,12 +42,12 @@ export default function EventsPage() {
   const [addEventLoading, setAddEventLoading] = useState(false);
 
   const [allEvents, setAllEvents] = useState<
-    Tables<"v001_events_stag">[] | null
+    Tables<"v002_events_stag">[] | null
   >([]);
 
   const getAllEvents = async (userId?: string) => {
     const { data, error } = await supabase
-      .from("v001_events_stag")
+      .from("v002_events_stag")
       .select()
       .eq("owner", userId ? userId : user?.id);
 
@@ -58,8 +58,9 @@ export default function EventsPage() {
   };
 
   const deleteEvent = async (eventId: Number) => {
+    console.log("start delete");
     const { data, error } = await supabase
-      .from("v001_events_stag")
+      .from("v002_events_stag")
       .delete()
       .eq("id", eventId);
 
@@ -72,7 +73,7 @@ export default function EventsPage() {
 
   const addEvent = async (formData: FormData) => {
     const { data, error } = await supabase
-      .from("v001_events_stag")
+      .from("v002_events_stag")
       .insert([
         {
           name: formData.get("event-name"),

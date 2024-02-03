@@ -39,21 +39,21 @@ export default function EventOngoingPage() {
   const [user, setUser] = useState<User | null>(null);
 
   // Event
-  const [event, setEvent] = useState<Tables<"v001_events_stag">>();
+  const [event, setEvent] = useState<Tables<"v002_events_stag">>();
 
   // Rounds
-  const [rounds, setRounds] = useState<Tables<"v001_rounds_stag">[]>();
-  const [activeRound, setActiveRound] = useState<Tables<"v001_rounds_stag">>();
+  const [rounds, setRounds] = useState<Tables<"v002_rounds_stag">[]>();
+  const [activeRound, setActiveRound] = useState<Tables<"v002_rounds_stag">>();
 
   // Questions
-  const [questions, setQuestions] = useState<Tables<"v001_questions_stag">[]>();
+  const [questions, setQuestions] = useState<Tables<"v002_questions_stag">[]>();
   const [activeQuestion, setActiveQuestion] =
-    useState<Tables<"v001_questions_stag">>();
+    useState<Tables<"v002_questions_stag">>();
   const [nextQuestion, setNextQuestion] =
-    useState<Tables<"v001_questions_stag">>();
+    useState<Tables<"v002_questions_stag">>();
 
   // Responses
-  const [responses, setResponses] = useState<Tables<"v001_responses_stag">[]>();
+  const [responses, setResponses] = useState<Tables<"v002_responses_stag">[]>();
 
   // Header button status
   const [topHeaderButton, setTopHeaderButton] = useState("");
@@ -65,8 +65,8 @@ export default function EventOngoingPage() {
   // Responses functions
   const getResponses = async () => {
     const { data, error } = await supabase
-      .from("v001_responses_stag")
-      .select("*, v001_teams_stag( name )")
+      .from("v002_responses_stag")
+      .select("*, v002_teams_stag( name )")
       .eq("question_id", activeQuestion?.id);
 
     if (data) {
@@ -76,7 +76,7 @@ export default function EventOngoingPage() {
 
   const approveResponse = async (responseId: number, isCorrect: boolean) => {
     const { data, error } = await supabase
-      .from("v001_responses_stag")
+      .from("v002_responses_stag")
       .update({ is_correct: isCorrect })
       .eq("id", responseId);
 
@@ -98,7 +98,7 @@ export default function EventOngoingPage() {
     }
 
     const { data, error } = await supabase
-      .from("v001_questions_stag")
+      .from("v002_questions_stag")
       .update({ status: "ONGOING" })
       .eq("id", nextQuestion?.id);
 
@@ -114,7 +114,7 @@ export default function EventOngoingPage() {
    */
   const getQuestions = async () => {
     const { data, error } = await supabase
-      .from("v001_questions_stag")
+      .from("v002_questions_stag")
       .select()
       .order("id")
       .eq("round_id", activeRound?.id)
@@ -161,7 +161,7 @@ export default function EventOngoingPage() {
         {
           event: "*",
           schema: "public",
-          table: "v001_questions_stag",
+          table: "v002_questions_stag",
           filter: `round_id=eq.${activeRound?.id}`,
         },
         () => {
@@ -174,7 +174,7 @@ export default function EventOngoingPage() {
   // Rounds functions
   const startRound = async () => {
     const { data, error } = await supabase
-      .from("v001_rounds_stag")
+      .from("v002_rounds_stag")
       .update({ status: "ONGOING" })
       .eq("id", activeRound?.id);
   };
@@ -182,13 +182,13 @@ export default function EventOngoingPage() {
   const closeRound = async () => {
     questions?.map(async (item) => {
       const { data, error } = await supabase
-        .from("v001_questions_stag")
+        .from("v002_questions_stag")
         .update({ status: "COMPLETE" })
         .eq("id", item.id);
     });
 
     const { data, error } = await supabase
-      .from("v001_rounds_stag")
+      .from("v002_rounds_stag")
       .update({ status: "COMPLETE" })
       .eq("id", activeRound?.id);
 
@@ -198,7 +198,7 @@ export default function EventOngoingPage() {
 
   const getRounds = async () => {
     const { data, error } = await supabase
-      .from("v001_rounds_stag")
+      .from("v002_rounds_stag")
       .select()
       .eq("event_id", event?.id)
       .eq("owner", user?.id)
@@ -221,7 +221,7 @@ export default function EventOngoingPage() {
           {
             event: "*",
             schema: "public",
-            table: "v001_rounds_stag",
+            table: "v002_rounds_stag",
             filter: `id=eq.${activeRound?.id}`,
           },
           () => {
@@ -235,7 +235,7 @@ export default function EventOngoingPage() {
   // Event functions
   const endEvent = async () => {
     const { data, error } = await supabase
-      .from("v001_events_stag")
+      .from("v002_events_stag")
       .update({ status: "COMPLETE" })
       .eq("id", eventId);
 
@@ -246,7 +246,7 @@ export default function EventOngoingPage() {
 
   const getEvent = async () => {
     const { data, error } = await supabase
-      .from("v001_events_stag")
+      .from("v002_events_stag")
       .select()
       .eq("id", eventId)
       .eq("owner", user?.id);

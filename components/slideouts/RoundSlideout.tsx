@@ -21,7 +21,7 @@ export default function RoundSlideout({
   setRoundSlideoutOpen,
 }: {
   user: User | null;
-  rounds: Array<Tables<"v001_rounds_stag">> | undefined;
+  rounds: Array<Tables<"v002_rounds_stag">> | undefined;
   getRounds: Function;
   roundSlideoutOpen: boolean;
   setRoundSlideoutOpen: Function;
@@ -41,7 +41,7 @@ export default function RoundSlideout({
 
   const addRound = async (formData: FormData) => {
     const { data, error } = await supabase
-      .from("v001_rounds_stag")
+      .from("v002_rounds_stag")
       .insert([
         {
           name: formData.get("round-name"),

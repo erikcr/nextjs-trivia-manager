@@ -49,23 +49,23 @@ export default function EditorByIdPage() {
   const [session, setSession] = useState<any>(undefined);
 
   // Event
-  const [event, setEvent] = useState<Tables<"v001_events_stag">>();
+  const [event, setEvent] = useState<Tables<"v002_events_stag">>();
   const [eLoading, setELoading] = useState(true);
   const [eError, setEError] = useState<PostgrestError>();
 
   // Rounds
-  const [rounds, setRounds] = useState<Tables<"v001_rounds_stag">[]>();
+  const [rounds, setRounds] = useState<Tables<"v002_rounds_stag">[]>();
   const [rLoading, setRLoading] = useState(true);
   const [rError, setRError] = useState<PostgrestError>();
-  const [activeRound, setActiveRound] = useState<Tables<"v001_rounds_stag">>();
+  const [activeRound, setActiveRound] = useState<Tables<"v002_rounds_stag">>();
   const [addRoundLoading, setAddRoundLoading] = useState(false);
   const [roundSlideoutOpen, setRoundSlideoutOpen] = useState(false);
 
   // Questions
-  const [questions, setQuestions] = useState<Tables<"v001_questions_stag">[]>();
+  const [questions, setQuestions] = useState<Tables<"v002_questions_stag">[]>();
   const [qLoading, setQLoading] = useState(true);
   const [questionToEdit, setQuestionToEdit] =
-    useState<Tables<"v001_questions_stag">>();
+    useState<Tables<"v002_questions_stag">>();
   const [qError, setQError] = useState<PostgrestError>();
   const questionToEditFormRef = useRef<HTMLFormElement | undefined>();
 
@@ -80,7 +80,7 @@ export default function EditorByIdPage() {
 
   const getQuestions = async () => {
     const { data, error } = await supabase
-      .from("v001_questions_stag")
+      .from("v002_questions_stag")
       .select()
       .order("id")
       .eq("round_id", activeRound?.id)
@@ -94,7 +94,7 @@ export default function EditorByIdPage() {
 
   const getRounds = async () => {
     const { data, error } = await supabase
-      .from("v001_rounds_stag")
+      .from("v002_rounds_stag")
       .select()
       .order("order_num")
       .eq("event_id", eventId)
@@ -118,10 +118,10 @@ export default function EditorByIdPage() {
   };
 
   const deleteRound = async (roundId: Number) => {
-    await supabase.from("v001_questions_stag").delete().eq("round_id", roundId);
+    await supabase.from("v002_questions_stag").delete().eq("round_id", roundId);
 
     const { data, error } = await supabase
-      .from("v001_rounds_stag")
+      .from("v002_rounds_stag")
       .delete()
       .eq("id", roundId);
 
@@ -134,7 +134,7 @@ export default function EditorByIdPage() {
 
   const startEvent = async () => {
     const { data, error } = await supabase
-      .from("v001_events_stag")
+      .from("v002_events_stag")
       .update({ status: "ONGOING" })
       .eq("id", event?.id)
       .eq("owner", user?.id)
@@ -150,7 +150,7 @@ export default function EditorByIdPage() {
 
   const getEvent = async () => {
     const { data, error } = await supabase
-      .from("v001_events_stag")
+      .from("v002_events_stag")
       .select()
       .eq("id", eventId)
       .eq("owner", user?.id);
@@ -588,7 +588,7 @@ export default function EditorByIdPage() {
 
     const deleteQuestion = async () => {
       const { data, error } = await supabase
-        .from("v001_questions_stag")
+        .from("v002_questions_stag")
         .delete()
         .eq("id", questionToEdit?.id);
 
@@ -602,7 +602,7 @@ export default function EditorByIdPage() {
 
     const addQuestion = async (formData: FormData) => {
       const { data, error } = await supabase
-        .from("v001_questions_stag")
+        .from("v002_questions_stag")
         .insert([
           {
             question: formData.get("question"),
@@ -623,7 +623,7 @@ export default function EditorByIdPage() {
 
     const updateQuestion = async (formData: FormData) => {
       const { data, error } = await supabase
-        .from("v001_questions_stag")
+        .from("v002_questions_stag")
         .update([
           {
             question: formData.get("question"),
