@@ -1,57 +1,337 @@
-import { createClient } from "@/utils/supabase/client";
+export type Json =
+  | string
+  | number
+  | boolean
+  | null
+  | { [key: string]: Json | undefined }
+  | Json[]
 
-import { Database } from './supabase'
-import { PostgrestError, QueryResult, QueryData, QueryError } from '@supabase/supabase-js'
+export interface Database {
+  public: {
+    Tables: {
+      v001_events_stag: {
+        Row: {
+          date_of_event: string
+          description: string | null
+          id: number
+          inserted_at: string
+          join_code: number
+          location: string | null
+          name: string
+          owner: string
+          status: Database["public"]["Enums"]["event_status"]
+          updated_at: string
+          venue: string | null
+        }
+        Insert: {
+          date_of_event: string
+          description?: string | null
+          id?: number
+          inserted_at?: string
+          join_code?: number
+          location?: string | null
+          name: string
+          owner: string
+          status?: Database["public"]["Enums"]["event_status"]
+          updated_at?: string
+          venue?: string | null
+        }
+        Update: {
+          date_of_event?: string
+          description?: string | null
+          id?: number
+          inserted_at?: string
+          join_code?: number
+          location?: string | null
+          name?: string
+          owner?: string
+          status?: Database["public"]["Enums"]["event_status"]
+          updated_at?: string
+          venue?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "v001_events_stag_owner_fkey"
+            columns: ["owner"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      v001_questions_stag: {
+        Row: {
+          answer: string
+          id: number
+          inserted_at: string
+          owner: string
+          points: number
+          question: string
+          round_id: number
+          status: Database["public"]["Enums"]["question_status"]
+          updated_at: string
+        }
+        Insert: {
+          answer: string
+          id?: number
+          inserted_at?: string
+          owner: string
+          points: number
+          question: string
+          round_id: number
+          status?: Database["public"]["Enums"]["question_status"]
+          updated_at?: string
+        }
+        Update: {
+          answer?: string
+          id?: number
+          inserted_at?: string
+          owner?: string
+          points?: number
+          question?: string
+          round_id?: number
+          status?: Database["public"]["Enums"]["question_status"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "v001_questions_stag_owner_fkey"
+            columns: ["owner"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "v001_questions_stag_round_id_fkey"
+            columns: ["round_id"]
+            isOneToOne: false
+            referencedRelation: "v001_rounds_stag"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      v001_responses_stag: {
+        Row: {
+          id: number
+          inserted_at: string
+          is_correct: boolean | null
+          question_id: number
+          submitted_answer: string
+          team_id: number
+          updated_at: string
+        }
+        Insert: {
+          id?: number
+          inserted_at?: string
+          is_correct?: boolean | null
+          question_id: number
+          submitted_answer: string
+          team_id: number
+          updated_at?: string
+        }
+        Update: {
+          id?: number
+          inserted_at?: string
+          is_correct?: boolean | null
+          question_id?: number
+          submitted_answer?: string
+          team_id?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "v001_responses_stag_question_id_fkey"
+            columns: ["question_id"]
+            isOneToOne: false
+            referencedRelation: "v001_questions_stag"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "v001_responses_stag_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "v001_teams_stag"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      v001_rounds_stag: {
+        Row: {
+          description: string | null
+          event_id: number
+          id: number
+          inserted_at: string
+          name: string
+          order_num: number
+          owner: string
+          status: Database["public"]["Enums"]["round_status"]
+          updated_at: string
+        }
+        Insert: {
+          description?: string | null
+          event_id: number
+          id?: number
+          inserted_at?: string
+          name: string
+          order_num: number
+          owner: string
+          status?: Database["public"]["Enums"]["round_status"]
+          updated_at?: string
+        }
+        Update: {
+          description?: string | null
+          event_id?: number
+          id?: number
+          inserted_at?: string
+          name?: string
+          order_num?: number
+          owner?: string
+          status?: Database["public"]["Enums"]["round_status"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "v001_rounds_stag_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "v001_events_stag"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "v001_rounds_stag_owner_fkey"
+            columns: ["owner"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      v001_teams_stag: {
+        Row: {
+          event_id: number
+          id: number
+          inserted_at: string
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          event_id: number
+          id?: number
+          inserted_at?: string
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          event_id?: number
+          id?: number
+          inserted_at?: string
+          name?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "v001_teams_stag_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "v001_events_stag"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+    }
+    Views: {
+      [_ in never]: never
+    }
+    Functions: {
+      [_ in never]: never
+    }
+    Enums: {
+      event_status: "PENDING" | "ONGOING" | "COMPLETE"
+      question_status: "PENDING" | "ONGOING" | "COMPLETE"
+      round_status: "PENDING" | "ONGOING" | "COMPLETE"
+    }
+    CompositeTypes: {
+      [_ in never]: never
+    }
+  }
+}
 
-export type DbResult<T> = T extends PromiseLike<infer U> ? U : never
-export type DbResultOk<T> = T extends PromiseLike<{ data: infer U }> ? Exclude<U, null> : never
-export type DbResultErr = PostgrestError
+export type Tables<
+  PublicTableNameOrOptions extends
+    | keyof (Database["public"]["Tables"] & Database["public"]["Views"])
+    | { schema: keyof Database },
+  TableName extends PublicTableNameOrOptions extends { schema: keyof Database }
+    ? keyof (Database[PublicTableNameOrOptions["schema"]]["Tables"] &
+        Database[PublicTableNameOrOptions["schema"]]["Views"])
+    : never = never
+> = PublicTableNameOrOptions extends { schema: keyof Database }
+  ? (Database[PublicTableNameOrOptions["schema"]]["Tables"] &
+      Database[PublicTableNameOrOptions["schema"]]["Views"])[TableName] extends {
+      Row: infer R
+    }
+    ? R
+    : never
+  : PublicTableNameOrOptions extends keyof (Database["public"]["Tables"] &
+      Database["public"]["Views"])
+  ? (Database["public"]["Tables"] &
+      Database["public"]["Views"])[PublicTableNameOrOptions] extends {
+      Row: infer R
+    }
+    ? R
+    : never
+  : never
 
-export type Tables<T extends keyof Database['public']['Tables']> = Database['public']['Tables'][T]['Row']
+export type TablesInsert<
+  PublicTableNameOrOptions extends
+    | keyof Database["public"]["Tables"]
+    | { schema: keyof Database },
+  TableName extends PublicTableNameOrOptions extends { schema: keyof Database }
+    ? keyof Database[PublicTableNameOrOptions["schema"]]["Tables"]
+    : never = never
+> = PublicTableNameOrOptions extends { schema: keyof Database }
+  ? Database[PublicTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+      Insert: infer I
+    }
+    ? I
+    : never
+  : PublicTableNameOrOptions extends keyof Database["public"]["Tables"]
+  ? Database["public"]["Tables"][PublicTableNameOrOptions] extends {
+      Insert: infer I
+    }
+    ? I
+    : never
+  : never
 
-const supabase = createClient();
-const teamsWithResponsesQuery = supabase
-  .from("v001_teams_stag")
-  .select(`
-    id,
-    name,
-    v001_responses_stag (
-      id,
-      is_correct,
-      submitted_answer,
-      v001_questions_stag (
-        points
-      )
-    )
-  `);
-export type TeamsWithResponses = QueryData<typeof teamsWithResponsesQuery>;
+export type TablesUpdate<
+  PublicTableNameOrOptions extends
+    | keyof Database["public"]["Tables"]
+    | { schema: keyof Database },
+  TableName extends PublicTableNameOrOptions extends { schema: keyof Database }
+    ? keyof Database[PublicTableNameOrOptions["schema"]]["Tables"]
+    : never = never
+> = PublicTableNameOrOptions extends { schema: keyof Database }
+  ? Database[PublicTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+      Update: infer U
+    }
+    ? U
+    : never
+  : PublicTableNameOrOptions extends keyof Database["public"]["Tables"]
+  ? Database["public"]["Tables"][PublicTableNameOrOptions] extends {
+      Update: infer U
+    }
+    ? U
+    : never
+  : never
 
-const teamWithResponsesQuery = supabase
-  .from("v001_teams_stag")
-  .select(`
-    id,
-    name,
-    v001_responses_stag (
-      id,
-      is_correct,
-      submitted_answer,
-      v001_questions_stag (
-        points
-      )
-    )
-  `)
-  .limit(1);
-export type TeamWithResponses = QueryData<typeof teamWithResponsesQuery>[0];
-
-const responseWithQuestionsQuery = supabase
-  .from("v001_responses_stag")
-  .select(`
-    id,
-    is_correct,
-    submitted_answer,
-    v001_questions_stag (
-      points
-    )
-  `)
-  .limit(1);
-export type ResponeWithQuestions = QueryData<typeof responseWithQuestionsQuery>;
+export type Enums<
+  PublicEnumNameOrOptions extends
+    | keyof Database["public"]["Enums"]
+    | { schema: keyof Database },
+  EnumName extends PublicEnumNameOrOptions extends { schema: keyof Database }
+    ? keyof Database[PublicEnumNameOrOptions["schema"]]["Enums"]
+    : never = never
+> = PublicEnumNameOrOptions extends { schema: keyof Database }
+  ? Database[PublicEnumNameOrOptions["schema"]]["Enums"][EnumName]
+  : PublicEnumNameOrOptions extends keyof Database["public"]["Enums"]
+  ? Database["public"]["Enums"][PublicEnumNameOrOptions]
+  : never
