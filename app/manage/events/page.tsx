@@ -58,7 +58,6 @@ export default function EventsPage() {
   };
 
   const deleteEvent = async (eventId: Number) => {
-    console.log("start delete");
     const { data, error } = await supabase
       .from("v002_events_stag")
       .delete()

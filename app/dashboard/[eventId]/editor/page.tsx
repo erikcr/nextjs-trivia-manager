@@ -118,8 +118,6 @@ export default function EditorByIdPage() {
   };
 
   const deleteRound = async (roundId: Number) => {
-    await supabase.from("v002_questions_stag").delete().eq("round_id", roundId);
-
     const { data, error } = await supabase
       .from("v002_rounds_stag")
       .delete()
@@ -417,6 +415,10 @@ export default function EditorByIdPage() {
           </span>
         </button>
 
+        {/**
+         * TODO
+         * Ensure rounds are rendered in horizonal scroll view when wider than container
+         */}
         {rounds?.map((item) => (
           <div
             key={item.name}
