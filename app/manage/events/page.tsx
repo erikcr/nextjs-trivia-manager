@@ -108,7 +108,23 @@ export default function EventsPage() {
 
   useEffect(() => {
     getUser();
-  });
+  }, []);
+
+  const getMinEventDate = () => {
+    const dtToday = new Date();
+
+    let month = dtToday.getMonth() + 1;
+    let day = dtToday.getDate();
+    let yearStr = dtToday.getFullYear().toString();
+
+    let monthStr,
+      dayStr = "";
+
+    if (month < 10) monthStr = "0" + month.toString();
+    if (day < 10) dayStr = "0" + day.toString();
+
+    return yearStr + "-" + monthStr + "-" + dayStr;
+  };
 
   return (
     <>
@@ -432,6 +448,7 @@ export default function EventsPage() {
                                 type="date"
                                 name="event-date"
                                 id="event-date"
+                                min={getMinEventDate()}
                                 className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
                               />
                             </div>
