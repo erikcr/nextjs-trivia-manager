@@ -1,11 +1,16 @@
 "use client";
 
-import { Fragment, useEffect, useState } from "react";
+import { Fragment, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { parseISO, format } from "date-fns";
 import { Dialog, Menu, Transition } from "@headlessui/react";
-import { XMarkIcon, EllipsisHorizontalIcon } from "@heroicons/react/24/outline";
+import {
+  XMarkIcon,
+  EllipsisHorizontalIcon,
+  CheckIcon,
+  XCircleIcon,
+} from "@heroicons/react/24/outline";
 
 // Supabase
 import { User } from "@supabase/supabase-js";
@@ -37,6 +42,12 @@ export default function EventsPage() {
   const [eventSlideout, setEventSlideout] = useState(false);
   const [addEventLoading, setAddEventLoading] = useState(false);
   const [eventToEdit, setEventToEdit] = useState<Tables<"v002_events_stag">>();
+  const [eventToDelete, setEventToDelete] =
+    useState<Tables<"v002_events_stag">>();
+
+  // Modal
+  const [deleteEventConfirmShow, setDeleteEventConfirmShow] = useState(false);
+  const cancelButtonRef = useRef(null);
 
   const [allEvents, setAllEvents] = useState<
     Tables<"v002_events_stag">[] | null
@@ -54,14 +65,15 @@ export default function EventsPage() {
     }
   };
 
-  const deleteEvent = async (eventId: Number) => {
+  const deleteEvent = async () => {
     const { data, error } = await supabase
       .from("v002_events_stag")
       .delete()
-      .eq("id", eventId);
+      .eq("id", eventToDelete?.id);
 
-    if (data) {
+    if (!error) {
       getAllEvents();
+      setDeleteEventConfirmShow(false);
     } else if (error) {
       console.log(error);
     }
@@ -116,6 +128,8 @@ export default function EventsPage() {
       setNotifShow(true);
       setEventSlideout(false);
       setAddEventLoading(false);
+
+      getAllEvents();
     } else {
       console.log(error);
     }
@@ -298,7 +312,10 @@ export default function EventsPage() {
                                     : "text-gray-700",
                                   "block px-4 py-2 text-sm"
                                 )}
-                                onClick={() => deleteEvent(item.id)}
+                                onClick={() => {
+                                  setDeleteEventConfirmShow(true);
+                                  setEventToDelete(item);
+                                }}
                               >
                                 Delete
                               </p>
@@ -634,6 +651,90 @@ export default function EventsPage() {
                   </Dialog.Panel>
                 </Transition.Child>
               </div>
+            </div>
+          </div>
+        </Dialog>
+      </Transition.Root>
+
+      {/**
+       * Start event confirm modal
+       */}
+      <Transition.Root show={deleteEventConfirmShow} as={Fragment}>
+        <Dialog
+          as="div"
+          className="relative"
+          initialFocus={cancelButtonRef}
+          onClose={setDeleteEventConfirmShow}
+        >
+          <Transition.Child
+            as={Fragment}
+            enter="ease-out duration-300"
+            enterFrom="opacity-0"
+            enterTo="opacity-100"
+            leave="ease-in duration-200"
+            leaveFrom="opacity-100"
+            leaveTo="opacity-0"
+          >
+            <div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" />
+          </Transition.Child>
+
+          <div className="fixed inset-0 w-screen overflow-y-auto">
+            <div className="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+              <Transition.Child
+                as={Fragment}
+                enter="ease-out duration-300"
+                enterFrom="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                enterTo="opacity-100 translate-y-0 sm:scale-100"
+                leave="ease-in duration-200"
+                leaveFrom="opacity-100 translate-y-0 sm:scale-100"
+                leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+              >
+                <Dialog.Panel className="relative transform overflow-hidden rounded-lg bg-white px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6">
+                  <div>
+                    <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-red-100">
+                      <XCircleIcon
+                        className="h-6 w-6 text-red-600"
+                        aria-hidden="true"
+                      />
+                    </div>
+                    <div className="mt-3 text-center sm:mt-5">
+                      <Dialog.Title
+                        as="h3"
+                        className="text-base font-semibold leading-6 text-gray-900"
+                      >
+                        Confirm event delete
+                      </Dialog.Title>
+                      <div className="mt-2">
+                        <p className="text-sm text-gray-500">
+                          You are about to delete <b>{eventToDelete?.name}</b>.
+                          Are you sure?
+                        </p>
+                        <p className="text-sm text-gray-500">
+                          This will delete all rounds and questions you created
+                          for this event.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="mt-5 sm:mt-6 sm:grid sm:grid-flow-row-dense sm:grid-cols-2 sm:gap-3">
+                    <button
+                      type="button"
+                      className="inline-flex w-full justify-center rounded-md bg-red-400 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary sm:col-start-2"
+                      onClick={() => deleteEvent()}
+                    >
+                      Yes, I'm sure
+                    </button>
+                    <button
+                      type="button"
+                      className="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:col-start-1 sm:mt-0"
+                      onClick={() => setDeleteEventConfirmShow(false)}
+                      ref={cancelButtonRef}
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </Dialog.Panel>
+              </Transition.Child>
             </div>
           </div>
         </Dialog>
