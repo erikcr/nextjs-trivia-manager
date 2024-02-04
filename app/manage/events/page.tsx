@@ -40,6 +40,7 @@ export default function EventsPage() {
   const [eLoading, setELoading] = useState(true);
   const [eventSlideout, setEventSlideout] = useState(false);
   const [addEventLoading, setAddEventLoading] = useState(false);
+  const [eventToEdit, setEventToEdit] = useState<Tables<"v002_events_stag">>();
 
   const [allEvents, setAllEvents] = useState<
     Tables<"v002_events_stag">[] | null
@@ -98,6 +99,32 @@ export default function EventsPage() {
     }
   };
 
+  const updateEvent = async (formData: FormData) => {
+    const { data, error } = await supabase
+      .from("v002_events_stag")
+      .update([
+        {
+          name: formData.get("event-name"),
+          date_of_event: formData.get("event-date"),
+          description: formData.get("event-description"),
+          location: formData.get("event-location"),
+          venue: formData.get("event-venue"),
+        },
+      ])
+      .eq("id", eventToEdit?.id)
+      .select();
+
+    if (!error) {
+      setNotifTitle("Event updated");
+      setNotifType("success");
+      setNotifShow(true);
+      setEventSlideout(false);
+      setAddEventLoading(false);
+    } else {
+      console.log(error);
+    }
+  };
+
   const getUser = async () => {
     const { data } = await supabase.auth.getUser();
     if (data) {
@@ -109,6 +136,20 @@ export default function EventsPage() {
   useEffect(() => {
     getUser();
   }, []);
+
+  const getEventDate = (dateOfEvent: string) => {
+    const date = dateOfEvent.split("T")[0];
+    // const month = Date.parse(date).
+
+    const options = {
+      weekday: "long",
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    };
+
+    return date;
+  };
 
   const getMinEventDate = () => {
     const dtToday = new Date();
@@ -243,6 +284,24 @@ export default function EventsPage() {
                                     : "text-gray-700",
                                   "block px-4 py-2 text-sm"
                                 )}
+                                onClick={() => {
+                                  setEventToEdit(item);
+                                  setEventSlideout(true);
+                                }}
+                              >
+                                Edit
+                              </p>
+                            )}
+                          </Menu.Item>
+                          <Menu.Item>
+                            {({ active }) => (
+                              <p
+                                className={classNames(
+                                  active
+                                    ? "bg-gray-100 text-gray-900"
+                                    : "text-gray-700",
+                                  "block px-4 py-2 text-sm"
+                                )}
                                 onClick={() => deleteEvent(item.id)}
                               >
                                 Delete
@@ -258,7 +317,7 @@ export default function EventsPage() {
                       <dt className="text-gray-500 dark:text-gray-300">Date</dt>
                       <dd className="text-gray-700 dark:text-gray-400">
                         <time dateTime={item.date_of_event}>
-                          {format(parseISO(item.date_of_event), "LLLL d, yyyy")}
+                          {getEventDate(item.date_of_event)}
                         </time>
                       </dd>
                     </div>
@@ -372,7 +431,7 @@ export default function EventsPage() {
                       className="flex h-full flex-col overflow-y-scroll bg-white shadow-xl"
                       action={(e) => {
                         setAddEventLoading(true);
-                        addEvent(e);
+                        eventToEdit ? updateEvent(e) : addEvent(e);
                       }}
                     >
                       <div className="flex-1">
@@ -425,6 +484,7 @@ export default function EventsPage() {
                                 name="event-name"
                                 id="event-name"
                                 placeholder="The Next Great Trivia"
+                                defaultValue={eventToEdit?.name}
                                 className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
                               />
                             </div>
@@ -449,6 +509,9 @@ export default function EventsPage() {
                                 name="event-date"
                                 id="event-date"
                                 min={getMinEventDate()}
+                                defaultValue={
+                                  eventToEdit?.date_of_event.split("T")[0]
+                                }
                                 className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
                               />
                             </div>
@@ -472,6 +535,7 @@ export default function EventsPage() {
                               name="event-description"
                               rows={3}
                               placeholder="An optional description of The Next Great Trivia event with relevant details for the players."
+                              defaultValue={eventToEdit?.description}
                               className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
                             />
                           </div>
@@ -495,6 +559,7 @@ export default function EventsPage() {
                               id="event-location"
                               autoComplete="home city"
                               placeholder="Chattanooga, TN"
+                              defaultValue={eventToEdit?.location}
                               className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
                             />
                           </div>
@@ -517,6 +582,7 @@ export default function EventsPage() {
                               name="event-venue"
                               id="event-venue"
                               placeholder="South Side Social"
+                              defaultValue={eventToEdit?.venue}
                               className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
                             />
                           </div>
@@ -563,7 +629,7 @@ export default function EventsPage() {
                                 Loading...
                               </>
                             ) : (
-                              <>Create</>
+                              <>{!eventToEdit ? <>Create</> : <>Save</>}</>
                             )}
                           </button>
                         </div>
