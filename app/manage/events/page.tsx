@@ -5,11 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { parseISO, format } from "date-fns";
 import { Dialog, Menu, Transition } from "@headlessui/react";
-import {
-  XMarkIcon,
-  ChevronRightIcon,
-  EllipsisHorizontalIcon,
-} from "@heroicons/react/24/outline";
+import { XMarkIcon, EllipsisHorizontalIcon } from "@heroicons/react/24/outline";
 
 // Supabase
 import { User } from "@supabase/supabase-js";
@@ -207,7 +203,7 @@ export default function EventsPage() {
               <div className="text-sm font-medium leading-6 text-gray-400 dark:text-gray-200">
                 Loading...
               </div>
-              <ChevronRightIcon
+              <EllipsisHorizontalIcon
                 className="h-5 w-5 relative ml-auto text-gray-300 dark:text-gray-200"
                 aria-hidden="true"
               />
