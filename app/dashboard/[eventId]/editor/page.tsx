@@ -60,6 +60,7 @@ export default function EditorByIdPage() {
   const [activeRound, setActiveRound] = useState<Tables<"v002_rounds_stag">>();
   const [addRoundLoading, setAddRoundLoading] = useState(false);
   const [roundSlideoutOpen, setRoundSlideoutOpen] = useState(false);
+  const [roundToEdit, setRoundToEdit] = useState<Tables<"v002_rounds_stag">>();
 
   // Questions
   const [questions, setQuestions] = useState<Tables<"v002_questions_stag">[]>();
@@ -243,6 +244,8 @@ export default function EditorByIdPage() {
         user={user}
         rounds={rounds}
         getRounds={getRounds}
+        roundToEdit={roundToEdit}
+        setRoundToEdit={setRoundToEdit}
         roundSlideoutOpen={roundSlideoutOpen}
         setRoundSlideoutOpen={setRoundSlideoutOpen}
       />
@@ -452,24 +455,42 @@ export default function EditorByIdPage() {
                 leaveFrom="transform opacity-100 scale-100"
                 leaveTo="transform opacity-0 scale-95"
               >
-                <Menu.Items className="absolute right-0 z-10 -mr-1 mt-2 w-56 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-                  <div className="py-1">
-                    <Menu.Item key={item.name}>
-                      {({ active }) => (
-                        <p
-                          className={classNames(
-                            active
-                              ? "bg-gray-100 text-gray-900"
-                              : "text-gray-700",
-                            "block px-4 py-2 text-sm"
-                          )}
-                          onClick={() => deleteRound(item.id)}
-                        >
-                          Delete
-                        </p>
-                      )}
-                    </Menu.Item>
-                  </div>
+                <Menu.Items className="absolute right-0 z-10 mt-0.5 w-32 origin-top-right rounded-md bg-white py-2 shadow-lg ring-1 ring-gray-900/5 focus:outline-none">
+                  <Menu.Item>
+                    {({ active }) => (
+                      <p
+                        className={classNames(
+                          active
+                            ? "bg-gray-100 text-gray-900"
+                            : "text-gray-700",
+                          "block px-4 py-2 text-sm"
+                        )}
+                        onClick={() => {
+                          setRoundToEdit(item);
+                          setRoundSlideoutOpen(true);
+                        }}
+                      >
+                        Edit
+                      </p>
+                    )}
+                  </Menu.Item>
+                  <Menu.Item>
+                    {({ active }) => (
+                      <p
+                        className={classNames(
+                          active
+                            ? "bg-gray-100 text-gray-900"
+                            : "text-gray-700",
+                          "block px-4 py-2 text-sm"
+                        )}
+                        onClick={() => {
+                          deleteRound(item.id);
+                        }}
+                      >
+                        Delete
+                      </p>
+                    )}
+                  </Menu.Item>
                 </Menu.Items>
               </Transition>
             </Menu>

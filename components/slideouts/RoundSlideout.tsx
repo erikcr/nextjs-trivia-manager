@@ -17,12 +17,16 @@ export default function RoundSlideout({
   user,
   rounds,
   getRounds,
+  roundToEdit,
+  setRoundToEdit,
   roundSlideoutOpen,
   setRoundSlideoutOpen,
 }: {
   user: User | null;
   rounds: Array<Tables<"v002_rounds_stag">> | undefined;
   getRounds: Function;
+  roundToEdit: Tables<"v002_rounds_stag"> | undefined;
+  setRoundToEdit: Function;
   roundSlideoutOpen: boolean;
   setRoundSlideoutOpen: Function;
 }) {
@@ -65,6 +69,33 @@ export default function RoundSlideout({
     }
   };
 
+  const updateRound = async (formData: FormData) => {
+    const { data, error } = await supabase
+      .from("v002_rounds_stag")
+      .update([
+        {
+          name: formData.get("round-name"),
+          description: formData.get("round-description"),
+          order_num: rounds?.length,
+          event_id: eventId,
+          owner: user?.id,
+        },
+      ])
+      .eq("id", roundToEdit?.id)
+      .select();
+
+    if (!error) {
+      getRounds();
+      setNotifTitle("Round updated");
+      setNotifType("success");
+      setNotifShow(true);
+      setRoundSlideoutOpen(false);
+      setAddRoundLoading(false);
+    } else {
+      console.log(error);
+    }
+  };
+
   return (
     <>
       {/**
@@ -77,11 +108,17 @@ export default function RoundSlideout({
         setShow={setNotifShow}
       />
 
+      {/**
+       * Round panel slideout
+       */}
       <Transition.Root show={roundSlideoutOpen} as={Fragment}>
         <Dialog
           as="div"
           className="relative z-50"
-          onClose={() => setRoundSlideoutOpen(false)}
+          onClose={() => {
+            setRoundSlideoutOpen(false);
+            setRoundToEdit(undefined);
+          }}
         >
           <Transition.Child
             as={Fragment}
@@ -112,7 +149,7 @@ export default function RoundSlideout({
                       className="flex h-full flex-col overflow-y-scroll shadow-xl"
                       action={(e) => {
                         setAddRoundLoading(true);
-                        addRound(e);
+                        roundToEdit ? updateRound(e) : addRound(e);
                       }}
                     >
                       <div className="flex-1">
@@ -120,17 +157,22 @@ export default function RoundSlideout({
                           <div className="flex items-start justify-between space-x-3">
                             <div className="space-y-1">
                               <Dialog.Title className="text-base font-semibold leading-6 text-gray-900">
-                                New round
+                                {roundToEdit ? "Update" : "New"} round
                               </Dialog.Title>
                               <p className="text-sm text-gray-500">
-                                Add a new round to the event.
+                                {roundToEdit
+                                  ? "Make changes to the round details."
+                                  : "Add a new round to the event.."}
                               </p>
                             </div>
                             <div className="flex h-7 items-center">
                               <button
                                 type="button"
                                 className="relative text-gray-400 hover:text-gray-500"
-                                onClick={() => setRoundSlideoutOpen(false)}
+                                onClick={() => {
+                                  setRoundSlideoutOpen(false);
+                                  setRoundToEdit(undefined);
+                                }}
                               >
                                 <span className="absolute -inset-2.5" />
                                 <span className="sr-only">Close panel</span>
@@ -160,7 +202,8 @@ export default function RoundSlideout({
                                 type="text"
                                 name="round-name"
                                 id="round-name"
-                                placeholder="Beyond Harry Potter "
+                                placeholder="Beyond Harry Potter"
+                                defaultValue={roundToEdit?.name}
                                 className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
                               />
                             </div>
@@ -183,6 +226,7 @@ export default function RoundSlideout({
                               name="round-description"
                               rows={3}
                               placeholder="An optional description of Beyond Harry Potter round."
+                              defaultValue={roundToEdit?.description}
                               className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
                             />
                           </div>
@@ -195,7 +239,10 @@ export default function RoundSlideout({
                             disabled={addRoundLoading}
                             type="button"
                             className="rounded-md px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
-                            onClick={() => setRoundSlideoutOpen(false)}
+                            onClick={() => {
+                              setRoundSlideoutOpen(false);
+                              setRoundToEdit(undefined);
+                            }}
                           >
                             Cancel
                           </button>
@@ -228,7 +275,7 @@ export default function RoundSlideout({
                                 Loading...
                               </>
                             ) : (
-                              <>Add</>
+                              <>{roundToEdit ? <>Save</> : <>Create</>}</>
                             )}
                           </button>
                         </div>
