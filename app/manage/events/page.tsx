@@ -130,6 +130,7 @@ export default function EventsPage() {
       setAddEventLoading(false);
 
       getAllEvents();
+      setEventToEdit(undefined);
     } else {
       console.log(error);
     }
@@ -239,14 +240,7 @@ export default function EventsPage() {
           allEvents
             ?.filter((item) => item.status !== "COMPLETE")
             .map((item) => (
-              <div
-                key={item.id}
-                // href={
-                //   item.status === "PENDING"
-                //     ? `/dashboard/${item.id}/editor`
-                //     : `/dashboard/${item.id}/ongoing`
-                // }
-              >
+              <div key={item.id}>
                 <li
                   key={item.id}
                   className="overflow-hidden rounded-xl border border-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600"
@@ -325,24 +319,34 @@ export default function EventsPage() {
                       </Transition>
                     </Menu>
                   </div>
-                  <dl className="-my-3 divide-y divide-gray-100 dark:divide-gray-600 px-6 py-4 text-sm leading-6">
-                    <div className="flex justify-between gap-x-4 py-3">
-                      <dt className="text-gray-500 dark:text-gray-300">Date</dt>
-                      <dd className="text-gray-700 dark:text-gray-400">
-                        <time dateTime={item.date_of_event}>
-                          {getEventDate(item.date_of_event)}
-                        </time>
-                      </dd>
-                    </div>
-                    <div className="flex justify-between gap-x-4 py-3">
-                      <dt className="text-gray-500 dark:text-gray-300">
-                        Venue
-                      </dt>
-                      <dd className="text-gray-700 dark:text-gray-400">
-                        {item.venue}
-                      </dd>
-                    </div>
-                  </dl>
+                  <a
+                    href={
+                      item.status === "PENDING"
+                        ? `/dashboard/${item.id}/editor`
+                        : `/dashboard/${item.id}/ongoing`
+                    }
+                  >
+                    <dl className="-my-3 divide-y divide-gray-100 dark:divide-gray-600 px-6 py-4 text-sm leading-6">
+                      <div className="flex justify-between gap-x-4 py-3">
+                        <dt className="text-gray-500 dark:text-gray-300">
+                          Date
+                        </dt>
+                        <dd className="text-gray-700 dark:text-gray-400">
+                          <time dateTime={item.date_of_event}>
+                            {getEventDate(item.date_of_event)}
+                          </time>
+                        </dd>
+                      </div>
+                      <div className="flex justify-between gap-x-4 py-3">
+                        <dt className="text-gray-500 dark:text-gray-300">
+                          Venue
+                        </dt>
+                        <dd className="text-gray-700 dark:text-gray-400">
+                          {item.venue}
+                        </dd>
+                      </div>
+                    </dl>
+                  </a>
                 </li>
               </div>
             ))}
@@ -411,10 +415,17 @@ export default function EventsPage() {
       </ul>
 
       {/**
-       * New event panel
+       * Event panel slideout
        */}
       <Transition.Root show={eventSlideout} as={Fragment}>
-        <Dialog as="div" className="relative z-10" onClose={setEventSlideout}>
+        <Dialog
+          as="div"
+          className="relative z-10"
+          onClose={() => {
+            setEventSlideout(false);
+            setEventToEdit(undefined);
+          }}
+        >
           <Transition.Child
             as={Fragment}
             enter="ease-in-out duration-500"
@@ -453,18 +464,22 @@ export default function EventsPage() {
                           <div className="flex items-start justify-between space-x-3">
                             <div className="space-y-1">
                               <Dialog.Title className="text-base font-semibold leading-6 text-gray-900">
-                                New event
+                                {eventToEdit ? "Update" : "New"} event
                               </Dialog.Title>
                               <p className="text-sm text-gray-500">
-                                Get started by filling in the information below
-                                to create your next event.
+                                {eventToEdit
+                                  ? "Make changes to the event details."
+                                  : "Get started by filling in the information below to create your next event."}
                               </p>
                             </div>
                             <div className="flex h-7 items-center">
                               <button
                                 type="button"
                                 className="relative text-gray-400 hover:text-gray-500"
-                                onClick={() => setEventSlideout(false)}
+                                onClick={() => {
+                                  setEventSlideout(false);
+                                  setEventToEdit(undefined);
+                                }}
                               >
                                 <span className="absolute -inset-2.5" />
                                 <span className="sr-only">Close panel</span>
@@ -609,7 +624,10 @@ export default function EventsPage() {
                             disabled={addEventLoading}
                             type="button"
                             className="rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
-                            onClick={() => setEventSlideout(false)}
+                            onClick={() => {
+                              setEventSlideout(false);
+                              setEventToEdit(undefined);
+                            }}
                           >
                             Cancel
                           </button>
