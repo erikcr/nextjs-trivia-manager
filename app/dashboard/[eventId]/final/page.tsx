@@ -113,7 +113,7 @@ export default function EventFinalPage() {
       {/**
        * Top header
        */}
-      <div className="fixed top-0 left-0 right-0 z-40 flex h-16 shrink-0 items-center gap-x-4 border-b border-gray-400">
+      <div className="fixed top-0 left-0 right-0 flex h-16 shrink-0 items-center gap-x-4 border-b bg-primary text-gray-100 border-gray-400">
         <TopHeader />
       </div>
 

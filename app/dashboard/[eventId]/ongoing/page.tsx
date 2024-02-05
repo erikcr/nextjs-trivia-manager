@@ -102,7 +102,9 @@ export default function EventOngoingPage() {
       .update({ status: "ONGOING" })
       .eq("id", nextQuestion?.id);
 
-    if (error) {
+    if (!error) {
+      getQuestions();
+    } else {
       console.log(error);
     }
   };
@@ -192,7 +194,7 @@ export default function EventOngoingPage() {
       .update({ status: "COMPLETE" })
       .eq("id", activeRound?.id);
 
-    const nextRound = rounds?.find(i => i.status === "PENDING")
+    const nextRound = rounds?.find((i) => i.status === "PENDING");
     setActiveRound(nextRound);
   };
 
@@ -240,8 +242,8 @@ export default function EventOngoingPage() {
       .eq("id", eventId);
 
     setTopHeaderButton("");
-    
-    router.push(`/dashbaord/${event?.id}/final`)
+
+    router.push(`/dashbaord/${event?.id}/final`);
   };
 
   const getEvent = async () => {
@@ -279,7 +281,7 @@ export default function EventOngoingPage() {
       {/**
        * Top header
        */}
-      <div className="fixed top-0 left-0 right-0 z-40 flex h-16 shrink-0 items-center gap-x-4 border-b border-gray-400">
+      <div className="fixed top-0 left-0 right-0 flex h-16 shrink-0 items-center gap-x-4 border-b bg-primary text-gray-100 border-gray-400">
         <TopHeader />
       </div>
 
@@ -334,7 +336,7 @@ export default function EventOngoingPage() {
               <button
                 type="button"
                 disabled={event === undefined}
-                className="inline-flex items-center gap-x-1.5 px-2.5 py-1.5 text-sm text-gray-900 hover:text-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+                className="inline-flex items-center gap-x-1.5 px-2.5 py-1.5 text-sm hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
                 onClick={
                   topHeaderButton === "ACTIVATE_NEXT_QUESTION"
                     ? updateQuestionOngoing
@@ -372,7 +374,9 @@ export default function EventOngoingPage() {
                   : "text-gray-500 hover:text-gray-700",
                 "rounded-md px-3 py-2 text-sm font-medium"
               )}
-              aria-current={item.id === Number(activeRound?.id) ? "page" : undefined}
+              aria-current={
+                item.id === Number(activeRound?.id) ? "page" : undefined
+              }
               onClick={() => setActiveRound(item)}
             >
               {item.name}
