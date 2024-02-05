@@ -15,12 +15,12 @@ import logoBrainyBrawls from "@/public/logos/brainybrawls.svg";
 // Supabase
 import { User } from "@supabase/supabase-js";
 import { createClient } from "@/utils/supabase/client";
+import { Tables } from "@/types/database.types";
 import {
-  Tables,
   TeamsWithResponses,
   TeamWithResponses,
   ResponeWithQuestions,
-} from "@/types/database.types";
+} from "@/types/app.types";
 
 function classNames(...classes: any[]) {
   return classes.filter(Boolean).join(" ");
