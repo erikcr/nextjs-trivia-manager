@@ -212,14 +212,14 @@ export default function EditorByIdPage() {
       {/**
        * Top header
        */}
-      <div className="fixed top-0 left-0 right-0 z-40 flex h-16 shrink-0 items-center gap-x-4 border-b border-gray-400">
+      <div className="fixed top-0 left-0 right-0 flex h-16 shrink-0 items-center gap-x-4 border-b bg-primary text-gray-100 border-gray-400">
         <TopHeader />
       </div>
 
       {/**
        * Secondary header
        */}
-      <div className="fixed top-16 left-0 right-0 z-40 flex h-16 shrink-0 items-center gap-x-4 border-b border-gray-400">
+      <div className="fixed top-16 left-0 right-0 flex h-16 shrink-0 items-center gap-x-4 border-b border-gray-400">
         <SecondaryHeader />
       </div>
 
@@ -386,7 +386,7 @@ export default function EditorByIdPage() {
             <button
               type="button"
               disabled={event === undefined}
-              className="inline-flex items-center gap-x-1.5 rounded-md px-2.5 py-1.5 text-sm text-gray-900 hover:text-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+              className="inline-flex items-center gap-x-1.5 rounded-md px-2.5 py-1.5 text-sm hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
               onClick={() => {
                 setStartConfirmShow(true);
               }}
@@ -442,7 +442,7 @@ export default function EditorByIdPage() {
               {item.name}
             </button>
             <Menu as="div" className="relative -ml-px block">
-              <Menu.Button className="relative inline-flex items-center rounded-r-md bg-white px-2 py-2 hover:bg-gray-50 focus:z-10">
+              <Menu.Button className="relative inline-flex items-center rounded-r-md bg-white px-2 py-2 hover:bg-gray-50">
                 <span className="sr-only">Open options</span>
                 <ChevronDownIcon className="h-5 w-5" aria-hidden="true" />
               </Menu.Button>
@@ -455,7 +455,7 @@ export default function EditorByIdPage() {
                 leaveFrom="transform opacity-100 scale-100"
                 leaveTo="transform opacity-0 scale-95"
               >
-                <Menu.Items className="absolute right-0 z-10 mt-0.5 w-32 origin-top-right rounded-md bg-white py-2 shadow-lg ring-1 ring-gray-900/5 focus:outline-none">
+                <Menu.Items className="absolute right-0 mt-0.5 w-32 origin-top-right rounded-md bg-white py-2 shadow-lg ring-1 ring-gray-900/5 focus:outline-none">
                   <Menu.Item>
                     {({ active }) => (
                       <p

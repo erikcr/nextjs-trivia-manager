@@ -564,7 +564,7 @@ export default function EventsPage() {
                               name="event-description"
                               rows={3}
                               placeholder="An optional description of The Next Great Trivia event with relevant details for the players."
-                              defaultValue={eventToEdit?.description}
+                              defaultValue={eventToEdit?.description || ""}
                               className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
                             />
                           </div>
@@ -588,7 +588,7 @@ export default function EventsPage() {
                               id="event-location"
                               autoComplete="home city"
                               placeholder="Chattanooga, TN"
-                              defaultValue={eventToEdit?.location}
+                              defaultValue={eventToEdit?.location || ""}
                               className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
                             />
                           </div>
@@ -611,7 +611,7 @@ export default function EventsPage() {
                               name="event-venue"
                               id="event-venue"
                               placeholder="South Side Social"
-                              defaultValue={eventToEdit?.venue}
+                              defaultValue={eventToEdit?.venue || ""}
                               className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
                             />
                           </div>
@@ -741,7 +741,7 @@ export default function EventsPage() {
                       className="inline-flex w-full justify-center rounded-md bg-red-400 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary sm:col-start-2"
                       onClick={() => deleteEvent()}
                     >
-                      Yes, I'm sure
+                      Yes, I&apos;m sure
                     </button>
                     <button
                       type="button"

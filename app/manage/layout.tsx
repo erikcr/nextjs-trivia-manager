@@ -89,7 +89,7 @@ export default function ManageLayout({
                     <Image
                       src={logoBrainyBrawls}
                       alt="Next.js Trivia Manager"
-                      className="h-8 w-8 text-gray-800"
+                      className="h-8 w-8 text-gray-100"
                       unoptimized
                     />
                   </button>
@@ -122,7 +122,7 @@ export default function ManageLayout({
 
                   <button
                     type="button"
-                    className="relative rounded-full p-1 text-gray-800 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800"
+                    className="relative rounded-full p-1 text-gray-100 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800"
                     onClick={signOut}
                   >
                     <span className="absolute -inset-1.5" />
@@ -153,7 +153,7 @@ export default function ManageLayout({
 
         <header className="py-10">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <h1 className="text-3xl font-bold tracking-tight text-gray-800">
+            <h1 className="text-3xl font-bold tracking-tight text-gray-100">
               {navigation.find((item) => item.href === pathname)?.name}
             </h1>
           </div>

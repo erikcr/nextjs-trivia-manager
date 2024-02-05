@@ -159,7 +159,7 @@ export default function RoundSlideout({
                               <p className="text-sm text-gray-500">
                                 {roundToEdit
                                   ? "Make changes to the round details."
-                                  : "Add a new round to the event.."}
+                                  : "Add a new round to the event."}
                               </p>
                             </div>
                             <div className="flex h-7 items-center">
@@ -223,7 +223,7 @@ export default function RoundSlideout({
                               name="round-description"
                               rows={3}
                               placeholder="An optional description of Beyond Harry Potter round."
-                              defaultValue={roundToEdit?.description}
+                              defaultValue={roundToEdit?.description || ""}
                               className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
                             />
                           </div>
