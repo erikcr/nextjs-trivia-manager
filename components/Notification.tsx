@@ -1,4 +1,4 @@
-import { Fragment, useState } from "react";
+import { Fragment, useEffect } from "react";
 import { Transition } from "@headlessui/react";
 import {
   CheckCircleIcon,
@@ -19,6 +19,15 @@ export default function Notification({
   show: boolean;
   setShow: Function;
 }) {
+  useEffect(() => {
+    if (show === true) {
+      const timer = setTimeout(() => {
+        setShow(false);
+      }, 4000);
+      return () => clearTimeout(timer);
+    }
+  }, [show]);
+
   return (
     <>
       {/* Global notification live region, render this permanently at the end of the document */}
