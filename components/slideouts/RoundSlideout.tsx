@@ -76,9 +76,6 @@ export default function RoundSlideout({
         {
           name: formData.get("round-name"),
           description: formData.get("round-description"),
-          order_num: rounds?.length,
-          event_id: eventId,
-          owner: user?.id,
         },
       ])
       .eq("id", roundToEdit?.id)
