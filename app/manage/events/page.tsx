@@ -57,7 +57,8 @@ export default function EventsPage() {
     const { data, error } = await supabase
       .from("v002_events_stag")
       .select()
-      .eq("owner", userId ? userId : user?.id);
+      .eq("owner", userId ? userId : user?.id)
+      .order("date_of_event");
 
     if (data) {
       setAllEvents(data);
