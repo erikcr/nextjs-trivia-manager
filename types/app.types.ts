@@ -12,6 +12,11 @@ interface SidebarItem {
 }
 export interface SidebarList extends Array<SidebarItem> { }
 
+const roundsWithQuestions = supabase
+  .from("v002_rounds_stag")
+  .select(`*, v002_questions_stag ( id )`);
+export type RoundsWithQuestions = QueryData<typeof roundsWithQuestions>;
+
 const teamsWithResponsesQuery = supabase
   .from("v002_teams_stag")
   .select(`

@@ -18,6 +18,7 @@ import logoBrainyBrawls from "@/public/logos/brainybrawls.svg";
 import { PostgrestError, User } from "@supabase/supabase-js";
 import { createClient } from "@/utils/supabase/client";
 import { Tables } from "@/types/database.types";
+import { RoundsWithQuestions } from "@/types/app.types";
 
 // Components
 import Notification from "@/components/Notification";
@@ -54,7 +55,7 @@ export default function EditorByIdPage() {
   const [eError, setEError] = useState<PostgrestError>();
 
   // Rounds
-  const [rounds, setRounds] = useState<Tables<"v002_rounds_stag">[]>();
+  const [rounds, setRounds] = useState<RoundsWithQuestions>();
   const [rLoading, setRLoading] = useState(true);
   const [rError, setRError] = useState<PostgrestError>();
   const [activeRound, setActiveRound] = useState<Tables<"v002_rounds_stag">>();
@@ -80,6 +81,7 @@ export default function EditorByIdPage() {
   const cancelButtonRef = useRef(null);
 
   // Tooltip
+  const [startDisabled, setStartDisabled] = useState(true);
   const [startErrorMsg, setStartErrorMsg] = useState("");
 
   const getQuestions = async () => {
@@ -93,13 +95,27 @@ export default function EditorByIdPage() {
     if (data) {
       setQuestions(data);
       setQLoading(false);
+
+      const nextRounds = rounds?.map((round) => {
+        if (round.id === activeRound?.id) {
+          return {
+            ...round,
+            v002_questions_stag: data,
+          };
+        } else {
+          return round;
+        }
+      });
+
+      console.log(nextRounds);
+      setRounds(nextRounds);
     }
   };
 
   const getRounds = async () => {
     const { data, error } = await supabase
       .from("v002_rounds_stag")
-      .select()
+      .select("*, v002_questions_stag ( id )")
       .order("order_num")
       .eq("event_id", eventId)
       .eq("owner", user?.id);
@@ -198,16 +214,24 @@ export default function EditorByIdPage() {
     getUser();
   }, []);
 
-  const checkStartReady = () => {
+  useEffect(() => {
+    setStartErrorMsg("");
+    setStartDisabled(false);
+
     if (!rounds?.length) {
       setStartErrorMsg("Please add at least one round to start.");
-      return true;
+      setStartDisabled(true);
+    } else {
+      const emptyRound = rounds.find((i) => i.v002_questions_stag.length <= 0);
+      console.log(emptyRound);
+      if (emptyRound) {
+        setStartErrorMsg(
+          `The round ${emptyRound.name} doesn't have any questions.`
+        );
+        setStartDisabled(true);
+      }
     }
-
-    
-    setStartErrorMsg("");
-    return false;
-  };
+  }, [rounds]);
 
   return (
     <>
@@ -399,7 +423,7 @@ export default function EditorByIdPage() {
             <div className="relative flex flex-col items-center group">
               <button
                 type="button"
-                disabled={checkStartReady()}
+                disabled={startDisabled}
                 className="inline-flex items-center gap-x-1.5 rounded-md px-2.5 py-1.5 text-sm hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
                 onClick={() => {
                   setStartConfirmShow(true);
@@ -415,11 +439,11 @@ export default function EditorByIdPage() {
               <div
                 className={classNames(
                   startErrorMsg.length > 0 ? "" : "invisible",
-                  "absolute top-0 flex flex-col items-center hidden mt-8 group-hover:flex"
+                  "absolute z-50 top-0 flex flex-col items-center hidden mt-12 group-hover:flex"
                 )}
               >
                 <div className="w-3 h-3 -mb-2 rotate-45 bg-gray-800"></div>
-                <span className="relative z-10 p-2 rounded-md text-sm leading-none text-white whitespace-no-wrap bg-gray-800 shadow-lg">
+                <span className="relative p-2 rounded-md text-md leading-none text-white  bg-gray-800 shadow-lg">
                   {startErrorMsg}
                 </span>
               </div>
