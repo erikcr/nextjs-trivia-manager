@@ -79,6 +79,9 @@ export default function EditorByIdPage() {
   const [startConfirmShow, setStartConfirmShow] = useState(false);
   const cancelButtonRef = useRef(null);
 
+  // Tooltip
+  const [startErrorMsg, setStartErrorMsg] = useState("");
+
   const getQuestions = async () => {
     const { data, error } = await supabase
       .from("v002_questions_stag")
@@ -194,6 +197,17 @@ export default function EditorByIdPage() {
 
     getUser();
   }, []);
+
+  const checkStartReady = () => {
+    if (!rounds?.length) {
+      setStartErrorMsg("Please add at least one round to start.");
+      return true;
+    }
+
+    
+    setStartErrorMsg("");
+    return false;
+  };
 
   return (
     <>
@@ -382,21 +396,34 @@ export default function EditorByIdPage() {
                 {event?.status}
               </span>
             )}
+            <div className="relative flex flex-col items-center group">
+              <button
+                type="button"
+                disabled={checkStartReady()}
+                className="inline-flex items-center gap-x-1.5 rounded-md px-2.5 py-1.5 text-sm hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+                onClick={() => {
+                  setStartConfirmShow(true);
+                }}
+              >
+                START EVENT
+                <RocketLaunchIcon
+                  className="-mr-0.5 h-5 w-5"
+                  aria-hidden="true"
+                />
+              </button>
 
-            <button
-              type="button"
-              disabled={event === undefined}
-              className="inline-flex items-center gap-x-1.5 rounded-md px-2.5 py-1.5 text-sm hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
-              onClick={() => {
-                setStartConfirmShow(true);
-              }}
-            >
-              START EVENT
-              <RocketLaunchIcon
-                className="-mr-0.5 h-5 w-5"
-                aria-hidden="true"
-              />
-            </button>
+              <div
+                className={classNames(
+                  startErrorMsg.length > 0 ? "" : "invisible",
+                  "absolute top-0 flex flex-col items-center hidden mt-8 group-hover:flex"
+                )}
+              >
+                <div className="w-3 h-3 -mb-2 rotate-45 bg-gray-800"></div>
+                <span className="relative z-10 p-2 rounded-md text-sm leading-none text-white whitespace-no-wrap bg-gray-800 shadow-lg">
+                  {startErrorMsg}
+                </span>
+              </div>
+            </div>
           </div>
         </nav>
       </div>
