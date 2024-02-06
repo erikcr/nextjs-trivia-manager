@@ -8,7 +8,7 @@ import {
   Bars3Icon,
   RocketLaunchIcon,
   CheckIcon,
-  ChevronDownIcon,
+  PencilSquareIcon,
 } from "@heroicons/react/24/outline";
 import { useChat } from "ai/react";
 
@@ -134,19 +134,8 @@ export default function EditorByIdPage() {
       if (!data.length) {
         setQLoading(false);
       }
-    }
-  };
-
-  const deleteRound = async (roundId: Number) => {
-    const { data, error } = await supabase
-      .from("v002_rounds_stag")
-      .delete()
-      .eq("id", roundId);
-
-    if (!error) {
+    } else {
       setActiveRound(undefined);
-      setQuestions(undefined);
-      getRounds();
     }
   };
 
@@ -439,11 +428,11 @@ export default function EditorByIdPage() {
               <div
                 className={classNames(
                   startErrorMsg.length > 0 ? "" : "invisible",
-                  "absolute z-50 top-0 flex flex-col items-center hidden mt-12 group-hover:flex"
+                  "absolute top-0 flex flex-col items-center hidden mt-8 group-hover:flex"
                 )}
               >
                 <div className="w-3 h-3 -mb-2 rotate-45 bg-gray-800"></div>
-                <span className="relative p-2 rounded-md text-md leading-none text-white  bg-gray-800 shadow-lg">
+                <span className="relative p-2 rounded-md text-md leading-none text-white bg-gray-800 shadow-lg">
                   {startErrorMsg}
                 </span>
               </div>
@@ -483,68 +472,23 @@ export default function EditorByIdPage() {
                 item.id === activeRound?.id
                   ? "bg-primary text-white"
                   : "text-gray-700 hover:text-gray-900 bg-gray-200 hover:bg-gray-100",
-                "relative inline-flex items-center rounded-l-md px-3 py-2 text-sm font-medium"
+                "relative inline-flex items-center rounded-md px-3 py-2 text-sm font-medium"
               )}
               aria-current={item.id === activeRound?.id ? "page" : undefined}
               onClick={() => {
                 setActiveRound(item);
               }}
             >
-              {item.name}
+              <p className="pr-2">{item.name}</p>
+
+              <PencilSquareIcon
+                className="w-5 h-5"
+                onClick={() => {
+                  setRoundToEdit(item);
+                  setRoundSlideoutOpen(true);
+                }}
+              />
             </button>
-            <Menu as="div" className="relative -ml-px block">
-              <Menu.Button className="relative inline-flex items-center rounded-r-md bg-white px-2 py-2 hover:bg-gray-50">
-                <span className="sr-only">Open options</span>
-                <ChevronDownIcon className="h-5 w-5" aria-hidden="true" />
-              </Menu.Button>
-              <Transition
-                as={Fragment}
-                enter="transition ease-out duration-100"
-                enterFrom="transform opacity-0 scale-95"
-                enterTo="transform opacity-100 scale-100"
-                leave="transition ease-in duration-75"
-                leaveFrom="transform opacity-100 scale-100"
-                leaveTo="transform opacity-0 scale-95"
-              >
-                <Menu.Items className="absolute right-0 mt-0.5 w-32 origin-top-right rounded-md bg-white py-2 shadow-lg ring-1 ring-gray-900/5 focus:outline-none">
-                  <Menu.Item>
-                    {({ active }) => (
-                      <p
-                        className={classNames(
-                          active
-                            ? "bg-gray-100 text-gray-900"
-                            : "text-gray-700",
-                          "block px-4 py-2 text-sm"
-                        )}
-                        onClick={() => {
-                          setRoundToEdit(item);
-                          setRoundSlideoutOpen(true);
-                        }}
-                      >
-                        Edit
-                      </p>
-                    )}
-                  </Menu.Item>
-                  <Menu.Item>
-                    {({ active }) => (
-                      <p
-                        className={classNames(
-                          active
-                            ? "bg-gray-100 text-gray-900"
-                            : "text-gray-700",
-                          "block px-4 py-2 text-sm"
-                        )}
-                        onClick={() => {
-                          deleteRound(item.id);
-                        }}
-                      >
-                        Delete
-                      </p>
-                    )}
-                  </Menu.Item>
-                </Menu.Items>
-              </Transition>
-            </Menu>
           </div>
         ))}
       </div>
