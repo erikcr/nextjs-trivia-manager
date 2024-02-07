@@ -16,6 +16,7 @@ import logoBrainyBrawls from "@/public/logos/brainybrawls.svg";
 import { User } from "@supabase/supabase-js";
 import { createClient } from "@/utils/supabase/client";
 import { Tables } from "@/types/database.types";
+import { ResponsesWithTeam } from "@/types/app.types";
 
 // Components
 import Notification from "@/components/Notification";
@@ -54,7 +55,7 @@ export default function EventOngoingPage() {
     useState<Tables<"v002_questions_stag">>();
 
   // Responses
-  const [responses, setResponses] = useState<Tables<"v002_responses_stag">[]>();
+  const [responses, setResponses] = useState<ResponsesWithTeam>();
 
   // Header button status
   const [topHeaderButton, setTopHeaderButton] = useState("");
@@ -89,6 +90,22 @@ export default function EventOngoingPage() {
   useEffect(() => {
     if (activeQuestion) {
       getResponses();
+
+      supabase
+        .channel("active-question-responses-changes")
+        .on(
+          "postgres_changes",
+          {
+            event: "*",
+            schema: "public",
+            table: "v002_responses_stag",
+            filter: `question_id=eq.${activeQuestion?.id}`,
+          },
+          () => {
+            getResponses();
+          }
+        )
+        .subscribe();
     }
   }, [activeQuestion]);
 
@@ -481,10 +498,15 @@ export default function EventOngoingPage() {
             key={item.id}
             className="flex flex-wrap items-center justify-between gap-x-6 gap-y-4 py-2 sm:flex-nowrap"
           >
-            <div>
-              <p className="text-sm font-semibold leading-6 text-gray-900">
-                {item.submitted_answer}
-              </p>
+            <div className="flex min-w-0 gap-x-4">
+              <div className="min-w-0 flex-auto">
+                <p className="text-sm font-semibold leading-6 text-gray-900">
+                  {item.submitted_answer}
+                </p>
+                <p className="mt-1 truncate text-xs leading-5 text-gray-500">
+                  {item.v002_teams_stag.name}
+                </p>
+              </div>
             </div>
             <dl className="flex w-full flex-none items-center justify-between px-4 py-4 sm:w-auto">
               <div

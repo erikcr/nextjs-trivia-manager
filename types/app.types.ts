@@ -50,6 +50,19 @@ const teamWithResponsesQuery = supabase
   .limit(1);
 export type TeamWithResponses = QueryData<typeof teamWithResponsesQuery>[0];
 
+const responsesWithTeamQuery = supabase
+  .from("v002_responses_stag")
+  .select(`
+    id,
+    is_correct,
+    submitted_answer,
+    v002_teams_stag (
+      id,
+      name
+    )
+  `);
+export type ResponsesWithTeam = QueryData<typeof responsesWithTeamQuery>;
+
 const responseWithQuestionsQuery = supabase
   .from("v002_responses_stag")
   .select(`
