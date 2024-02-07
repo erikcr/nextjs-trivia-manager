@@ -261,7 +261,7 @@ export default function EventOngoingPage() {
 
     setTopHeaderButton("");
 
-    router.push(`/dashbaord/${event?.id}/final`);
+    router.push(`/dashboard/${event?.id}/final`);
   };
 
   const getEvent = async () => {

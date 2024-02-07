@@ -163,9 +163,9 @@ export default function EditorByIdPage() {
 
     if (data) {
       if (data[0].status === "ONGOING") {
-        router.push(`/dashboard/${data[0].id}/responses`);
+        router.push(`/dashboard/${data[0].id}/ongoing`);
       } else if (data[0].status === "COMPLETE") {
-        router.push(`/dashboard/${data[0].id}/complete`);
+        router.push(`/dashboard/${data[0].id}/final`);
       } else {
         setEvent(data[0]);
         setELoading(false);
