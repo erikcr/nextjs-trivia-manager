@@ -504,7 +504,7 @@ export default function EventOngoingPage() {
                   {item.submitted_answer}
                 </p>
                 <p className="mt-1 truncate text-xs leading-5 text-gray-500">
-                  {item.v002_teams_stag.name}
+                  {/* {item.v002_teams_stag.name} */}
                 </p>
               </div>
             </div>
