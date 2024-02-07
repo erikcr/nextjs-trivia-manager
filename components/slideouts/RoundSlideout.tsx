@@ -9,6 +9,7 @@ import { XMarkIcon } from "@heroicons/react/24/outline";
 import { User } from "@supabase/supabase-js";
 import { createClient } from "@/utils/supabase/client";
 import { Tables } from "@/types/database.types";
+import { RoundsWithQuestions } from "@/types/app.types";
 
 // Components
 import Notification from "@/components/Notification";
@@ -16,19 +17,21 @@ import Notification from "@/components/Notification";
 export default function RoundSlideout({
   user,
   rounds,
-  getRounds,
+  setRounds,
   roundToEdit,
   setRoundToEdit,
   roundSlideoutOpen,
   setRoundSlideoutOpen,
+  setActiveRound,
 }: {
   user: User | null;
-  rounds: Array<Tables<"v002_rounds_stag">> | undefined;
-  getRounds: Function;
+  rounds: RoundsWithQuestions | undefined;
+  setRounds: Function;
   roundToEdit: Tables<"v002_rounds_stag"> | undefined;
   setRoundToEdit: Function;
   roundSlideoutOpen: boolean;
   setRoundSlideoutOpen: Function;
+  setActiveRound: Function;
 }) {
   const { eventId } = useParams();
   const router = useRouter();
@@ -55,15 +58,20 @@ export default function RoundSlideout({
           owner: user?.id,
         },
       ])
-      .select();
+      .select("*, v002_questions_stag ( id )");
 
     if (!error) {
-      getRounds();
       setNotifTitle("Round added");
       setNotifType("success");
       setNotifShow(true);
       setRoundSlideoutOpen(false);
       setAddRoundLoading(false);
+
+      const nextRounds = rounds?.concat(data);
+      setRounds(nextRounds);
+
+      setActiveRound(data[0]);
+      setRoundToEdit(undefined);
     } else {
       console.log(error);
     }
@@ -79,15 +87,25 @@ export default function RoundSlideout({
         },
       ])
       .eq("id", roundToEdit?.id)
-      .select();
+      .select("*, v002_questions_stag ( id )");
 
     if (!error) {
-      getRounds();
       setNotifTitle("Round updated");
       setNotifType("success");
       setNotifShow(true);
       setRoundSlideoutOpen(false);
       setAddRoundLoading(false);
+
+      const nextRounds = rounds?.map((round) => {
+        if (round.id === roundToEdit?.id) {
+          return data;
+        } else {
+          return round;
+        }
+      });
+
+      setRounds(nextRounds);
+      setRoundToEdit(undefined);
     } else {
       console.log(error);
     }
@@ -100,12 +118,24 @@ export default function RoundSlideout({
       .eq("id", roundToEdit?.id);
 
     if (!error) {
-      getRounds();
+      setRounds(undefined);
       setNotifTitle("Round deleted");
       setNotifType("success");
       setNotifShow(true);
       setRoundSlideoutOpen(false);
       setAddRoundLoading(false);
+
+      const nextRounds = rounds?.filter(
+        (round) => round.id !== roundToEdit?.id
+      );
+
+      setRounds(nextRounds);
+      if (nextRounds) {
+        setActiveRound(nextRounds[0]);
+      } else {
+        setActiveRound(undefined);
+      }
+      setRoundToEdit(undefined);
     }
   };
 

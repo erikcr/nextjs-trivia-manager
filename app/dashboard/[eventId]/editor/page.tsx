@@ -107,7 +107,6 @@ export default function EditorByIdPage() {
         }
       });
 
-      console.log(nextRounds);
       setRounds(nextRounds);
     }
   };
@@ -177,6 +176,8 @@ export default function EditorByIdPage() {
   useEffect(() => {
     if (activeRound) {
       getQuestions();
+    } else {
+      setQuestions(undefined);
     }
   }, [activeRound]);
 
@@ -212,7 +213,6 @@ export default function EditorByIdPage() {
       setStartDisabled(true);
     } else {
       const emptyRound = rounds.find((i) => i.v002_questions_stag.length <= 0);
-      console.log(emptyRound);
       if (emptyRound) {
         setStartErrorMsg(
           `The round ${emptyRound.name} doesn't have any questions.`
@@ -270,11 +270,12 @@ export default function EditorByIdPage() {
       <RoundSlideout
         user={user}
         rounds={rounds}
-        getRounds={getRounds}
+        setRounds={setRounds}
         roundToEdit={roundToEdit}
         setRoundToEdit={setRoundToEdit}
         roundSlideoutOpen={roundSlideoutOpen}
         setRoundSlideoutOpen={setRoundSlideoutOpen}
+        setActiveRound={setActiveRound}
       />
 
       {/**
@@ -464,7 +465,7 @@ export default function EditorByIdPage() {
          */}
         {rounds?.map((item) => (
           <div
-            key={item.name}
+            key={item.id}
             className="inline-flex rounded-md shadow-sm mr-4"
           >
             <button
