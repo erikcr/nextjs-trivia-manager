@@ -19,6 +19,7 @@ import { Tables } from "@/types/database.types";
 
 // Components
 import Notification from "@/components/Notification";
+import QrCodePopover from "@/components/QrCodePopover";
 
 function classNames(...classes: any[]) {
   return classes.filter(Boolean).join(" ");
@@ -288,7 +289,7 @@ export default function EventOngoingPage() {
       {/**
        * Secondary header
        */}
-      <div className="fixed top-16 left-0 right-0 z-40 flex h-16 shrink-0 items-center gap-x-4 border-b border-gray-400">
+      <div className="fixed top-16 left-0 right-0 flex h-16 shrink-0 items-center gap-x-4 border-b border-gray-400">
         <SecondaryHeader />
       </div>
 
@@ -330,6 +331,8 @@ export default function EventOngoingPage() {
 
             <div className="flex lg:gap-x-12">
               <p>{event?.name}</p>
+
+              <QrCodePopover />
             </div>
 
             <div className="hidden lg:flex lg:flex-1 lg:justify-end">
