@@ -507,7 +507,7 @@ export default function EditorByIdPage() {
                   <tr>
                     <th
                       scope="col"
-                      className="w-8/12 py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6 lg:pl-8"
+                      className="w-7/12 py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6 lg:pl-8"
                     >
                       Question
                     </th>
@@ -516,6 +516,12 @@ export default function EditorByIdPage() {
                       className="w-2/12 px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
                     >
                       Answer
+                    </th>
+                    <th
+                      scope="col"
+                      className="w-1/12 px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+                    >
+                      Points
                     </th>
                     <th
                       scope="col"
@@ -555,6 +561,9 @@ export default function EditorByIdPage() {
                       </td>
                       <td className=" px-3 py-4 text-sm text-gray-500">
                         {item.answer}
+                      </td>
+                      <td className=" px-3 py-4 text-sm text-gray-500">
+                        {item.points}
                       </td>
                       <td className="relative py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6 lg:pr-8">
                         {questionToEdit?.id === item.id ? (
