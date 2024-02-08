@@ -464,6 +464,9 @@ export default function EventOngoingPage() {
                     {item.status}
                   </span>
                 </div>
+
+                <p>Points: {item.points}</p>
+
                 <ChevronRightIcon
                   className={classNames(
                     activeQuestion?.id === item.id
