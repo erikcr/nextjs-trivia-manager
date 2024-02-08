@@ -26,33 +26,39 @@ Deno.serve(async (req) => {
 
     if (teamsError) throw teamsError;
 
-    // Fetch responses and questions for the teams
-    const promises = teams.map(async team => {
-      const { data: responses, error: responsesError } = await supabase
-        .from('v002_responses_stag')
-        .select(`
-            is_correct,
-            question_id,
-            v002_questions_stag (points)
-        `)
-        .eq('team_id', team.id)
-        .is('is_correct', true); // Only consider correct responses
+    const { data, error } = await supabase
+      .from("v002_teams_stag")
+      .select(
+        `
+          id,
+          name,
+          event_id,
+          responses: v002_responses_stag (
+              question: v002_questions_stag (
+                points,
+                round: v002_rounds_stag (status)
+              ),
+              is_correct
+          )
+        `
+      )
+      .eq("event_id", eventId);
 
-      if (responsesError) throw responsesError;
+    const sumTeamPoints = data?.map((team) => ({
+      id: team.id,
+      name: team.name,
+      team_total_points: team.responses.reduce(
+        (acc, response) =>
+          response.question.round.status === "COMPLETE" && response.is_correct
+            ? acc + response.question.points
+            : acc,
+        0
+      ),
+    }));
 
-      // Calculate total points for the team
-      const totalPoints = responses.reduce((acc, response) => acc + response.v002_questions_stag.points, 0);
+    const pointsSorted = sumTeamPoints.sort((a, b) => b.team_total_points - a.team_total_points);
 
-      return { team_id: team.id, team_total_points: totalPoints };
-    });
-
-    // Resolve all promises and calculate total points for each team
-    const scores = await Promise.all(promises);
-
-    // Sort teams by total points in descending order
-    scores.sort((a, b) => b.team_total_points - a.team_total_points);
-
-    return new Response(JSON.stringify(scores), {
+    return new Response(JSON.stringify(pointsSorted), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       status: 200,
     })
