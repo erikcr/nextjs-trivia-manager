@@ -235,7 +235,7 @@ export default function EventOngoingPage() {
       } else if (findFirstPending) {
         setActiveRound(findFirstPending);
       } else {
-        setActiveQuestion(data[data.length - 1]);
+        setActiveRound(data[data.length - 1]);
       }
     }
   };
