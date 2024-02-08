@@ -171,25 +171,25 @@ export default function EventOngoingPage() {
   };
 
   useEffect(() => {
-    if (rounds) {
+    if (activeRound) {
       getQuestions();
-    }
 
-    supabase
-      .channel("active-round-question-changes")
-      .on(
-        "postgres_changes",
-        {
-          event: "*",
-          schema: "public",
-          table: "v002_questions_stag",
-          filter: `round_id=eq.${activeRound?.id}`,
-        },
-        () => {
-          getQuestions();
-        }
-      )
-      .subscribe();
+      supabase
+        .channel("active-round-question-changes")
+        .on(
+          "postgres_changes",
+          {
+            event: "*",
+            schema: "public",
+            table: "v002_questions_stag",
+            filter: `round_id=eq.${activeRound?.id}`,
+          },
+          () => {
+            getQuestions();
+          }
+        )
+        .subscribe();
+    }
   }, [activeRound]);
 
   // Rounds functions
@@ -226,8 +226,17 @@ export default function EventOngoingPage() {
       .order("id");
 
     if (data) {
-      setActiveRound(data[0]);
       setRounds(data);
+
+      const findFirstOngoing = data.find((i) => i.status === "ONGOING");
+      const findFirstPending = data.find((i) => i.status === "PENDING");
+      if (findFirstOngoing) {
+        setActiveRound(findFirstOngoing);
+      } else if (findFirstPending) {
+        setActiveRound(findFirstPending);
+      } else {
+        setActiveQuestion(data[data.length - 1]);
+      }
     }
   };
 
