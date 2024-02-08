@@ -314,14 +314,14 @@ export default function EventOngoingPage() {
       {/**
        * Main content
        */}
-      <main className="fixed top-32 bottom-0 left-0 w-2/3 border-r border-gray-400">
+      <main className="fixed top-32 bottom-0 left-0 w-2/3 border-r border-gray-400 overflow-auto">
         <MainContent />
       </main>
 
       {/**
        * Right-side column
        */}
-      <aside className="fixed top-32 bottom-0 right-0 w-1/3">
+      <aside className="fixed top-32 bottom-0 right-0 w-1/3 overflow-auto">
         <RightSidebar />
       </aside>
     </>
@@ -493,7 +493,7 @@ export default function EventOngoingPage() {
     }
 
     return (
-      <ul role="list" className="mt-2 divide-y divide-gray-300 px-6">
+      <ul role="list" className="mt-2 divide-y divide-gray-300 px-6 pb-12">
         {responses?.map((item) => (
           <li
             key={item.id}
