@@ -69,7 +69,8 @@ export default function EventOngoingPage() {
     const { data, error } = await supabase
       .from("v002_responses_stag")
       .select("*, v002_teams_stag( name )")
-      .eq("question_id", activeQuestion?.id);
+      .eq("question_id", activeQuestion?.id)
+      .order("id");
 
     if (data) {
       setResponses(data);
@@ -492,23 +493,23 @@ export default function EventOngoingPage() {
     }
 
     return (
-      <ul role="list" className="divide-y divide-gray-100 px-6">
+      <ul role="list" className="mt-2 divide-y divide-gray-300 px-6">
         {responses?.map((item) => (
           <li
             key={item.id}
-            className="flex flex-wrap items-center justify-between gap-x-6 gap-y-4 py-2 sm:flex-nowrap"
+            className="flex flex-wrap items-center justify-between gap-x-6 py-2 sm:flex-nowrap"
           >
             <div className="flex min-w-0 gap-x-4">
               <div className="min-w-0 flex-auto">
                 <p className="text-sm font-semibold leading-6 text-gray-900">
                   {item.submitted_answer}
                 </p>
-                <p className="mt-1 truncate text-xs leading-5 text-gray-500">
+                <p className="truncate text-xs leading-5 text-gray-500">
                   {/* {item.v002_teams_stag.name} */}
                 </p>
               </div>
             </div>
-            <dl className="flex w-full flex-none items-center justify-between px-4 py-4 sm:w-auto">
+            <dl className="flex w-full flex-none items-center justify-between px-4 sm:w-auto">
               <div
                 className={classNames(
                   activeRound?.status !== "COMPLETE"
