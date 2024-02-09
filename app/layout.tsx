@@ -10,7 +10,7 @@ function classNames(...classes: any[]) {
 }
 
 export const metadata: Metadata = {
-  title: "Brainy Brawls",
+  title: "TriviaLynx",
   description: "Let's get ready to trivia!",
 };
 

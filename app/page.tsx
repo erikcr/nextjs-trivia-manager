@@ -52,14 +52,14 @@ export default function Example() {
             </button>
           </div>
           <div className="flex lg:hidden">
-            <button
-              type="button"
-              className="-m-2.5 inline-flex items-center justify-center rounded-md p-2.5 text-gray-700"
-              onClick={() => setMobileMenuOpen(true)}
-            >
-              <span className="sr-only">Open main menu</span>
-              <Bars3Icon className="h-6 w-6" aria-hidden="true" />
-            </button>
+            <div className="flex items-center gap-x-6">
+              <a
+                href="https://play.trivialynx.tech"
+                className="rounded-md bg-primary px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-primary-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+              >
+                Let&apos;s play!
+              </a>
+            </div>
           </div>
           <div className="hidden lg:flex lg:gap-x-12">
             {navigation.map((item) => (
@@ -182,9 +182,9 @@ export default function Example() {
             fill="url(#83fd4e5a-9d52-42fc-97b6-718e5d7ee527)"
           />
         </svg>
-        <div className="mx-auto max-w-7xl px-6 py-24 sm:py-32 lg:flex lg:items-center lg:gap-x-10 lg:px-8 lg:py-40">
+        <div className="mx-auto max-w-7xl px-6 py-16 md:py-24 lg:flex lg:items-center lg:gap-x-10 lg:px-8 lg:py-40">
           <div className="mx-auto max-w-2xl lg:mx-0 lg:flex-auto">
-            <h1 className="mt-10 max-w-lg text-4xl font-bold tracking-tight text-gray-900 sm:text-6xl">
+            <h1 className="md:mt-10 max-w-lg text-4xl font-bold tracking-tight text-gray-900 sm:text-6xl">
               Let&apos;s get ready to trivia!
             </h1>
             <p className="mt-6 text-lg leading-8 text-gray-600">
@@ -193,7 +193,7 @@ export default function Example() {
               challenge your intellect, and climb the leaderboard as you explore
               a vast array of captivating trivia categories.
             </p>
-            <div className="mt-10 flex items-center gap-x-6">
+            <div className="mt-10 flex items-center gap-x-6 hidden md:display">
               <a
                 href="/auth/login"
                 className="rounded-md bg-primary px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-primary-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
@@ -202,7 +202,7 @@ export default function Example() {
               </a>
             </div>
           </div>
-          <div className="mt-16 sm:mt-24 lg:mt-0 lg:flex-shrink-0 lg:flex-grow">
+          <div className="mt-8 md:mt-16 lg:mt-0 lg:flex-shrink-0 lg:flex-grow">
             <svg
               viewBox="0 0 366 729"
               role="img"
