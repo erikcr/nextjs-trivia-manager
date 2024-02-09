@@ -375,13 +375,13 @@ export default function EditorByIdPage() {
               <Image
                 src={logoTriviaLynx}
                 alt="Trivia Management Dashboard"
-                className="h-12 w-12"
+                className="h-10 w-10"
                 unoptimized
               />
             </a>
           </div>
 
-          <div className="flex lg:gap-x-12">
+          <div className="flex lg:gap-x-12 text-xl text-black">
             <p>{event?.name}</p>
           </div>
 
