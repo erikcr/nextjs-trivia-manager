@@ -3,7 +3,7 @@ import { createClient } from "@/utils/supabase/server";
 import { redirect } from "next/navigation";
 import Image from "next/image";
 
-import logoBrainyBrawls from "@/public/logos/brainybrawls.svg";
+import headerLogo from "@/public/logos/trivialynx-logo.svg";
 
 export default function SignupScreen({}: {}) {
   const signUp = async (formData: FormData) => {
@@ -35,7 +35,7 @@ export default function SignupScreen({}: {}) {
       <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
         <div className="sm:mx-auto sm:w-full sm:max-w-sm">
           <Image
-            src={logoBrainyBrawls}
+            src={headerLogo}
             alt="Next.js Trivia Manager"
             className="mx-auto h-16 w-auto"
             unoptimized
@@ -100,7 +100,7 @@ export default function SignupScreen({}: {}) {
           <p className="mt-10 text-center text-sm text-gray-500">
             Already a memeber?{" "}
             <a
-              href="/auth/login"
+              href="/auth/magic"
               className="font-semibold leading-6 text-primary hover:text-primary-hover"
             >
               Login

@@ -47,7 +47,7 @@ export default function ManageLayout({
       if (data.session) {
         setAuthenticated(true);
       } else {
-        router.push("/auth/login");
+        router.push("/auth/magic");
       }
     };
 

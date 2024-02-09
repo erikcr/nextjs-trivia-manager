@@ -7,6 +7,6 @@ export default function ManagePage() {
   const router = useRouter();
 
   useEffect(() => {
-    router.push("/auth/login");
+    router.push("/auth/magic");
   }, []);
 }

@@ -54,7 +54,7 @@ export default function Example() {
           <div className="flex lg:hidden">
             <div className="flex items-center gap-x-6">
               <a
-                href="https://play.trivialynx.tech"
+                href={process.env.NEXT_PUBLIC_APP_PLAY_URL}
                 className="rounded-md bg-primary px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-primary-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
               >
                 Let&apos;s play!
@@ -75,7 +75,7 @@ export default function Example() {
           <div className="hidden lg:flex lg:flex-1 lg:justify-end">
             {session === undefined ? (
               <Link
-                href="/auth/login"
+                href="/auth/magic"
                 className="text-sm font-semibold leading-6 text-gray-900"
               >
                 Log in <span aria-hidden="true">&rarr;</span>
@@ -132,7 +132,7 @@ export default function Example() {
                 <div className="py-6">
                   {session === undefined ? (
                     <Link
-                      href="/auth/login"
+                      href="/auth/magic"
                       className="-mx-3 block rounded-lg px-3 py-2.5 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50"
                     >
                       Log in
@@ -195,7 +195,7 @@ export default function Example() {
             </p>
             <div className="mt-10 flex items-center gap-x-6 hidden md:display">
               <a
-                href="/auth/login"
+                href="/auth/magic"
                 className="rounded-md bg-primary px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-primary-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
               >
                 Get started

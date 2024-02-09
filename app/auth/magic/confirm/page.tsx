@@ -1,6 +1,6 @@
 import Image from "next/image";
 
-import logoBrainyBrawls from "@/public/logos/brainybrawls.svg";
+import headerLogo from "@/public/logos/trivialynx-logo.svg";
 
 export default function MagicLinkPage({}: {}) {
   return (
@@ -8,7 +8,7 @@ export default function MagicLinkPage({}: {}) {
       <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
         <div className="sm:mx-auto sm:w-full sm:max-w-sm">
           <Image
-            src={logoBrainyBrawls}
+            src={headerLogo}
             alt="Next.js Trivia Manager"
             className="mx-auto h-16 w-auto"
             unoptimized

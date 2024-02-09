@@ -3,7 +3,7 @@ import { createClient } from "@/utils/supabase/server";
 import { redirect } from "next/navigation";
 import Image from "next/image";
 
-import logoBrainyBrawls from "@/public/logos/brainybrawls.svg";
+import headerLogo from "@/public/logos/trivialynx-logo.svg";
 import { XCircleIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { Transition } from "@headlessui/react";
 import { Fragment } from "react";
@@ -27,7 +27,7 @@ export default function LoginScreen({
     });
 
     if (error) {
-      return redirect("/auth/login?message=Could not authenticate user");
+      return redirect("/auth/magic?message=Could not authenticate user");
     }
 
     return redirect("/manage/events");
@@ -38,7 +38,7 @@ export default function LoginScreen({
       <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
         <div className="sm:mx-auto sm:w-full sm:max-w-sm">
           <Image
-            src={logoBrainyBrawls}
+            src={headerLogo}
             alt="Next.js Trivia Manager"
             className="mx-auto h-16 w-auto"
             unoptimized

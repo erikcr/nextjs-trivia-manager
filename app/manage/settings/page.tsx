@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 
 // Supabase
 import { User } from "@supabase/supabase-js";
@@ -16,6 +17,8 @@ function classNames(...classes: any[]) {
 
 export default function SettingsPage() {
   const supabase = createClient();
+
+  const router = useRouter();
 
   const passwordForm = useRef<HTMLFormElement>(null);
 
@@ -35,7 +38,10 @@ export default function SettingsPage() {
       email,
     });
 
-    if (data) {
+    if (error) {
+      console.error(error);
+    } else if (data) {
+      console.log(data);
       setNotifTitle("Email updated");
       setNotifDesc("Click the link sent to your new email to confirm change.");
       setNotifType("success");
@@ -66,6 +72,16 @@ export default function SettingsPage() {
     const { data } = await supabase.auth.getUser();
     if (data) {
       setUser(data.user);
+    }
+  };
+
+  const signOut = async () => {
+    const { error } = await supabase.auth.signOut();
+
+    if (error) {
+      console.error(error);
+    } else {
+      router.push("/");
     }
   };
 
@@ -196,6 +212,24 @@ export default function SettingsPage() {
               </button>
             </div>
           </form>
+        </div>
+
+        <div className="grid max-w-7xl grid-cols-1 gap-x-8 gap-y-10 px-4 py-16 sm:px-6 md:grid-cols-3 lg:px-8">
+          <div>
+            <h2 className="text-base font-semibold leading-7 dark:text-white">
+              Sign out of your account
+            </h2>
+          </div>
+
+          <div className="flex">
+            <button
+              type="submit"
+              className="rounded-md bg-primary px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+              onClick={() => signOut()}
+            >
+              Sign out
+            </button>
+          </div>
         </div>
 
         {/* <div className="grid max-w-7xl grid-cols-1 gap-x-8 gap-y-10 px-4 py-16 sm:px-6 md:grid-cols-3 lg:px-8">

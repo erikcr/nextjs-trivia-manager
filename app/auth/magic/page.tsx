@@ -3,7 +3,7 @@ import { createClient } from "@/utils/supabase/server";
 import { redirect } from "next/navigation";
 import Image from "next/image";
 
-import logoBrainyBrawls from "@/public/logos/brainybrawls.svg";
+import headerLogo from "@/public/logos/trivialynx-logo.svg";
 
 export default function MagicLinkPage({}: {}) {
   const sendMagicLink = async (formData: FormData) => {
@@ -33,7 +33,7 @@ export default function MagicLinkPage({}: {}) {
       <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
         <div className="sm:mx-auto sm:w-full sm:max-w-sm">
           <Image
-            src={logoBrainyBrawls}
+            src={headerLogo}
             alt="Next.js Trivia Manager"
             className="mx-auto h-16 w-auto"
             unoptimized
@@ -41,6 +41,9 @@ export default function MagicLinkPage({}: {}) {
           <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
             Get a magic link
           </h2>
+          <p className="mt-4 text-center">
+            Don&apos;t worry about creating (or remembering) a password. Enter you email to sign in.
+          </p>
         </div>
 
         <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
