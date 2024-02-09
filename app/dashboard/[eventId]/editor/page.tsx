@@ -12,7 +12,7 @@ import {
 } from "@heroicons/react/24/outline";
 import { useChat } from "ai/react";
 
-import logoBrainyBrawls from "@/public/logos/brainybrawls.svg";
+import logoTriviaLynx from "@/public/logos/trivialynx-logo.svg";
 
 // Supabase
 import { PostgrestError, User } from "@supabase/supabase-js";
@@ -373,9 +373,9 @@ export default function EditorByIdPage() {
             <a href="/manage/events" className="-m-1.5 p-1.5">
               <span className="sr-only">Trivia Management Dashboard</span>
               <Image
-                src={logoBrainyBrawls}
+                src={logoTriviaLynx}
                 alt="Trivia Management Dashboard"
-                className="h-8 w-8"
+                className="h-12 w-12"
                 unoptimized
               />
             </a>

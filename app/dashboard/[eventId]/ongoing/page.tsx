@@ -10,7 +10,7 @@ import {
   XCircleIcon,
 } from "@heroicons/react/24/outline";
 
-import logoBrainyBrawls from "@/public/logos/brainybrawls.svg";
+import logoTriviaLynx from "@/public/logos/trivialynx-logo.svg";
 
 // Supabase
 import { User } from "@supabase/supabase-js";
@@ -348,25 +348,23 @@ export default function EventOngoingPage() {
               <a href="/manage/events" className="-m-1.5 p-1.5">
                 <span className="sr-only">Trivia Management Dashboard</span>
                 <Image
-                  src={logoBrainyBrawls}
+                  src={logoTriviaLynx}
                   alt="Trivia Management Dashboard"
-                  className="h-8 w-8"
+                  className="h-10 w-10"
                   unoptimized
                 />
               </a>
             </div>
 
-            <div className="flex lg:gap-x-12">
+            <div className="flex lg:gap-x-12 text-xl text-black">
               <p>{event?.name}</p>
-
-              <QrCodePopover />
             </div>
 
-            <div className="hidden lg:flex lg:flex-1 lg:justify-end">
+            <div className="hidden text-black lg:flex lg:flex-1 lg:justify-end ">
               <button
                 type="button"
                 disabled={event === undefined}
-                className="inline-flex items-center gap-x-1.5 px-2.5 py-1.5 text-sm hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+                className="inline-flex items-center gap-x-1.5 pr-8 py-1.5 text-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
                 onClick={
                   topHeaderButton === "ACTIVATE_NEXT_QUESTION"
                     ? updateQuestionOngoing
@@ -377,6 +375,8 @@ export default function EventOngoingPage() {
               >
                 {topHeaderButton.replaceAll("_", " ")}
               </button>
+
+              <QrCodePopover />
             </div>
           </nav>
         </div>

@@ -10,8 +10,8 @@ import { ChevronRightIcon } from "@heroicons/react/20/solid";
 
 import { createClient } from "@/utils/supabase/client";
 
-import logoBrainyBrawls from "@/public/logos/brainybrawls-dark.svg";
-import appScreenshot from "@/public/app-screenshot.png"
+import logoTriviaLynx from "@/public/logos/trivialynx-logo.svg";
+import appScreenshot from "@/public/app-screenshot.png";
 
 const navigation: any[] = [];
 
@@ -44,9 +44,9 @@ export default function Example() {
           <div className="flex-shrink-0">
             <button onClick={() => router.push("/")}>
               <Image
-                src={logoBrainyBrawls}
+                src={logoTriviaLynx}
                 alt="Next.js Trivia Manager"
-                className="h-8 w-8 text-gray-800"
+                className="h-12 w-12 text-gray-800"
                 unoptimized
               />
             </button>
@@ -101,7 +101,7 @@ export default function Example() {
             <div className="flex items-center justify-between">
               <button onClick={() => router.push("/")}>
                 <Image
-                  src={logoBrainyBrawls}
+                  src={logoTriviaLynx}
                   alt="Next.js Trivia Manager"
                   className="h-8 w-8 text-gray-800"
                   unoptimized
@@ -228,10 +228,7 @@ export default function Example() {
                 transform="translate(24 24)"
                 clipPath="url(#2ade4387-9c63-4fc4-b754-10e687a0d332)"
               >
-                <Image
-                  src={appScreenshot}
-                  alt=""
-                />
+                <Image src={appScreenshot} alt="" />
               </foreignObject>
             </svg>
           </div>

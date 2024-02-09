@@ -5,7 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import Image from "next/image";
 import { ArrowRightOnRectangleIcon } from "@heroicons/react/24/outline";
 
-import logoBrainyBrawls from "@/public/logos/brainybrawls.svg";
+import logoTriviaLynx from "@/public/logos/trivialynx-logo.svg";
 
 // Supabase
 import { createClient } from "@/utils/supabase/client";
@@ -84,12 +84,12 @@ export default function ManageLayout({
           <div className="border-b border-gray-700">
             <div className="flex h-16 items-center justify-between px-4 sm:px-0">
               <div className="flex items-center">
-                <div className="flex-shrink-0">
+                <div className="flex-shrink-0 pt-2">
                   <button onClick={() => router.push("/manage/events")}>
                     <Image
-                      src={logoBrainyBrawls}
+                      src={logoTriviaLynx}
                       alt="Next.js Trivia Manager"
-                      className="h-8 w-8 text-gray-100"
+                      className="h-10 w-10 text-gray-100"
                       unoptimized
                     />
                   </button>
@@ -121,20 +121,7 @@ export default function ManageLayout({
                   <ThemeSwitcher />
 
                   <button
-                    type="button"
-                    className="relative rounded-full p-1 text-gray-100 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800"
-                    onClick={signOut}
-                  >
-                    <span className="absolute -inset-1.5" />
-                    <span className="sr-only">Sign out</span>
-                    <ArrowRightOnRectangleIcon
-                      className="h-6 w-6"
-                      aria-hidden="true"
-                    />
-                  </button>
-
-                  <button
-                    className="inline-block h-8 w-8 ml-2 overflow-hidden rounded-full bg-gray-100"
+                    className="inline-block h-8 w-8 ml-2 overflow-hidden rounded-full bg-gray-900"
                     onClick={() => router.push("/manage/settings")}
                   >
                     <svg

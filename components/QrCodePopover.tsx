@@ -25,7 +25,7 @@ export default function QrCodePopover() {
 
   return (
     <>
-      <QrCodeIcon className="w-5 h-5" onClick={() => setQrCodeShow(true)} />
+      <QrCodeIcon className="w-8 h-8" onClick={() => setQrCodeShow(true)} />
 
       <Transition.Root show={qrCodeShow} as={Fragment}>
         <Dialog

@@ -37,7 +37,7 @@ const ThemeSwitcher = () => {
         >
           <span className="absolute -inset-1.5" />
           <span className="sr-only">Set theme light</span>
-          <SunIcon className="h-6 w-6" aria-hidden="true" />
+          <SunIcon className="h-8 w-8" aria-hidden="true" />
         </button>
       );
     } else {
@@ -49,12 +49,12 @@ const ThemeSwitcher = () => {
         // />
         <button
           type="button"
-          className="relative rounded-full p-1 text-gray-100 hover:text-white"
+          className="relative rounded-full p-1"
           onClick={() => setTheme("dark")}
         >
           <span className="absolute -inset-1.5" />
           <span className="sr-only">Set theme dark</span>
-          <MoonIcon className="h-6 w-6" aria-hidden="true" />
+          <MoonIcon className="h-8 w-8" aria-hidden="true" />
         </button>
       );
     }
