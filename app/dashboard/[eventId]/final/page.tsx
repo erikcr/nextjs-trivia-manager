@@ -19,7 +19,7 @@ import { Tables } from "@/types/database.types";
 import {
   TeamsWithResponses,
   TeamWithResponses,
-  ResponeWithQuestions,
+  TeamScoresSorted,
 } from "@/types/app.types";
 
 function classNames(...classes: any[]) {
@@ -41,39 +41,28 @@ export default function EventFinalPage() {
   const [event, setEvent] = useState<Tables<"v002_events_stag">>();
 
   // Teams
-  const [teams, setTeams] = useState<TeamsWithResponses>();
-  const [activeTeam, setActiveTeam] = useState<TeamWithResponses>();
-
-  // Responses functions
-  const getTeamScore = (teamResponses: ResponeWithQuestions) => {
-    let score = 0;
-    teamResponses.map((i) => {
-      if (i.is_correct) {
-        /** TODO
-         * Fix the database.types.ts definition for questions table
-         */
-        // @ts-ignore
-        score += i.v002_questions_stag.points;
-      }
-    });
-    return score;
-  };
+  const [activeTeam, setActiveTeam] = useState<TeamScoresSorted>();
+  const [teamsSorted, setTeamSorted] = useState<TeamScoresSorted[]>();
 
   // Teams functions
-  const getTeams = async () => {
-    const { data, error } = await supabase
-      .from("v002_teams_stag")
-      .select("*, v002_responses_stag ( *, v002_questions_stag ( points ) )")
-      .eq("event_id", eventId);
+  const getTeamsScoresSorted = async () => {
+    const { data, error } = await supabase.functions.invoke(
+      "get_teams_scores_sorted",
+      {
+        body: { eventId },
+      }
+    );
 
     if (data) {
-      setTeams(data);
+      setTeamSorted(data);
+    } else if (error) {
+      console.error(error);
     }
   };
 
   useEffect(() => {
     if (event) {
-      getTeams();
+      getTeamsScoresSorted();
     }
   }, [event]);
 
@@ -154,13 +143,13 @@ export default function EventFinalPage() {
                 <Image
                   src={logoTriviaLynx}
                   alt="Trivia Management Dashboard"
-                  className="h-12 w-12"
+                  className="h-10 w-10"
                   unoptimized
                 />
               </a>
             </div>
 
-            <div className="flex lg:gap-x-12">
+            <div className="flex lg:gap-x-12 text-xl text-black">
               <p>{event?.name}</p>
             </div>
 
@@ -175,7 +164,7 @@ export default function EventFinalPage() {
     return (
       <div className="hidden sm:block">
         <ul role="list" className="border-b divide-y divide-gray-200">
-          {teams?.map((item) => (
+          {teamsSorted?.map((item) => (
             <li
               key={item.id}
               className={classNames(
@@ -194,7 +183,7 @@ export default function EventFinalPage() {
               </div>
               <div className="flex shrink-0 items-center gap-x-4">
                 <div className="hidden lg:flex lg:flex-1 lg:justify-end">
-                  <span>Score: {getTeamScore(item.v002_responses_stag)}</span>
+                  <span>Score: {item.team_total_points}</span>
                 </div>
                 <ChevronRightIcon
                   className={classNames(
@@ -225,7 +214,7 @@ export default function EventFinalPage() {
 
     return (
       <ul role="list" className="divide-y divide-gray-100 px-6">
-        {activeTeam?.v002_responses_stag?.map((item) => (
+        {activeTeam?.responses?.map((item) => (
           <li
             key={item.id}
             className="flex flex-wrap items-center justify-between gap-x-6 gap-y-4 py-2 sm:flex-nowrap"

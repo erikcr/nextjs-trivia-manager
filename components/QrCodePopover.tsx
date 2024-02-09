@@ -17,7 +17,7 @@ export default function QrCodePopover() {
 
   const { Canvas } = useQRCode();
 
-  const joinLink = `https://expo-trivia-app.vercel.app?joinCode=${eventId}`;
+  const joinLink = `${process.env.NEXT_PUBLIC_APP_PLAY_URL}?eventId=${eventId}`;
 
   // Modal
   const [qrCodeShow, setQrCodeShow] = useState(false);

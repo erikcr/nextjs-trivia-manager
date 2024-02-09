@@ -54,6 +54,7 @@ Deno.serve(async (req) => {
             : acc,
         0
       ),
+      responses: team.responses
     }));
 
     const pointsSorted = sumTeamPoints.sort((a, b) => b.team_total_points - a.team_total_points);
