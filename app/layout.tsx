@@ -12,6 +12,20 @@ function classNames(...classes: any[]) {
 export const metadata: Metadata = {
   title: "TriviaLynx",
   description: "Let's get ready to trivia!",
+  icons: [
+    {
+      rel: 'icon',
+      type: 'image/x-icon',
+      url: '/favicon.ico',
+      media: '(prefers-color-scheme: light)',
+    },
+    {
+      rel: 'icon',
+      type: 'image/png',
+      url: '/favicon-dark.png',
+      media: '(prefers-color-scheme: dark)',
+    },
+  ],
 };
 
 export default function RootLayout({
