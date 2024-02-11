@@ -41,9 +41,9 @@ export default function RootLayout({
           "h-full bg-gray-50 dark:bg-zinc-900"
         )}
       >
-        <Provider>
+        {/* <Provider> */}
           <div>{children}</div>
-        </Provider>
+        {/* </Provider> */}
       </body>
     </html>
   );
