@@ -188,7 +188,7 @@ export default function EventsPage() {
         <li>
           <button
             type="button"
-            className="relative block w-full rounded-lg border-2 border-dashed border-gray-300 hover:border-gray-400 dark:border-zinc-700 dark:hover:border-zinc-500 p-12 text-center focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+            className="relative block w-full rounded-lg border-2 border-dashed border-gray-300 hover:border-gray-400 dark:border-zinc-700 dark:hover:border-zinc-500 p-12 text-center focus:outline-none"
             onClick={() => {
               setEventSlideout(true);
             }}
@@ -425,7 +425,7 @@ export default function EventsPage() {
             leaveFrom="opacity-100"
             leaveTo="opacity-0"
           >
-            <div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" />
+            <div className="fixed inset-0 bg-gray-500 bg-opacity-75 dark:bg-zinc-800 dark:bg-opacity-75 transition-opacity" />
           </Transition.Child>
 
           <div className="fixed inset-0 overflow-hidden">
@@ -442,7 +442,7 @@ export default function EventsPage() {
                 >
                   <Dialog.Panel className="pointer-events-auto w-screen max-w-2xl">
                     <form
-                      className="flex h-full flex-col overflow-y-scroll bg-white shadow-xl"
+                      className="flex h-full flex-col overflow-y-scroll bg-gray-50 dark:bg-zinc-900 shadow-xl"
                       action={(e) => {
                         setAddEventLoading(true);
                         eventToEdit ? updateEvent(e) : addEvent(e);
@@ -450,13 +450,13 @@ export default function EventsPage() {
                     >
                       <div className="flex-1">
                         {/* Header */}
-                        <div className="bg-gray-50 px-4 py-6 sm:px-6">
+                        <div className="bg-gray-50 dark:bg-zinc-900 px-4 py-6 sm:px-6">
                           <div className="flex items-start justify-between space-x-3">
                             <div className="space-y-1">
-                              <Dialog.Title className="text-base font-semibold leading-6 text-gray-900">
+                              <Dialog.Title className="text-base font-semibold leading-6 text-gray-900 dark:text-gray-200">
                                 {eventToEdit ? "Update" : "New"} event
                               </Dialog.Title>
-                              <p className="text-sm text-gray-500">
+                              <p className="text-sm text-gray-500 dark:text-gray-400">
                                 {eventToEdit
                                   ? "Make changes to the event details."
                                   : "Get started by filling in the information below to create your next event."}
@@ -465,7 +465,7 @@ export default function EventsPage() {
                             <div className="flex h-7 items-center">
                               <button
                                 type="button"
-                                className="relative text-gray-400 hover:text-gray-500"
+                                className="relative text-gray-400 hover:text-gray-500 dark:text-gray-200"
                                 onClick={() => {
                                   setEventSlideout(false);
                                   setEventToEdit(undefined);
@@ -483,13 +483,13 @@ export default function EventsPage() {
                         </div>
 
                         {/* Divider container */}
-                        <div className="space-y-6 py-6 sm:space-y-0 sm:border-b sm:border-1 sm:py-0">
+                        <div className="space-y-6 py-6 sm:space-y-0 sm:border-b sm:border-1 sm:py-0 dark:border-zinc-700">
                           {/* Event name */}
                           <div className="space-y-2 px-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:space-y-0 sm:px-6 sm:py-5">
                             <div>
                               <label
                                 htmlFor="event-name"
-                                className="block text-sm font-medium leading-6 text-gray-900 sm:mt-1.5"
+                                className="block text-sm font-medium leading-6 text-gray-900 dark:text-gray-200 sm:mt-1.5"
                               >
                                 Name <span className="text-red-600">*</span>
                               </label>
@@ -503,7 +503,7 @@ export default function EventsPage() {
                                 id="event-name"
                                 placeholder="The Next Great Trivia"
                                 defaultValue={eventToEdit?.name}
-                                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
+                                className="block w-full rounded-md border-0 py-1.5 text-gray-900 dark:bg-zinc-800 dark:text-gray-200 shadow-sm dark:shadow-gray-700 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary dark:focus-primary-dark sm:text-sm sm:leading-6"
                               />
                             </div>
                           </div>
@@ -513,7 +513,7 @@ export default function EventsPage() {
                             <div>
                               <label
                                 htmlFor="event-date"
-                                className="block text-sm font-medium leading-6 text-gray-900 sm:mt-1.5"
+                                className="block text-sm font-medium leading-6 text-gray-900 dark:text-gray-200 sm:mt-1.5"
                               >
                                 Date of event{" "}
                                 <span className="text-red-600">*</span>
@@ -530,7 +530,7 @@ export default function EventsPage() {
                                 defaultValue={
                                   eventToEdit?.date_of_event.split("T")[0]
                                 }
-                                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
+                                className="block w-full rounded-md border-0 py-1.5 text-gray-900 dark:bg-zinc-800 dark:text-gray-200 shadow-sm dark:shadow-gray-700 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary dark:focus-primary-dark sm:text-sm sm:leading-6"
                               />
                             </div>
                           </div>
@@ -541,7 +541,7 @@ export default function EventsPage() {
                           <div>
                             <label
                               htmlFor="event-description"
-                              className="block text-sm font-medium leading-6 text-gray-900 sm:mt-1.5"
+                              className="block text-sm font-medium leading-6 text-gray-900 dark:text-gray-200 sm:mt-1.5"
                             >
                               Description
                             </label>
@@ -554,7 +554,7 @@ export default function EventsPage() {
                               rows={3}
                               placeholder="An optional description of The Next Great Trivia event with relevant details for the players."
                               defaultValue={eventToEdit?.description || ""}
-                              className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
+                              className="block w-full rounded-md border-0 py-1.5 text-gray-900 dark:bg-zinc-800 dark:text-gray-200 shadow-sm dark:shadow-gray-700 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary dark:focus-primary-dark sm:text-sm sm:leading-6"
                             />
                           </div>
                         </div>
@@ -564,7 +564,7 @@ export default function EventsPage() {
                           <div>
                             <label
                               htmlFor="event-location"
-                              className="block text-sm font-medium leading-6 text-gray-900 sm:mt-1.5"
+                              className="block text-sm font-medium leading-6 text-gray-900 dark:text-gray-200 sm:mt-1.5"
                             >
                               Location
                             </label>
@@ -578,7 +578,7 @@ export default function EventsPage() {
                               autoComplete="home city"
                               placeholder="Chattanooga, TN"
                               defaultValue={eventToEdit?.location || ""}
-                              className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
+                              className="block w-full rounded-md border-0 py-1.5 text-gray-900 dark:bg-zinc-800 dark:text-gray-200 shadow-sm dark:shadow-gray-700 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary dark:focus-primary-dark sm:text-sm sm:leading-6"
                             />
                           </div>
                         </div>
@@ -588,7 +588,7 @@ export default function EventsPage() {
                           <div>
                             <label
                               htmlFor="event-venue"
-                              className="block text-sm font-medium leading-6 text-gray-900 sm:mt-1.5"
+                              className="block text-sm font-medium leading-6 text-gray-900 dark:text-gray-200 sm:mt-1.5"
                             >
                               Venue
                             </label>
@@ -601,19 +601,19 @@ export default function EventsPage() {
                               id="event-venue"
                               placeholder="South Side Social"
                               defaultValue={eventToEdit?.venue || ""}
-                              className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
+                              className="block w-full rounded-md border-0 py-1.5 text-gray-900 dark:bg-zinc-800 dark:text-gray-200 shadow-sm dark:shadow-gray-700 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary dark:focus-primary-dark sm:text-sm sm:leading-6"
                             />
                           </div>
                         </div>
                       </div>
 
                       {/* Action buttons */}
-                      <div className="flex-shrink-0 border-t border-gray-200 px-4 py-5 sm:px-6">
+                      <div className="flex-shrink-0 border-t border-gray-200 dark:border-zinc-700 px-4 py-5 sm:px-6">
                         <div className="flex justify-end space-x-3">
                           <button
                             disabled={addEventLoading}
                             type="button"
-                            className="rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
+                            className="rounded-md bg-gray-50 hover:bg-gray-100 dark:bg-zinc-900 dark:hover:bg-zinc-800 px-3 py-2 text-sm font-semibold text-gray-900 dark:text-gray-200 shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-slate-700"
                             onClick={() => {
                               setEventSlideout(false);
                               setEventToEdit(undefined);
@@ -624,7 +624,7 @@ export default function EventsPage() {
                           <button
                             disabled={addEventLoading}
                             type="submit"
-                            className="inline-flex justify-center rounded-md bg-primary px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+                            className="inline-flex justify-center rounded-md bg-primary hover:bg-primary-hover dark:bg-primary-dark dark:hover:bg-primary-dark-hover px-3 py-2 text-sm font-semibold text-white shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
                           >
                             {addEventLoading ? (
                               <>

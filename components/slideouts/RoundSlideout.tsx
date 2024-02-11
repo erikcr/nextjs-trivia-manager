@@ -187,7 +187,7 @@ export default function RoundSlideout({
                   leaveFrom="translate-x-0"
                   leaveTo="translate-x-full"
                 >
-                  <Dialog.Panel className="bg-gray-100 pointer-events-auto w-screen max-w-2xl">
+                  <Dialog.Panel className="bg-gray-100 dark:bg-zinc-900 pointer-events-auto w-screen max-w-2xl">
                     <form
                       className="flex h-full flex-col overflow-y-scroll shadow-xl"
                       action={(e) => {

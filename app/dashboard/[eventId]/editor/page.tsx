@@ -454,7 +454,7 @@ export default function EditorByIdPage() {
             setRoundSlideoutOpen(true);
           }}
         >
-          <span className="block text-sm font-semibold text-gray-900 dark:text-gray-400">
+          <span className="block text-sm font-semibold text-gray-900">
             Add round
           </span>
         </button>
@@ -988,7 +988,7 @@ export default function EditorByIdPage() {
                       <div role="status" className="">
                         <svg
                           aria-hidden="true"
-                          className="w-5 h-5 text-gray-500 animate-spin dark:text-gray-600 fill-white"
+                          className="w-5 h-5 text-gray-500 animate-spin fill-white"
                           viewBox="0 0 100 101"
                           fill="none"
                           xmlns="http://www.w3.org/2000/svg"
