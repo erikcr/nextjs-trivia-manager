@@ -6,6 +6,7 @@ import Image from "next/image";
 import { ArrowRightOnRectangleIcon } from "@heroicons/react/24/outline";
 
 import logoTriviaLynx from "@/public/logos/trivialynx-logo.svg";
+import logoTriviaLynxDark from "@/public/logos/trivialynx-logo-dark.svg";
 
 // Supabase
 import { createClient } from "@/utils/supabase/client";
@@ -79,9 +80,9 @@ export default function ManageLayout({
 
   return (
     <div className="min-h-full">
-      <div className="bg-primary pb-32">
+      <div className="bg-primary dark:bg-primary-dark pb-32">
         <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
-          <div className="border-b border-gray-700">
+          <div className="border-b border-gray-700 dark:border-slate-800">
             <div className="flex h-16 items-center justify-between px-4 sm:px-0">
               <div className="flex items-center">
                 <div className="flex-shrink-0 pt-2">
@@ -89,7 +90,13 @@ export default function ManageLayout({
                     <Image
                       src={logoTriviaLynx}
                       alt="Next.js Trivia Manager"
-                      className="h-10 w-10 text-gray-100"
+                      className="dark:hidden h-10 w-10 text-gray-100"
+                      unoptimized
+                    />
+                    <Image
+                      src={logoTriviaLynxDark}
+                      alt="Next.js Trivia Manager"
+                      className="hidden dark:block h-10 w-10 text-gray-100"
                       unoptimized
                     />
                   </button>
@@ -121,11 +128,11 @@ export default function ManageLayout({
                   <ThemeSwitcher />
 
                   <button
-                    className="inline-block h-8 w-8 ml-2 overflow-hidden rounded-full bg-gray-900"
+                    className="inline-block h-8 w-8 ml-2 overflow-hidden rounded-full bg-gray-900 dark:bg-gray-400"
                     onClick={() => router.push("/manage/settings")}
                   >
                     <svg
-                      className="h-full w-full text-gray-300"
+                      className="h-full w-full text-gray-300 dark:text-gray-200 dark:hover:text-white"
                       fill="currentColor"
                       viewBox="0 0 24 24"
                     >
@@ -140,7 +147,7 @@ export default function ManageLayout({
 
         <header className="py-10">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <h1 className="text-3xl font-bold tracking-tight text-gray-100">
+            <h1 className="text-3xl font-bold tracking-tight text-gray-100 dark:text-slate-900">
               {navigation.find((item) => item.href === pathname)?.name}
             </h1>
           </div>
@@ -149,7 +156,7 @@ export default function ManageLayout({
 
       <main className="-mt-32">
         <div className="mx-auto max-w-7xl px-4 pb-12 sm:px-6 lg:px-8">
-          <div className="rounded-lg bg-gray-50 dark:bg-gray-700 px-5 py-6 shadow dark:shadow-gray-600 sm:px-6">
+          <div className="rounded-lg bg-gray-50 dark:bg-zinc-800 px-5 py-6 shadow dark:shadow-gray-600 sm:px-6">
             {children}
           </div>
         </div>

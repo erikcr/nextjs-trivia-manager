@@ -24,12 +24,12 @@ export default function RootLayout({
       <body
         className={classNames(
           inter.className,
-          "h-full bg-gray-50 dark:bg-gray-700"
+          "h-full bg-gray-50 dark:bg-zinc-800"
         )}
       >
-        {/* <Provider> */}
+        <Provider>
           <div>{children}</div>
-        {/* </Provider> */}
+        </Provider>
       </body>
     </html>
   );
