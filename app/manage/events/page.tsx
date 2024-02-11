@@ -214,7 +214,7 @@ export default function EventsPage() {
         </li>
 
         {eLoading && (
-          <li className="animate-pulse overflow-hidden rounded-xl border border-gray-200 hover:bg-gray-100 dark:border-zinc-700 dark:hover:bg-zinc-600">
+          <li className="animate-pulse overflow-hidden rounded-xl border border-gray-200 dark:border-zinc-700">
             <div className="flex items-center gap-x-4 border-b border-gray-900/5 bg-gray-100 dark:border-zinc-700 dark:bg-zinc-800 p-6">
               <div className="text-sm font-medium leading-6 text-gray-400 dark:text-gray-200">
                 Loading...

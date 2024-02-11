@@ -46,8 +46,8 @@ export default function SettingsLayout({
                   href={item.href}
                   className={classNames(
                     pathname === item.href
-                      ? "bg-gray-50 text-primary"
-                      : "text-gray-700 hover:text-primary hover:bg-gray-50",
+                      ? "bg-gray-200 text-primary dark:bg-zinc-800 dark:text-gray-200"
+                      : "text-gray-700 hover:text-primary hover:bg-gray-200 dark:text-gray-200",
                     "group flex gap-x-3 rounded-md py-2 pl-2 pr-3 text-sm leading-6 font-semibold"
                   )}
                 >
@@ -56,7 +56,7 @@ export default function SettingsLayout({
                       pathname === item.href
                         ? "text-primary"
                         : "text-gray-400 group-hover:text-primary",
-                      "h-6 w-6 shrink-0"
+                      "h-6 w-6 shrink-0 dark:text-gray-200"
                     )}
                     aria-hidden="true"
                   />

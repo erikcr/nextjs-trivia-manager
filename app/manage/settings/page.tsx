@@ -94,7 +94,7 @@ export default function SettingsPage() {
       <div className="divide-y dark:divide-white/5">
         <div className="grid max-w-7xl grid-cols-1 gap-x-8 gap-y-10 px-4 py-8 sm:px-6 md:grid-cols-3 lg:px-8">
           <div>
-            <h2 className="text-base font-semibold leading-7 dark:text-white">
+            <h2 className="text-base font-semibold leading-7 dark:text-gray-200">
               Personal Information
             </h2>
           </div>
@@ -104,7 +104,7 @@ export default function SettingsPage() {
               <div className="col-span-full">
                 <label
                   htmlFor="email"
-                  className="block text-sm font-medium leading-6 dark:text-white"
+                  className="block text-sm font-medium leading-6 dark:text-gray-200"
                 >
                   Email address
                 </label>
@@ -114,7 +114,7 @@ export default function SettingsPage() {
                     name="email"
                     type="email"
                     autoComplete="email"
-                    className="block w-full rounded-md border-0 dark:bg-white/5 py-1.5 dark:text-white shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-white/10 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
+                    className="block w-full rounded-md border-0 dark:bg-white/5 py-1.5 dark:text-gray-200 shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-white/10 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
                     defaultValue={user?.email}
                   />
                 </div>
@@ -134,7 +134,7 @@ export default function SettingsPage() {
 
         <div className="grid max-w-7xl grid-cols-1 gap-x-8 gap-y-10 px-4 py-16 sm:px-6 md:grid-cols-3 lg:px-8">
           <div>
-            <h2 className="text-base font-semibold leading-7 dark:text-white">
+            <h2 className="text-base font-semibold leading-7 dark:text-gray-200">
               Change password
             </h2>
             <p className="mt-1 text-sm leading-6 text-gray-400">
@@ -151,7 +151,7 @@ export default function SettingsPage() {
               <div className="col-span-full">
                 <label
                   htmlFor="current-password"
-                  className="block text-sm font-medium leading-6 dark:text-white"
+                  className="block text-sm font-medium leading-6 dark:text-gray-200"
                 >
                   Current password
                 </label>
@@ -161,7 +161,7 @@ export default function SettingsPage() {
                     name="current_password"
                     type="password"
                     autoComplete="current-password"
-                    className="block w-full rounded-md border-0 dark:bg-white/5 py-1.5 dark:text-white shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-white/10 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
+                    className="block w-full rounded-md border-0 dark:bg-white/5 py-1.5 dark:text-gray-200 shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-white/10 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
                   />
                 </div>
               </div>
@@ -169,7 +169,7 @@ export default function SettingsPage() {
               <div className="col-span-full">
                 <label
                   htmlFor="new-password"
-                  className="block text-sm font-medium leading-6 dark:text-white"
+                  className="block text-sm font-medium leading-6 dark:text-gray-200"
                 >
                   New password
                 </label>
@@ -179,7 +179,7 @@ export default function SettingsPage() {
                     name="new_password"
                     type="password"
                     autoComplete="new-password"
-                    className="block w-full rounded-md border-0 dark:bg-white/5 py-1.5 dark:text-white shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-white/10 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
+                    className="block w-full rounded-md border-0 dark:bg-white/5 py-1.5 dark:text-gray-200 shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-white/10 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
                   />
                 </div>
               </div>
@@ -187,7 +187,7 @@ export default function SettingsPage() {
               <div className="col-span-full">
                 <label
                   htmlFor="confirm-password"
-                  className="block text-sm font-medium leading-6 dark:text-white"
+                  className="block text-sm font-medium leading-6 dark:text-gray-200"
                 >
                   Confirm password
                 </label>
@@ -197,7 +197,7 @@ export default function SettingsPage() {
                     name="confirm_password"
                     type="password"
                     autoComplete="new-password"
-                    className="block w-full rounded-md border-0 dark:bg-white/5 py-1.5 dark:text-white shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-white/10 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
+                    className="block w-full rounded-md border-0 dark:bg-white/5 py-1.5 dark:text-gray-200 shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-white/10 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
                   />
                 </div>
               </div>
@@ -216,7 +216,7 @@ export default function SettingsPage() {
 
         <div className="grid max-w-7xl grid-cols-1 gap-x-8 gap-y-10 px-4 py-16 sm:px-6 md:grid-cols-3 lg:px-8">
           <div>
-            <h2 className="text-base font-semibold leading-7 dark:text-white">
+            <h2 className="text-base font-semibold leading-7 dark:text-gray-200">
               Sign out of your account
             </h2>
           </div>
@@ -234,7 +234,7 @@ export default function SettingsPage() {
 
         {/* <div className="grid max-w-7xl grid-cols-1 gap-x-8 gap-y-10 px-4 py-16 sm:px-6 md:grid-cols-3 lg:px-8">
           <div>
-            <h2 className="text-base font-semibold leading-7 dark:text-white">
+            <h2 className="text-base font-semibold leading-7 dark:text-gray-200">
               Delete account
             </h2>
             <p className="mt-1 text-sm leading-6 text-gray-400">
