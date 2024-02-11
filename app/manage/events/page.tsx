@@ -188,13 +188,13 @@ export default function EventsPage() {
         <li>
           <button
             type="button"
-            className="relative block w-full rounded-lg border-2 border-dashed border-gray-300 p-12 text-center hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+            className="relative block w-full rounded-lg border-2 border-dashed border-gray-300 hover:border-gray-400 dark:border-zinc-700 dark:hover:border-zinc-500 p-12 text-center focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
             onClick={() => {
               setEventSlideout(true);
             }}
           >
             <svg
-              className="mx-auto h-12 w-12 text-gray-400"
+              className="mx-auto h-12 w-12 text-gray-400 dark:text-zinc-500"
               stroke="currentColor"
               fill="none"
               viewBox="0 0 48 48"
@@ -207,15 +207,15 @@ export default function EventsPage() {
                 d="M8 14v20c0 4.418 7.163 8 16 8 1.381 0 2.721-.087 4-.252M8 14c0 4.418 7.163 8 16 8s16-3.582 16-8M8 14c0-4.418 7.163-8 16-8s16 3.582 16 8m0 0v14m0-4c0 4.418-7.163 8-16 8S8 28.418 8 24m32 10v6m0 0v6m0-6h6m-6 0h-6"
               />
             </svg>
-            <span className="mt-2 block text-sm font-semibold text-gray-900 dark:text-gray-400">
+            <span className="mt-2 block text-sm font-semibold text-gray-900 dark:text-zinc-400">
               Create a new event
             </span>
           </button>
         </li>
 
         {eLoading && (
-          <li className="animate-pulse overflow-hidden rounded-xl border border-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600">
-            <div className="flex items-center gap-x-4 border-b border-gray-900/5 bg-gray-100 dark:bg-gray-600 p-6">
+          <li className="animate-pulse overflow-hidden rounded-xl border border-gray-200 hover:bg-gray-100 dark:border-zinc-700 dark:hover:bg-zinc-600">
+            <div className="flex items-center gap-x-4 border-b border-gray-900/5 bg-gray-100 dark:border-zinc-700 dark:bg-zinc-800 p-6">
               <div className="text-sm font-medium leading-6 text-gray-400 dark:text-gray-200">
                 Loading...
               </div>
@@ -244,20 +244,18 @@ export default function EventsPage() {
               <div key={item.id}>
                 <li
                   key={item.id}
-                  className="overflow-hidden rounded-xl border border-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600"
+                  className="overflow-hidden rounded-xl border border-gray-200 hover:bg-gray-100 dark:border-zinc-700 dark:hover:bg-zinc-800"
                 >
-                  <div className="flex items-center gap-x-4 border-b border-gray-900/5 bg-gray-100 dark:bg-gray-600 p-6">
+                  <div className="flex items-center gap-x-4 border-b border-gray-900/5 bg-gray-100 dark:border-zinc-700 dark:bg-zinc-800 p-6">
                     <div className="text-sm font-medium leading-6 text-gray-900 dark:text-gray-200">
                       {item.name}
                     </div>
                     <span
                       className={classNames(
                         item?.status === "PENDING"
-                          ? "bg-blue-100"
-                          : item?.status === "ONGOING"
-                          ? "bg-green-100"
-                          : "bg-gray-100",
-                        "inline-flex items-center rounded-full px-2 mr-3 py-1 text-xs font-medium text-gray-600 ring-1 ring-inset"
+                          ? "bg-blue-100 dark:bg-blue-900"
+                          : "bg-green-100 dark:bg-green-900",
+                        "inline-flex items-center rounded-full px-2 mr-3 py-1 text-xs font-medium text-gray-600 dark:text-gray-400 ring-1 ring-inset"
                       )}
                     >
                       {item.status}
@@ -355,8 +353,8 @@ export default function EventsPage() {
 
       {allEvents &&
         allEvents?.filter((item) => item.status === "COMPLETE").length > 0 && (
-          <div className="border-t border-gray-200 pb-5 mt-10">
-            <h3 className="text-base font-semibold leading-6 text-gray-900 pt-3">
+          <div className="border-t border-gray-200 pb-5 mt-10 dark:border-zinc-700">
+            <h3 className="text-base font-semibold leading-6 text-gray-900 dark:text-zinc-200 pt-3">
               Completed events
             </h3>
           </div>
@@ -373,22 +371,13 @@ export default function EventsPage() {
               <Link key={item.id} href={`/dashboard/${item.id}/final`}>
                 <li
                   key={item.id}
-                  className="overflow-hidden rounded-xl border border-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600"
+                  className="overflow-hidden rounded-xl border border-gray-200 hover:bg-gray-100 dark:border-zinc-700 dark:hover:bg-zinc-800"
                 >
-                  <div className="flex items-center gap-x-4 border-b border-gray-900/5 bg-gray-100 dark:bg-gray-600 p-6">
+                  <div className="flex items-center gap-x-4 border-b border-gray-900/5 bg-gray-100 dark:border-zinc-700 dark:bg-zinc-800 p-6">
                     <div className="text-sm font-medium leading-6 text-gray-900 dark:text-gray-200">
                       {item.name}
                     </div>
-                    <span
-                      className={classNames(
-                        item?.status === "PENDING"
-                          ? "bg-blue-100"
-                          : item?.status === "ONGOING"
-                          ? "bg-green-100"
-                          : "bg-gray-100",
-                        "inline-flex items-center rounded-full px-2 mr-3 py-1 text-xs font-medium text-gray-600 ring-1 ring-inset"
-                      )}
-                    >
+                    <span className="inline-flex items-center rounded-full px-2 mr-3 py-1 text-xs font-medium bg-gray-100 dark:bg-gray-900 text-gray-600 dark:text-gray-400 ring-1 ring-inset dark:ring-zinc-700">
                       {item.status}
                     </span>
                   </div>

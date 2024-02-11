@@ -24,7 +24,7 @@ export default function RootLayout({
       <body
         className={classNames(
           inter.className,
-          "h-full bg-gray-50 dark:bg-zinc-800"
+          "h-full bg-gray-50 dark:bg-zinc-900"
         )}
       >
         <Provider>
