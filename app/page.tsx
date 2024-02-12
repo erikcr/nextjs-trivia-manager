@@ -11,6 +11,7 @@ import { ChevronRightIcon } from "@heroicons/react/20/solid";
 import { createClient } from "@/utils/supabase/client";
 
 import logoTriviaLynx from "@/public/logos/trivialynx-logo.svg";
+import logoTriviaLynxDark from "@/public/logos/trivialynx-logo-dark.svg";
 import appScreenshot from "@/public/app-screenshot.png";
 
 const navigation: any[] = [];
@@ -46,7 +47,13 @@ export default function Example() {
               <Image
                 src={logoTriviaLynx}
                 alt="Next.js Trivia Manager"
-                className="h-12 w-12 text-gray-800"
+                className="dark:hidden h-10 w-10 text-gray-100"
+                unoptimized
+              />
+              <Image
+                src={logoTriviaLynxDark}
+                alt="Next.js Trivia Manager"
+                className="hidden dark:block h-10 w-10 text-gray-100"
                 unoptimized
               />
             </button>
@@ -76,14 +83,14 @@ export default function Example() {
             {session === undefined ? (
               <Link
                 href="/auth/magic"
-                className="text-sm font-semibold leading-6 text-gray-900"
+                className="text-sm font-semibold leading-6 text-gray-900 dark:text-gray-200"
               >
                 Log in <span aria-hidden="true">&rarr;</span>
               </Link>
             ) : (
               <Link
                 href="/manage/events"
-                className="text-sm font-semibold leading-6 text-gray-900"
+                className="text-sm font-semibold leading-6 text-gray-900 dark:text-gray-200"
               >
                 Dashboard <span aria-hidden="true">&rarr;</span>
               </Link>
@@ -169,7 +176,7 @@ export default function Example() {
               <path d="M100 200V.5M.5 .5H200" fill="none" />
             </pattern>
           </defs>
-          <svg x="50%" y={-1} className="overflow-visible fill-gray-50">
+          <svg x="50%" y={-1} className="overflow-visible fill-gray-50 dark:fill-zinc-800">
             <path
               d="M-100.5 0h201v201h-201Z M699.5 0h201v201h-201Z M499.5 400h201v201h-201Z M-300.5 600h201v201h-201Z"
               strokeWidth={0}
@@ -184,10 +191,10 @@ export default function Example() {
         </svg>
         <div className="mx-auto max-w-7xl px-6 py-16 md:py-24 lg:flex lg:items-center lg:gap-x-10 lg:px-8 lg:py-40">
           <div className="mx-auto max-w-2xl lg:mx-0 lg:flex-auto">
-            <h1 className="md:mt-10 max-w-lg text-4xl font-bold tracking-tight text-gray-900 sm:text-6xl">
+            <h1 className="md:mt-10 max-w-lg text-4xl font-bold tracking-tight text-gray-900 dark:text-gray-200 sm:text-6xl">
               Let&apos;s get ready to trivia!
             </h1>
-            <p className="mt-6 text-lg leading-8 text-gray-600">
+            <p className="mt-6 text-lg leading-8 text-gray-600 dark:text-gray-200">
               Discover a world of fun and learning with our trivia app, where
               every question is a journey into knowledge! Engage with friends,
               challenge your intellect, and climb the leaderboard as you explore

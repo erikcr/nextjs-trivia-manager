@@ -13,6 +13,7 @@ import {
 import { useChat } from "ai/react";
 
 import logoTriviaLynx from "@/public/logos/trivialynx-logo.svg";
+import logoTriviaLynxDark from "@/public/logos/trivialynx-logo-dark.svg";
 
 // Supabase
 import { PostgrestError, User } from "@supabase/supabase-js";
@@ -374,8 +375,14 @@ export default function EditorByIdPage() {
               <span className="sr-only">Trivia Management Dashboard</span>
               <Image
                 src={logoTriviaLynx}
-                alt="Trivia Management Dashboard"
-                className="h-10 w-10"
+                alt="Next.js Trivia Manager"
+                className="dark:hidden h-10 w-10 text-gray-100"
+                unoptimized
+              />
+              <Image
+                src={logoTriviaLynxDark}
+                alt="Next.js Trivia Manager"
+                className="hidden dark:block h-10 w-10 text-gray-100"
                 unoptimized
               />
             </a>
@@ -464,10 +471,7 @@ export default function EditorByIdPage() {
          * Ensure rounds are rendered in horizonal scroll view when wider than container
          */}
         {rounds?.map((item) => (
-          <div
-            key={item.id}
-            className="inline-flex rounded-md shadow-sm mr-4"
-          >
+          <div key={item.id} className="inline-flex rounded-md shadow-sm mr-4">
             <button
               className={classNames(
                 item.id === activeRound?.id

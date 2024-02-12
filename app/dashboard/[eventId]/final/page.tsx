@@ -11,6 +11,7 @@ import {
 } from "@heroicons/react/24/outline";
 
 import logoTriviaLynx from "@/public/logos/trivialynx-logo.svg";
+import logoTriviaLynxDark from "@/public/logos/trivialynx-logo-dark.svg";
 
 // Supabase
 import { User } from "@supabase/supabase-js";
@@ -142,8 +143,14 @@ export default function EventFinalPage() {
                 <span className="sr-only">Trivia Management Dashboard</span>
                 <Image
                   src={logoTriviaLynx}
-                  alt="Trivia Management Dashboard"
-                  className="h-10 w-10"
+                  alt="Next.js Trivia Manager"
+                  className="dark:hidden h-10 w-10 text-gray-100"
+                  unoptimized
+                />
+                <Image
+                  src={logoTriviaLynxDark}
+                  alt="Next.js Trivia Manager"
+                  className="hidden dark:block h-10 w-10 text-gray-100"
                   unoptimized
                 />
               </a>

@@ -11,6 +11,7 @@ import {
 } from "@heroicons/react/24/outline";
 
 import logoTriviaLynx from "@/public/logos/trivialynx-logo.svg";
+import logoTriviaLynxDark from "@/public/logos/trivialynx-logo-dark.svg";
 
 // Supabase
 import { User } from "@supabase/supabase-js";
@@ -309,28 +310,28 @@ export default function EventOngoingPage() {
       {/**
        * Top header
        */}
-      <div className="fixed top-0 left-0 right-0 flex h-16 shrink-0 items-center gap-x-4 border-b bg-primary text-gray-100 border-gray-400">
+      <div className="fixed top-0 left-0 right-0 flex h-16 shrink-0 items-center gap-x-4 border-b bg-primary border-gray-400 dark:border-zinc-700 text-gray-900 dark:text-gray-200">
         <TopHeader />
       </div>
 
       {/**
        * Secondary header
        */}
-      <div className="fixed top-16 left-0 right-0 flex h-16 shrink-0 items-center gap-x-4 border-b border-gray-400">
+      <div className="fixed top-16 left-0 right-0 flex h-16 shrink-0 items-center gap-x-4 border-b border-gray-400 dark:border-zinc-700 text-gray-900 dark:text-gray-200">
         <SecondaryHeader />
       </div>
 
       {/**
        * Main content
        */}
-      <main className="fixed top-32 bottom-0 left-0 w-2/3 border-r border-gray-400 overflow-auto">
+      <main className="fixed top-32 bottom-0 left-0 w-2/3 border-r border-gray-400 dark:border-zinc-700 overflow-auto text-gray-900 dark:text-gray-200">
         <MainContent />
       </main>
 
       {/**
        * Right-side column
        */}
-      <aside className="fixed top-32 bottom-0 right-0 w-1/3 overflow-auto">
+      <aside className="fixed top-32 bottom-0 right-0 w-1/3 overflow-auto dark:border-zinc-700 text-gray-900 dark:text-gray-200">
         <RightSidebar />
       </aside>
     </>
@@ -349,18 +350,24 @@ export default function EventOngoingPage() {
                 <span className="sr-only">Trivia Management Dashboard</span>
                 <Image
                   src={logoTriviaLynx}
-                  alt="Trivia Management Dashboard"
-                  className="h-10 w-10"
+                  alt="Next.js Trivia Manager"
+                  className="dark:hidden h-10 w-10 text-gray-100"
+                  unoptimized
+                />
+                <Image
+                  src={logoTriviaLynxDark}
+                  alt="Next.js Trivia Manager"
+                  className="hidden dark:block h-10 w-10 text-gray-100"
                   unoptimized
                 />
               </a>
             </div>
 
-            <div className="flex lg:gap-x-12 text-xl text-black">
+            <div className="flex lg:gap-x-12 text-xl">
               <p>{event?.name}</p>
             </div>
 
-            <div className="hidden text-black lg:flex lg:flex-1 lg:justify-end ">
+            <div className="hidden lg:flex lg:flex-1 lg:justify-end ">
               <button
                 type="button"
                 disabled={event === undefined}
@@ -420,7 +427,7 @@ export default function EventOngoingPage() {
   function MainContent() {
     return (
       <div className="hidden sm:block">
-        <ul role="list" className="border-b divide-y divide-gray-200">
+        <ul role="list" className="border-b divide-y dark:divide-zinc-700 dark:border-zinc-700">
           {/** TODO:
            * Add skeleton placeholders for questions list
            */}
@@ -428,8 +435,8 @@ export default function EventOngoingPage() {
             <li
               key={item.id}
               className={classNames(
-                activeQuestion?.id === item.id ? "bg-gray-100" : "",
-                item.status !== "PENDING" ? "hover:bg-gray-100" : "",
+                activeQuestion?.id === item.id ? "bg-gray-100 dark:bg-zinc-800" : "",
+                item.status !== "PENDING" ? "hover:bg-gray-100 dark:hover:bg-zinc-800" : "",
                 "relative flex justify-between gap-x-6 px-4 py-2 sm:px-6"
               )}
               onClick={
@@ -440,11 +447,11 @@ export default function EventOngoingPage() {
             >
               <div className="flex min-w-0 gap-x-4">
                 <div className="min-w-0 flex-auto">
-                  <p className="text-sm font-semibold leading-6 text-gray-900">
+                  <p className="text-sm font-semibold leading-6">
                     <span className="absolute inset-x-0 -top-px bottom-0" />
                     Answer: {item.answer}
                   </p>
-                  <p className="mt-1 flex text-xs leading-5 text-gray-500">
+                  <p className="mt-1 flex text-xs leading-5">
                     Question: {item.question}
                   </p>
                 </div>
@@ -454,11 +461,11 @@ export default function EventOngoingPage() {
                   <span
                     className={classNames(
                       item.status === "ONGOING"
-                        ? "bg-green-100"
+                        ? "bg-green-100 dark:bg-green-900"
                         : item.status === "PENDING"
-                        ? "bg-blue-100"
-                        : "bg-gray-100",
-                      "inline-flex items-center rounded-full px-2 py-1 text-xs font-medium text-gray-600 ring-1 ring-inset"
+                        ? "bg-blue-100 dark:bg-blue-900"
+                        : "bg-gray-100 dark:bg-zinc-800",
+                      "inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ring-1 ring-inset"
                     )}
                   >
                     {item.status}
@@ -505,7 +512,7 @@ export default function EventOngoingPage() {
     }
 
     return (
-      <ul role="list" className="mt-2 divide-y divide-gray-300 px-6 pb-12">
+      <ul role="list" className="mt-2 divide-y divide-gray-300 dark:divide-zinc-700 px-6 pb-12">
         {responses?.map((item) => (
           <li
             key={item.id}
@@ -513,10 +520,10 @@ export default function EventOngoingPage() {
           >
             <div className="flex min-w-0 gap-x-4">
               <div className="min-w-0 flex-auto">
-                <p className="text-sm font-semibold leading-6 text-gray-900">
+                <p className="text-sm font-semibold leading-6">
                   {item.submitted_answer}
                 </p>
-                <p className="truncate text-xs leading-5 text-gray-500">
+                <p className="truncate text-xs leading-5">
                   {/* {item.v002_teams_stag.name} */}
                 </p>
               </div>
@@ -533,7 +540,7 @@ export default function EventOngoingPage() {
                   <CheckCircleIcon
                     className={classNames(
                       item.is_correct === true ? "text-green-600" : "",
-                      "h-6 w-6 text-gray-600 hover:text-green-600"
+                      "h-6 w-6 hover:text-green-600"
                     )}
                     aria-hidden="true"
                     onClick={() => approveResponse(item.id, true)}
