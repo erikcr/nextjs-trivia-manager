@@ -240,28 +240,28 @@ export default function EditorByIdPage() {
       {/**
        * Top header
        */}
-      <div className="fixed top-0 left-0 right-0 flex h-16 shrink-0 items-center gap-x-4 border-b bg-primary text-gray-100 border-gray-400">
+      <div className="fixed top-0 left-0 right-0 flex h-16 shrink-0 items-center gap-x-4 border-b bg-primary border-gray-400 dark:border-zinc-700 text-gray-900 dark:text-gray-200">
         <TopHeader />
       </div>
 
       {/**
        * Secondary header
        */}
-      <div className="fixed top-16 left-0 right-0 flex h-16 shrink-0 items-center gap-x-4 border-b border-gray-400">
+      <div className="fixed top-16 left-0 right-0 flex h-16 shrink-0 items-center gap-x-4 border-b border-gray-400 dark:border-zinc-700 text-gray-900 dark:text-gray-200">
         <SecondaryHeader />
       </div>
 
       {/**
        * Main content
        */}
-      <main className="fixed top-32 bottom-0 left-0 w-2/3 border-r border-gray-400">
+      <main className="fixed top-32 bottom-0 left-0 w-2/3 border-r border-gray-400 dark:border-zinc-700 text-gray-900 dark:text-gray-200">
         <MainContent />
       </main>
 
       {/**
        * Right-side column
        */}
-      <aside className="fixed top-32 bottom-0 right-0 w-1/3">
+      <aside className="fixed top-32 bottom-0 right-0 w-1/3 border-gray-400 dark:border-zinc-700 text-gray-900 dark:text-gray-200">
         <RightSidebar />
       </aside>
 
@@ -388,14 +388,14 @@ export default function EditorByIdPage() {
             </a>
           </div>
 
-          <div className="flex lg:gap-x-12 text-xl text-black">
+          <div className="flex lg:gap-x-12 text-xl">
             <p>{event?.name}</p>
           </div>
 
           <div className="flex lg:hidden">
             <button
               type="button"
-              className="-m-2.5 inline-flex items-center justify-center rounded-md p-2.5 text-gray-700"
+              className="-m-2.5 inline-flex items-center justify-center rounded-md p-2.5"
             >
               <span className="sr-only">Open main menu</span>
               <Bars3Icon className="h-6 w-6" aria-hidden="true" />
@@ -407,11 +407,9 @@ export default function EditorByIdPage() {
               <span
                 className={classNames(
                   event?.status === "PENDING"
-                    ? "bg-blue-100"
-                    : event?.status === "ONGOING"
-                    ? "bg-green-100"
-                    : "bg-gray-100",
-                  "inline-flex items-center rounded-full px-2 mr-3 py-1 text-xs font-medium text-gray-600 ring-1 ring-inset"
+                    ? "bg-blue-100 dark:bg-blue-900"
+                    : "bg-green-100 dark:bg-green-900",
+                  "inline-flex items-center rounded-full px-2 mr-3 py-1 text-xs font-medium text-gray-600 dark:text-gray-400 ring-1 ring-inset"
                 )}
               >
                 {event?.status}
@@ -421,7 +419,7 @@ export default function EditorByIdPage() {
               <button
                 type="button"
                 disabled={startDisabled}
-                className="inline-flex items-center gap-x-1.5 rounded-md px-2.5 py-1.5 text-sm hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+                className="inline-flex items-center gap-x-1.5 rounded-md px-2.5 py-1.5 text-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
                 onClick={() => {
                   setStartConfirmShow(true);
                 }}
@@ -440,7 +438,7 @@ export default function EditorByIdPage() {
                 )}
               >
                 <div className="w-3 h-3 -mb-2 rotate-45 bg-gray-800"></div>
-                <span className="relative p-2 rounded-md text-md leading-none text-white bg-gray-800 shadow-lg">
+                <span className="relative p-2 rounded-md text-md leading-none bg-gray-800 shadow-lg">
                   {startErrorMsg}
                 </span>
               </div>
@@ -456,14 +454,12 @@ export default function EditorByIdPage() {
       <div className="pl-6 spacing-x-4">
         <button
           type="button"
-          className="rounded-md px-8 py-2 mr-4 text-sm font-medium border-2 border-dashed border-gray-300 text-center hover:border-gray-400"
+          className="rounded-md px-8 py-2 mr-4 text-sm font-medium border-2 border-dashed border-gray-300 hover:border-gray-400 dark:border-gray-400 dark:hover:border-gray-300 text-center"
           onClick={() => {
             setRoundSlideoutOpen(true);
           }}
         >
-          <span className="block text-sm font-semibold text-gray-900">
-            Add round
-          </span>
+          <span className="block text-sm font-semibold">Add round</span>
         </button>
 
         {/**
@@ -475,8 +471,8 @@ export default function EditorByIdPage() {
             <button
               className={classNames(
                 item.id === activeRound?.id
-                  ? "bg-primary text-white"
-                  : "text-gray-700 hover:text-gray-900 bg-gray-200 hover:bg-gray-100",
+                  ? "bg-primary"
+                  : "bg-gray-200 hover:bg-gray-100",
                 "relative inline-flex items-center rounded-md px-3 py-2 text-sm font-medium"
               )}
               aria-current={item.id === activeRound?.id ? "page" : undefined}
@@ -506,42 +502,42 @@ export default function EditorByIdPage() {
         <div className="flow-root">
           <div className="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
             <div className="overflow-auto inline-block min-w-full py-2 align-middle">
-              <table className="min-w-full border-b divide-y divide-gray-300">
+              <table className="min-w-full border-b divide-y divide-gray-300 dark:divide-zinc-700 dark:border-zinc-700">
                 <thead>
                   <tr>
                     <th
                       scope="col"
-                      className="w-7/12 py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6 lg:pl-8"
+                      className="w-7/12 py-3.5 pl-4 pr-3 text-left text-sm font-semibold sm:pl-6 lg:pl-8"
                     >
                       Question
                     </th>
                     <th
                       scope="col"
-                      className="w-2/12 px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+                      className="w-2/12 px-3 py-3.5 text-left text-sm font-semibold"
                     >
                       Answer
                     </th>
                     <th
                       scope="col"
-                      className="w-1/12 px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+                      className="w-1/12 px-3 py-3.5 text-left text-sm font-semibold"
                     >
                       Points
                     </th>
                     <th
                       scope="col"
-                      className="relative py-3.5 pl-3 pr-4 text-right sm:pr-6 lg:pr-8 text-gray-50"
+                      className="relative py-3.5 pl-3 pr-4 text-right sm:pr-6 lg:pr-8"
                     >
-                      a
+                      {" "}
                     </th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200">
                   {qLoading && (
                     <tr className="animate-pulse">
-                      <td className="py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6 lg:pl-8">
+                      <td className="py-4 pl-4 pr-3 text-sm font-medium sm:pl-6 lg:pl-8">
                         <div className="bg-gray-200 group flex justify-between gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold" />
                       </td>
-                      <td className=" px-3 py-4 text-sm text-gray-500">
+                      <td className=" px-3 py-4 text-sm">
                         <div className="bg-gray-200 group flex justify-between gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold" />
                       </td>
                       <td className="relative py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6 lg:pr-8"></td>
@@ -550,7 +546,7 @@ export default function EditorByIdPage() {
 
                   {!qLoading && !questions?.length && (
                     <tr>
-                      <td className="py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6 lg:pl-8">
+                      <td className="py-4 pl-4 pr-3 text-sm font-medium sm:pl-6 lg:pl-8">
                         No questions yet.
                       </td>
                       <td className=" px-3 py-4 text-sm text-gray-500"></td>
