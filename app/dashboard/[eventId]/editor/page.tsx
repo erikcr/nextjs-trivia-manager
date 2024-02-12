@@ -240,7 +240,7 @@ export default function EditorByIdPage() {
       {/**
        * Top header
        */}
-      <div className="fixed top-0 left-0 right-0 flex h-16 shrink-0 items-center gap-x-4 border-b bg-primary border-gray-400 dark:border-zinc-700 text-gray-900 dark:text-gray-200">
+      <div className="fixed top-0 left-0 right-0 flex h-16 shrink-0 items-center gap-x-4 border-b bg-primary dark:bg-primary-dark border-gray-400 dark:border-zinc-700 text-gray-900 dark:text-gray-200">
         <TopHeader />
       </div>
 
@@ -471,8 +471,8 @@ export default function EditorByIdPage() {
             <button
               className={classNames(
                 item.id === activeRound?.id
-                  ? "bg-primary"
-                  : "bg-gray-200 hover:bg-gray-100",
+                  ? "bg-primary dark:bg-primary-dark"
+                  : "bg-gray-200 dark:bg-zinc-700 hover:bg-gray-100 dark:hover:bg-primary-dark",
                 "relative inline-flex items-center rounded-md px-3 py-2 text-sm font-medium"
               )}
               aria-current={item.id === activeRound?.id ? "page" : undefined}
@@ -742,18 +742,18 @@ export default function EditorByIdPage() {
                       required
                       id="answer"
                       name="answer"
-                      className="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
+                      className="block w-full rounded-md border-0 py-1.5 text-gray-900 dark:bg-zinc-800 dark:text-gray-200 shadow-sm dark:shadow-gray-700 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary dark:focus-primary-dark sm:text-sm sm:leading-6"
                       defaultValue={questionToEdit?.answer}
                     />
                   </div>
                 </div>
 
                 {/* Points */}
-                <div className="space-y-2 sm:grid sm:grid-cols-3 sm:gap-4 sm:space-y-0 sm:py-5">
+                <div className="space-y-2 sm:grid sm:grid-cols-3 sm:gap-4 sm:space-y-0 sm:py-5 dark:border-zinc-700">
                   <div>
                     <label
                       htmlFor="points"
-                      className="block text-sm font-medium leading-6 text-gray-900 sm:mt-1.5"
+                      className="block text-sm font-medium leading-6 text-gray-900 dark:text-gray-200 sm:mt-1.5"
                     >
                       Points <span className="text-red-600">*</span>
                     </label>
@@ -764,7 +764,7 @@ export default function EditorByIdPage() {
                       type="number"
                       name="points"
                       id="points"
-                      className="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
+                      className="block w-full rounded-md border-0 py-1.5 text-gray-900 dark:bg-zinc-800 dark:text-gray-200 shadow-sm dark:shadow-gray-700 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary dark:focus-primary-dark sm:text-sm sm:leading-6"
                       defaultValue={questionToEdit?.points}
                     />
                   </div>
@@ -819,7 +819,7 @@ export default function EditorByIdPage() {
                 <div className="space-y-2 sm:gap-4 sm:space-y-0 sm:py-3">
                   <label
                     htmlFor="question"
-                    className="block text-sm font-medium leading-6 text-gray-900 sm:mt-1.5 sm:mb-2"
+                    className="block text-sm font-medium leading-6 text-gray-900 dark:text-gray-200 sm:mt-1.5"
                   >
                     Question <span className="text-red-600">*</span>
                   </label>
@@ -830,7 +830,7 @@ export default function EditorByIdPage() {
                       name="question"
                       id="question"
                       rows={5}
-                      className="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
+                      className="block w-full rounded-md border-0 py-1.5 text-gray-900 dark:bg-zinc-800 dark:text-gray-200 shadow-sm dark:shadow-gray-700 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary dark:focus-primary-dark sm:text-sm sm:leading-6"
                       defaultValue={questionToAdd ? questionToAdd.question : ""}
                     />
                   </div>
@@ -841,7 +841,7 @@ export default function EditorByIdPage() {
                   <div>
                     <label
                       htmlFor="answer"
-                      className="block text-sm font-medium leading-6 text-gray-900 sm:mt-1.5"
+                      className="block text-sm font-medium leading-6 text-gray-900 dark:text-gray-200 sm:mt-1.5"
                     >
                       Answer <span className="text-red-600">*</span>
                     </label>
@@ -852,7 +852,7 @@ export default function EditorByIdPage() {
                       disabled={addQuestionLoading}
                       id="answer"
                       name="answer"
-                      className="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
+                      className="block w-full rounded-md border-0 py-1.5 text-gray-900 dark:bg-zinc-800 dark:text-gray-200 shadow-sm dark:shadow-gray-700 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary dark:focus-primary-dark sm:text-sm sm:leading-6"
                       defaultValue={questionToAdd ? questionToAdd.answer : ""}
                     />
                   </div>
@@ -863,7 +863,7 @@ export default function EditorByIdPage() {
                   <div>
                     <label
                       htmlFor="points"
-                      className="block text-sm font-medium leading-6 text-gray-900 sm:mt-1.5"
+                      className="block text-sm font-medium leading-6 text-gray-900 dark:text-gray-200 sm:mt-1.5"
                     >
                       Points <span className="text-red-600">*</span>
                     </label>
@@ -875,7 +875,7 @@ export default function EditorByIdPage() {
                       type="number"
                       name="points"
                       id="points"
-                      className="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
+                      className="block w-full rounded-md border-0 py-1.5 text-gray-900 dark:bg-zinc-800 dark:text-gray-200 shadow-sm dark:shadow-gray-700 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary dark:focus-primary-dark sm:text-sm sm:leading-6"
                       defaultValue={1}
                     />
                   </div>
@@ -896,7 +896,7 @@ export default function EditorByIdPage() {
                     <button
                       disabled={addQuestionLoading}
                       type="submit"
-                      className="inline-flex justify-center rounded-md bg-primary px-3 py-2 text-sm font-semibold text-white hover:bg-primary-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+                      className="inline-flex justify-center rounded-md bg-primary dark:bg-primary-dark px-3 py-2 text-sm font-semibold text-white hover:bg-primary-hover dark:hover:bg-primary-dark-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
                     >
                       <>Add</>
                     </button>
@@ -910,10 +910,10 @@ export default function EditorByIdPage() {
                 className="absolute inset-0 flex items-center"
                 aria-hidden="true"
               >
-                <div className="w-full border-t border-gray-300" />
+                <div className="w-full border-t border-gray-300 dark:border-zinc-600" />
               </div>
               <div className="relative flex justify-center">
-                <span className="bg-gray-50 px-3 text-base font-semibold leading-6 text-gray-900">
+                <span className="bg-gray-50 dark:bg-zinc-900 px-3 text-base font-semibold leading-6">
                   TriviaAI
                 </span>
               </div>
@@ -973,7 +973,7 @@ export default function EditorByIdPage() {
                       type="text"
                       name="topic"
                       id="topic"
-                      className="block w-full rounded-none rounded-l-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
+                      className="block w-full rounded-md border-0 py-1.5 text-gray-900 dark:bg-zinc-800 dark:text-gray-200 shadow-sm dark:shadow-gray-700 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary dark:focus-primary-dark sm:text-sm sm:leading-6"
                       placeholder="A trivia topic"
                       value={input}
                       onChange={handleInputChange}
@@ -982,13 +982,13 @@ export default function EditorByIdPage() {
                   <button
                     type="submit"
                     disabled={input ? false : true}
-                    className="relative -ml-px inline-flex items-center gap-x-1.5 rounded-r-md px-3 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
+                    className="relative -ml-px inline-flex items-center gap-x-1.5 rounded-r-md px-3 py-2 text-sm font-semibold text-gray-900 dark:text-gray-200 ring-1 ring-inset ring-gray-300 dark:ring-zinc-700 hover:bg-gray-50 dark:hover:bg-zinc-700"
                   >
                     {aiResponseLoading ? (
                       <div role="status" className="">
                         <svg
                           aria-hidden="true"
-                          className="w-5 h-5 text-gray-500 animate-spin fill-white"
+                          className="w-5 h-5 text-gray-500 animate-spin fill-white dark:fill-zinc-900"
                           viewBox="0 0 100 101"
                           fill="none"
                           xmlns="http://www.w3.org/2000/svg"
