@@ -106,7 +106,7 @@ export default function ManageLayout({
               </div>
               <div className="hidden md:block">
                 <div className="ml-4 flex items-center md:ml-6">
-                  {/* <ThemeSwitcher /> */}
+                  <ThemeSwitcher />
 
                   <button
                     className="inline-block h-8 w-8 ml-2 overflow-hidden rounded-full bg-gray-900 dark:bg-gray-400"

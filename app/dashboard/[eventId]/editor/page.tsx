@@ -312,7 +312,7 @@ export default function EditorByIdPage() {
                 leaveFrom="opacity-100 translate-y-0 sm:scale-100"
                 leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
               >
-                <Dialog.Panel className="relative transform overflow-hidden rounded-lg bg-white px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6">
+                <Dialog.Panel className="relative transform overflow-hidden rounded-lg bg-white dark:bg-zinc-900 px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6">
                   <div>
                     <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-green-100">
                       <CheckIcon
@@ -320,15 +320,15 @@ export default function EditorByIdPage() {
                         aria-hidden="true"
                       />
                     </div>
-                    <div className="mt-3 text-center sm:mt-5">
+                    <div className="mt-3 text-center sm:mt-5 text-gray-900 dark:text-gray-200">
                       <Dialog.Title
                         as="h3"
-                        className="text-base font-semibold leading-6 text-gray-900"
+                        className="text-base font-semibold leading-6"
                       >
                         Confirm event start
                       </Dialog.Title>
                       <div className="mt-2">
-                        <p className="text-sm text-gray-500">
+                        <p className="text-sm text-gray-500 dark:text-gray-300">
                           Make sure all of your event settings and details are
                           correct. You will not be able to make any edits once
                           you start the event.
@@ -339,7 +339,7 @@ export default function EditorByIdPage() {
                   <div className="mt-5 sm:mt-6 sm:grid sm:grid-flow-row-dense sm:grid-cols-2 sm:gap-3">
                     <button
                       type="button"
-                      className="inline-flex w-full justify-center rounded-md bg-primary px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary sm:col-start-2"
+                      className="inline-flex w-full justify-center rounded-md bg-primary hover:bg-primary-hover dark:bg-primary-dark dark:hover:bg-primary-dark-hover px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary sm:col-start-2"
                       onClick={() => startEvent()}
                     >
                       Let&apos;s go
@@ -347,7 +347,7 @@ export default function EditorByIdPage() {
                     </button>
                     <button
                       type="button"
-                      className="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:col-start-1 sm:mt-0"
+                      className="mt-3 inline-flex w-full justify-center rounded-md bg-gray-200 hover:bg-gray-50 dark:bg-zinc-900 dark:hover:bg-zinc-700 px-3 py-2 text-sm font-semibold text-gray-900 dark:text-gray-200 shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-slate-700 sm:col-start-1 sm:mt-0"
                       onClick={() => setStartConfirmShow(false)}
                       ref={cancelButtonRef}
                     >
@@ -471,8 +471,8 @@ export default function EditorByIdPage() {
             <button
               className={classNames(
                 item.id === activeRound?.id
-                  ? "bg-primary dark:bg-primary-dark"
-                  : "bg-gray-200 dark:bg-zinc-700 hover:bg-gray-100 dark:hover:bg-primary-dark",
+                  ? "bg-primary hover:bg-primary-hover dark:bg-primary-dark dark:hover:bg-primary-dark-hover"
+                  : "bg-gray-200 dark:bg-zinc-700 hover:bg-gray-100 dark:hover:bg-primary-dark-hover",
                 "relative inline-flex items-center rounded-md px-3 py-2 text-sm font-medium"
               )}
               aria-current={item.id === activeRound?.id ? "page" : undefined}
@@ -535,10 +535,10 @@ export default function EditorByIdPage() {
                   {qLoading && (
                     <tr className="animate-pulse">
                       <td className="py-4 pl-4 pr-3 text-sm font-medium sm:pl-6 lg:pl-8">
-                        <div className="bg-gray-200 group flex justify-between gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold" />
+                        <div className="bg-gray-200 dark:bg-gray-700 group flex justify-between gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold" />
                       </td>
                       <td className=" px-3 py-4 text-sm">
-                        <div className="bg-gray-200 group flex justify-between gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold" />
+                        <div className="bg-gray-200 dark:bg-gray-700 group flex justify-between gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold" />
                       </td>
                       <td className="relative py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6 lg:pr-8"></td>
                     </tr>
@@ -556,13 +556,13 @@ export default function EditorByIdPage() {
 
                   {questions?.map((item) => (
                     <tr key={item.id}>
-                      <td className="py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6 lg:pl-8">
+                      <td className="py-4 pl-4 pr-3 text-sm sm:pl-6 lg:pl-8">
                         {item.question}
                       </td>
-                      <td className=" px-3 py-4 text-sm text-gray-500">
+                      <td className="px-3 py-4 text-sm">
                         {item.answer}
                       </td>
-                      <td className=" px-3 py-4 text-sm text-gray-500">
+                      <td className="px-3 py-4 text-sm">
                         {item.points}
                       </td>
                       <td className="relative py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6 lg:pr-8">
@@ -571,7 +571,7 @@ export default function EditorByIdPage() {
                         ) : (
                           <button
                             type="button"
-                            className="text-primary hover:text-primary-hover"
+                            className="text-primary hover:text-primary-hover dark:text-zinc-200 dark:hover:text-primary-dark-hover"
                             onClick={() => {
                               if (questionToEdit)
                                 questionToEditFormRef?.current?.reset();

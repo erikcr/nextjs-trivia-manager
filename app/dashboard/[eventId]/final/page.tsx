@@ -237,7 +237,7 @@ export default function EventFinalPage() {
                   {item.submitted_answer}
                 </p>
                 <p className="truncate text-xs leading-5">
-                  {item.question.question}
+                  {/* {item.question.question} */}
                 </p>
               </div>
             </div>
