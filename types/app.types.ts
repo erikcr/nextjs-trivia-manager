@@ -67,10 +67,12 @@ const responseWithQuestionsQuery = supabase
   .from("v002_responses_stag")
   .select(`
     id,
-    is_correct,
     submitted_answer,
-    v002_questions_stag (
-      points
+    is_correct,
+    question: v002_questions_stag (
+      points,
+      question,
+      round: v002_rounds_stag (status)
     )
   `)
   .limit(1);
@@ -80,5 +82,5 @@ export type TeamScoresSorted = {
   id: string,
   name: string,
   team_total_points: number,
-  responses: Tables<"v002_responses_stag">[]
+  responses: ResponeWithQuestions
 }

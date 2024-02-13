@@ -34,11 +34,14 @@ Deno.serve(async (req) => {
           name,
           event_id,
           responses: v002_responses_stag (
+              id,
+              submitted_answer,
+              is_correct,
               question: v002_questions_stag (
                 points,
+                question,
                 round: v002_rounds_stag (status)
-              ),
-              is_correct
+              )
           )
         `
       )
@@ -54,7 +57,7 @@ Deno.serve(async (req) => {
             : acc,
         0
       ),
-      responses: team.responses
+      responses: team.responses.sort((a, b) => parseInt(a.id) - parseInt(b.id))
     }));
 
     const pointsSorted = sumTeamPoints.sort((a, b) => b.team_total_points - a.team_total_points);
