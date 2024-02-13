@@ -52,6 +52,7 @@ export default function EventFinalPage() {
 
     if (data) {
       setTeamSorted(data);
+      setActiveTeam(data[0]);
     } else if (error) {
       console.error(error);
     }
@@ -113,14 +114,14 @@ export default function EventFinalPage() {
       {/**
        * Main content
        */}
-      <main className="fixed top-16 bottom-0 left-0 w-2/3 border-r border-gray-400 dark:border-zinc-700 text-gray-900 dark:text-gray-200">
+      <main className="fixed top-16 bottom-0 left-0 w-2/3 overflow-auto border-r border-gray-400 dark:border-zinc-700 text-gray-900 dark:text-gray-200">
         <MainContent />
       </main>
 
       {/**
        * Right-side column
        */}
-      <aside className="fixed top-16 bottom-0 right-0 w-1/3 border-gray-400 dark:border-zinc-700 text-gray-900 dark:text-gray-200">
+      <aside className="fixed top-16 bottom-0 right-0 w-1/3 overflow-auto border-gray-400 dark:border-zinc-700 text-gray-900 dark:text-gray-200">
         <RightSidebar />
       </aside>
     </>
@@ -223,7 +224,7 @@ export default function EventFinalPage() {
     return (
       <ul
         role="list"
-        className="divide-y dark:divide-zinc-700 dark:border-zinc-700 px-6"
+        className="divide-y dark:divide-zinc-700 dark:border-zinc-700 px-6 pb-12"
       >
         {activeTeam?.responses?.map((item) => (
           <li
