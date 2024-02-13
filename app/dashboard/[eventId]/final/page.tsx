@@ -17,11 +17,7 @@ import logoTriviaLynxDark from "@/public/logos/trivialynx-logo-dark.svg";
 import { User } from "@supabase/supabase-js";
 import { createClient } from "@/utils/supabase/client";
 import { Tables } from "@/types/database.types";
-import {
-  TeamsWithResponses,
-  TeamWithResponses,
-  TeamScoresSorted,
-} from "@/types/app.types";
+import { TeamScoresSorted } from "@/types/app.types";
 
 function classNames(...classes: any[]) {
   return classes.filter(Boolean).join(" ");
@@ -103,7 +99,7 @@ export default function EventFinalPage() {
       {/**
        * Top header
        */}
-      <div className="fixed top-0 left-0 right-0 flex h-16 shrink-0 items-center gap-x-4 border-b bg-primary text-gray-100 border-gray-400">
+      <div className="fixed top-0 left-0 right-0 flex h-16 shrink-0 items-center gap-x-4 border-b bg-primary dark:bg-primary-dark border-gray-400 dark:border-zinc-700 text-gray-900 dark:text-gray-200">
         <TopHeader />
       </div>
 
@@ -117,14 +113,14 @@ export default function EventFinalPage() {
       {/**
        * Main content
        */}
-      <main className="fixed top-16 bottom-0 left-0 w-2/3 border-r border-gray-400">
+      <main className="fixed top-16 bottom-0 left-0 w-2/3 border-r border-gray-400 dark:border-zinc-700 text-gray-900 dark:text-gray-200">
         <MainContent />
       </main>
 
       {/**
        * Right-side column
        */}
-      <aside className="fixed top-16 bottom-0 right-0 w-1/3">
+      <aside className="fixed top-16 bottom-0 right-0 w-1/3 border-gray-400 dark:border-zinc-700 text-gray-900 dark:text-gray-200">
         <RightSidebar />
       </aside>
     </>
@@ -156,7 +152,7 @@ export default function EventFinalPage() {
               </a>
             </div>
 
-            <div className="flex lg:gap-x-12 text-xl text-black">
+            <div className="flex lg:gap-x-12 text-xl">
               <p>{event?.name}</p>
             </div>
 
@@ -170,19 +166,24 @@ export default function EventFinalPage() {
   function MainContent() {
     return (
       <div className="hidden sm:block">
-        <ul role="list" className="border-b divide-y divide-gray-200">
+        <ul
+          role="list"
+          className="border-b divide-y divide-gray-200 dark:divide-zinc-700 dark:border-zinc-700"
+        >
           {teamsSorted?.map((item) => (
             <li
               key={item.id}
               className={classNames(
-                activeTeam?.id === item.id ? "bg-gray-100" : "",
-                "relative flex justify-between gap-x-6 px-4 py-2 sm:px-6 hover:bg-gray-100"
+                activeTeam?.id === item.id
+                  ? "bg-gray-100 dark:bg-zinc-800"
+                  : "",
+                "relative flex justify-between gap-x-6 px-4 py-2 sm:px-6 hover:bg-gray-100 dark:hover:bg-zinc-800"
               )}
               onClick={() => setActiveTeam(item)}
             >
               <div className="flex min-w-0 gap-x-4">
                 <div className="min-w-0 flex-auto">
-                  <p className="text-sm font-semibold leading-6 text-gray-900">
+                  <p className="text-sm font-semibold leading-6">
                     <span className="absolute inset-x-0 -top-px bottom-0" />
                     {item.name}
                   </p>
@@ -195,8 +196,8 @@ export default function EventFinalPage() {
                 <ChevronRightIcon
                   className={classNames(
                     activeTeam?.id === item.id
-                      ? "text-gray-600"
-                      : "text-gray-100",
+                      ? "text-gray-600 dark:text-gray-100"
+                      : "text-gray-100 dark:text-gray-600",
                     "h-4 w-4"
                   )}
                 />
@@ -220,18 +221,26 @@ export default function EventFinalPage() {
     }
 
     return (
-      <ul role="list" className="divide-y divide-gray-100 px-6">
+      <ul
+        role="list"
+        className="divide-y dark:divide-zinc-700 dark:border-zinc-700 px-6"
+      >
         {activeTeam?.responses?.map((item) => (
           <li
             key={item.id}
-            className="flex flex-wrap items-center justify-between gap-x-6 gap-y-4 py-2 sm:flex-nowrap"
+            className="flex flex-wrap items-center justify-between gap-y-4 py-2 sm:flex-nowrap"
           >
-            <div>
-              <p className="text-sm font-semibold leading-6 text-gray-900">
-                {item.submitted_answer}
-              </p>
+            <div className="flex min-w-0 gap-x-4">
+              <div className="min-w-0 flex-auto">
+                <p className="text-sm font-semibold leading-6">
+                  {item.submitted_answer}
+                </p>
+                <p className="truncate text-xs leading-5">
+                  {item.question.question}
+                </p>
+              </div>
             </div>
-            <dl className="flex w-full flex-none items-center justify-between px-4 sm:w-auto">
+            <dl className="flex w-full flex-none items-center justify-between sm:w-auto">
               <div className="flex w-16 gap-x-1">
                 <dt>
                   {item.is_correct == true ? (
