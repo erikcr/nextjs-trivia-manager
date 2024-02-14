@@ -151,7 +151,6 @@ export default function EventsPage() {
 
   const getEventDate = (dateOfEvent: string) => {
     const date = dateOfEvent.split("T")[0];
-    // const month = Date.parse(date).
 
     const options = {
       weekday: "long",
@@ -170,11 +169,11 @@ export default function EventsPage() {
     let day = dtToday.getDate();
     let yearStr = dtToday.getFullYear().toString();
 
-    let monthStr,
-      dayStr = "";
+    let monthStr = month.toString();
+    let dayStr = day.toString();
 
-    if (month < 10) monthStr = "0" + month.toString();
-    if (day < 10) dayStr = "0" + day.toString();
+    if (month < 10) monthStr = "0" + monthStr;
+    if (day < 10) dayStr = "0" + dayStr;
 
     return yearStr + "-" + monthStr + "-" + dayStr;
   };

@@ -14,6 +14,10 @@ import { RoundsWithQuestions } from "@/types/app.types";
 // Components
 import Notification from "@/components/Notification";
 
+function classNames(...classes: any[]) {
+  return classes.filter(Boolean).join(" ");
+}
+
 export default function RoundSlideout({
   user,
   rounds,
@@ -282,7 +286,10 @@ export default function RoundSlideout({
                             {" "}
                             <button
                               disabled={addRoundLoading}
-                              className="rounded-md bg-red-200 dark:bg-red-800 px-3 py-2 text-sm font-semibold text-gray-900 dark:text-gray-200 shadow-sm hover:bg-red-500 dark:hover:bg-red-600"
+                              className={classNames(
+                                roundToEdit ? "" : "hidden",
+                                "rounded-md bg-red-200 dark:bg-red-800 px-3 py-2 text-sm font-semibold text-gray-900 dark:text-gray-200 shadow-sm hover:bg-red-500 dark:hover:bg-red-600"
+                              )}
                               onClick={() => {
                                 deleteRound();
                               }}
