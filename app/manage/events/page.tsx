@@ -683,7 +683,7 @@ export default function EventsPage() {
             leaveFrom="opacity-100"
             leaveTo="opacity-0"
           >
-            <div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" />
+            <div className="fixed inset-0 bg-gray-500 bg-opacity-75 dark:bg-zinc-800 dark:bg-opacity-75 transition-opacity" />
           </Transition.Child>
 
           <div className="fixed inset-0 w-screen overflow-y-auto">
@@ -697,7 +697,7 @@ export default function EventsPage() {
                 leaveFrom="opacity-100 translate-y-0 sm:scale-100"
                 leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
               >
-                <Dialog.Panel className="relative transform overflow-hidden rounded-lg bg-white px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6">
+                <Dialog.Panel className="relative transform overflow-hidden rounded-lg bg-white dark:bg-zinc-900 px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6">
                   <div>
                     <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-red-100">
                       <XCircleIcon
@@ -708,16 +708,16 @@ export default function EventsPage() {
                     <div className="mt-3 text-center sm:mt-5">
                       <Dialog.Title
                         as="h3"
-                        className="text-base font-semibold leading-6 text-gray-900"
+                        className="text-base font-semibold leading-6 text-gray-900 dark:text-gray-200"
                       >
                         Confirm event delete
                       </Dialog.Title>
                       <div className="mt-2">
-                        <p className="text-sm text-gray-500">
+                        <p className="text-sm text-gray-500 dark:text-gray-300">
                           You are about to delete <b>{eventToDelete?.name}</b>.
                           Are you sure?
                         </p>
-                        <p className="text-sm text-gray-500">
+                        <p className="text-sm text-gray-500 dark:text-gray-300">
                           This will delete all rounds and questions you created
                           for this event.
                         </p>
@@ -734,7 +734,7 @@ export default function EventsPage() {
                     </button>
                     <button
                       type="button"
-                      className="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:col-start-1 sm:mt-0"
+                      className="mt-3 inline-flex w-full justify-center rounded-md bg-gray-200 hover:bg-gray-50 dark:bg-zinc-900 dark:hover:bg-zinc-700 px-3 py-2 text-sm font-semibold text-gray-900 dark:text-gray-200 shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-slate-700  sm:col-start-1 sm:mt-0"
                       onClick={() => setDeleteEventConfirmShow(false)}
                       ref={cancelButtonRef}
                     >

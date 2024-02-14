@@ -157,16 +157,6 @@ export default function EventOngoingPage() {
         setTopHeaderButton("ACTIVATE_NEXT_QUESTION");
       } else if (ongoingQuestions) {
         setTopHeaderButton("CLOSE_ROUND");
-      } else {
-        const roundsComplete = rounds?.every(
-          (item) => item.status === "COMPLETE"
-        );
-
-        if (roundsComplete && event?.status !== "COMPLETE") {
-          setTopHeaderButton("END_EVENT");
-        } else {
-          setTopHeaderButton("");
-        }
       }
     }
   };
@@ -237,6 +227,16 @@ export default function EventOngoingPage() {
         setActiveRound(findFirstPending);
       } else {
         setActiveRound(data[data.length - 1]);
+      }
+
+      const roundsComplete = data?.every(
+        (item) => item.status === "COMPLETE"
+      );
+
+      if (roundsComplete && event?.status !== "COMPLETE") {
+        setTopHeaderButton("END_EVENT");
+      } else {
+        setTopHeaderButton("");
       }
     }
   };
@@ -427,7 +427,10 @@ export default function EventOngoingPage() {
   function MainContent() {
     return (
       <div className="hidden sm:block">
-        <ul role="list" className="border-b divide-y dark:divide-zinc-700 dark:border-zinc-700">
+        <ul
+          role="list"
+          className="border-b divide-y dark:divide-zinc-700 dark:border-zinc-700"
+        >
           {/** TODO:
            * Add skeleton placeholders for questions list
            */}
@@ -435,8 +438,12 @@ export default function EventOngoingPage() {
             <li
               key={item.id}
               className={classNames(
-                activeQuestion?.id === item.id ? "bg-gray-100 dark:bg-zinc-800" : "",
-                item.status !== "PENDING" ? "hover:bg-gray-100 dark:hover:bg-zinc-800" : "",
+                activeQuestion?.id === item.id
+                  ? "bg-gray-100 dark:bg-zinc-800"
+                  : "",
+                item.status !== "PENDING"
+                  ? "hover:bg-gray-100 dark:hover:bg-zinc-800"
+                  : "",
                 "relative flex justify-between gap-x-6 px-4 py-2 sm:px-6"
               )}
               onClick={
@@ -512,7 +519,10 @@ export default function EventOngoingPage() {
     }
 
     return (
-      <ul role="list" className="mt-2 divide-y divide-gray-300 dark:divide-zinc-700 px-6 pb-12">
+      <ul
+        role="list"
+        className="mt-2 divide-y divide-gray-300 dark:divide-zinc-700 px-6 pb-12"
+      >
         {responses?.map((item) => (
           <li
             key={item.id}
