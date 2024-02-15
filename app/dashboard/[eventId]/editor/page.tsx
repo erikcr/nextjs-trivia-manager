@@ -334,6 +334,13 @@ export default function EditorByIdPage() {
       </div>
 
       {/**
+       * Left-side column
+       */}
+      <aside className="fixed top-32 md:top-16 bottom-0 left-0 w-1/4 border-l border-gray-400 dark:border-zinc-700 text-gray-900 dark:text-gray-200">
+        <LeftSidebar />
+      </aside>
+
+      {/**
        * Main content
        */}
       <main className="fixed top-32 md:top-16 bottom-0 left-1/4 right-1/4 border-x border-gray-400 dark:border-zinc-700 text-gray-900 dark:text-gray-200">
@@ -563,6 +570,52 @@ export default function EditorByIdPage() {
                   ? "bg-primary hover:bg-primary-hover dark:bg-primary-dark dark:hover:bg-primary-dark-hover"
                   : "bg-gray-200 dark:bg-zinc-700 hover:bg-gray-100 dark:hover:bg-primary-dark-hover",
                 "relative inline-flex items-center rounded-md px-3 py-2 text-sm font-medium"
+              )}
+              aria-current={item.id === activeRound?.id ? "page" : undefined}
+              onClick={() => {
+                setActiveRound(item);
+              }}
+            >
+              <p className="pr-2">{item.name}</p>
+
+              <PencilSquareIcon
+                className="w-5 h-5"
+                onClick={() => {
+                  setRoundToEdit(item);
+                  setRoundSlideoutOpen(true);
+                }}
+              />
+            </button>
+          </div>
+        ))}
+      </div>
+    );
+  }
+  function LeftSidebar() {
+    return (
+      <div className="px-6 py-4">
+        <button
+          type="button"
+          className="rounded-md w-full px-8 py-2 mb-4 text-sm font-medium border-2 border-dashed border-gray-300 hover:border-gray-400 dark:border-gray-400 dark:hover:border-gray-300 text-center"
+          onClick={() => {
+            setRoundSlideoutOpen(true);
+          }}
+        >
+          <span className="block text-sm font-semibold">Add round</span>
+        </button>
+
+        {/**
+         * TODO
+         * Ensure rounds are rendered in horizonal scroll view when wider than container
+         */}
+        {rounds?.map((item) => (
+          <div key={item.id} className="inline-flex rounded-md shadow-sm mr-4 my-1 w-full">
+            <button
+              className={classNames(
+                item.id === activeRound?.id
+                  ? "bg-primary hover:bg-primary-hover dark:bg-primary-dark dark:hover:bg-primary-dark-hover"
+                  : "bg-gray-200 dark:bg-zinc-700 hover:bg-gray-100 dark:hover:bg-primary-dark-hover",
+                "w-full relative inline-flex items-center rounded-md px-3 py-2 text-sm font-medium"
               )}
               aria-current={item.id === activeRound?.id ? "page" : undefined}
               onClick={() => {
@@ -962,15 +1015,6 @@ export default function EditorByIdPage() {
                 </div>
 
                 <div className="sm:col-span-1">
-                  {questionToAdd && (
-                    <button
-                      disabled={addQuestionLoading}
-                      className="rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
-                      onClick={() => removeQuestionFromAI()}
-                    >
-                      <>Skip</>
-                    </button>
-                  )}
                   <button
                     disabled={addQuestionLoading}
                     type="submit"
@@ -1023,6 +1067,7 @@ export default function EditorByIdPage() {
               <button
                 type="button"
                 className="relative -ml-px inline-flex items-center gap-x-1.5 rounded-r-md px-5 py-2 text-sm font-semibold  ring-2 ring-inset ring-gray-300 dark:ring-zinc-900 hover:bg-gray-50 dark:hover:bg-zinc-500"
+                onClick={() => removeQuestionFromAI()}
               >
                 Skip
               </button>
