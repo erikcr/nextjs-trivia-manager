@@ -149,7 +149,9 @@ export default function EditorByIdPage() {
     if (!error) {
       getQuestions();
       setAddQuestionLoading(false);
+
       addFormRef.current?.reset();
+      removeQuestionFromAI();
     }
   };
 
@@ -593,7 +595,7 @@ export default function EditorByIdPage() {
   }
   function LeftSidebar() {
     return (
-      <div className="px-6 py-4">
+      <div className="px-3 py-4">
         <button
           type="button"
           className="rounded-md w-full px-8 py-2 mb-4 text-sm font-medium border-2 border-dashed border-gray-300 hover:border-gray-400 dark:border-gray-400 dark:hover:border-gray-300 text-center"
@@ -609,21 +611,13 @@ export default function EditorByIdPage() {
          * Ensure rounds are rendered in horizonal scroll view when wider than container
          */}
         {rounds?.map((item) => (
-          <div key={item.id} className="inline-flex rounded-md shadow-sm mr-4 my-1 w-full">
+          <span className="isolate inline-flex rounded-md my-1 w-full">
             <button
+              type="button"
               className={classNames(
-                item.id === activeRound?.id
-                  ? "bg-primary hover:bg-primary-hover dark:bg-primary-dark dark:hover:bg-primary-dark-hover"
-                  : "bg-gray-200 dark:bg-zinc-700 hover:bg-gray-100 dark:hover:bg-primary-dark-hover",
-                "w-full relative inline-flex items-center rounded-md px-3 py-2 text-sm font-medium"
+                "relative -ml-px inline-flex items-center rounded-l-md px-3 py-2 text-sm font-semibold border-r border-gray-400 dark:border-zinc-500 bg-gray-200 dark:bg-zinc-700 hover:bg-gray-100 dark:hover:bg-zinc-600 focus:z-10"
               )}
-              aria-current={item.id === activeRound?.id ? "page" : undefined}
-              onClick={() => {
-                setActiveRound(item);
-              }}
             >
-              <p className="pr-2">{item.name}</p>
-
               <PencilSquareIcon
                 className="w-5 h-5"
                 onClick={() => {
@@ -632,7 +626,24 @@ export default function EditorByIdPage() {
                 }}
               />
             </button>
-          </div>
+
+            <button
+              type="button"
+              // className="relative inline-flex items-center gap-x-1.5 rounded-l-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-10"
+              className={classNames(
+                item.id === activeRound?.id
+                  ? "bg-primary dark:bg-primary-dark"
+                  : "bg-gray-200 dark:bg-zinc-700 hover:bg-gray-100 dark:hover:bg-primary-dark",
+                "w-full relative inline-flex items-center rounded-r-md px-3 py-2 text-sm font-medium"
+              )}
+              aria-current={item.id === activeRound?.id ? "page" : undefined}
+              onClick={() => {
+                setActiveRound(item);
+              }}
+            >
+              {item.name}
+            </button>
+          </span>
         ))}
       </div>
     );
@@ -673,7 +684,7 @@ export default function EditorByIdPage() {
                     </th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-200">
+                <tbody className="divide-y divide-gray-200 dark:divide-zinc-700">
                   {qLoading && (
                     <tr className="animate-pulse">
                       <td className="py-4 pl-4 pr-3 text-sm font-medium sm:pl-6 lg:pl-8">
@@ -1028,7 +1039,7 @@ export default function EditorByIdPage() {
           </form>
         </div>
 
-        <div className="relative pb-2">
+        <div className="relative">
           <div
             className="absolute inset-0 flex items-center"
             aria-hidden="true"
@@ -1043,12 +1054,9 @@ export default function EditorByIdPage() {
         </div>
 
         <form
-          onSubmit={(e) => {
-            setAiResponseLoading(true);
-            handleSubmit(e);
-          }}
+          onSubmit={handleSubmit}
         >
-          <div className="mt-2 flex rounded-md shadow-sm">
+          <div className="mt-5 flex rounded-md shadow-sm">
             <div className="relative flex flex-grow items-stretch focus-within:z-10">
               <input
                 type="topic"
