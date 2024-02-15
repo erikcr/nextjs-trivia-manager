@@ -88,7 +88,7 @@ export default function EditorByIdPage() {
   const [startErrorMsg, setStartErrorMsg] = useState("");
 
   // TriviaAI
-  const [aiResponse, setAiResponse] = useState<TriviaItem[]>([]);
+  const [aiResponse, setAiResponse] = useState<TriviaItem[]>();
   const [aiResponseLoading, setAiResponseLoading] = useState(false);
 
   // Other
@@ -329,28 +329,28 @@ export default function EditorByIdPage() {
       {/**
        * Secondary header
        */}
-      <div className="fixed top-16 left-0 right-0 flex h-16 shrink-0 items-center gap-x-4 border-b border-gray-400 dark:border-zinc-700 text-gray-900 dark:text-gray-200">
+      <div className="md:hidden fixed top-16 left-0 right-0 flex h-16 shrink-0 items-center gap-x-4 border-b border-gray-400 dark:border-zinc-700 text-gray-900 dark:text-gray-200">
         <SecondaryHeader />
       </div>
 
       {/**
        * Main content
        */}
-      <main className="fixed top-32 bottom-0 left-0 w-2/3 border-r border-gray-400 dark:border-zinc-700 text-gray-900 dark:text-gray-200">
+      <main className="fixed top-32 md:top-16 bottom-0 left-1/4 right-1/4 border-x border-gray-400 dark:border-zinc-700 text-gray-900 dark:text-gray-200">
         <MainContent />
       </main>
 
       {/**
        * Right-side column
        */}
-      <aside className="fixed top-32 bottom-0 right-0 w-1/3 border-gray-400 dark:border-zinc-700 text-gray-900 dark:text-gray-200">
+      {/* <aside className="fixed top-32 bottom-0 right-0 w-1/3 border-l border-gray-400 dark:border-zinc-700 text-gray-900 dark:text-gray-200">
         <RightSidebar />
-      </aside>
+      </aside> */}
 
       {/**
        * Bottom input for TriviaAI
        */}
-      <div className="fixed bottom-0 z-10 left-1/4 right-1/4 w-1/2 flex rounded-t-md h-24 shrink-0 px-2 pt-2 gap-x-4 bg-white dark:bg-zinc-700 border border-gray-400 dark:border-zinc-700 shadow-2 text-gray-900 dark:text-gray-200">
+      <div className="fixed bottom-0 z-10 left-1/4 right-1/4 w-1/2 flex rounded-t-md h-72 shrink-0 px-2 pt-2 gap-x-4 bg-white dark:bg-zinc-700 border border-gray-400 dark:border-zinc-700 shadow-2 text-gray-900 dark:text-gray-200">
         <BottomContent />
       </div>
 
@@ -498,13 +498,13 @@ export default function EditorByIdPage() {
                   event?.status === "PENDING"
                     ? "bg-blue-100 dark:bg-blue-900"
                     : "bg-green-100 dark:bg-green-900",
-                  "inline-flex items-center rounded-full px-2 mr-3 py-1 text-xs font-medium text-gray-600 dark:text-gray-400 ring-1 ring-inset"
+                  "inline-flex items-center rounded-full px-2 mr-3 py-1 text-sm  text-gray-600 dark:text-gray-400 ring-1 ring-inset"
                 )}
               >
                 {event?.status}
               </span>
             )}
-            <div className="relative flex flex-col items-center group">
+            {/* <div className="relative flex flex-col items-center group">
               <button
                 type="button"
                 disabled={startDisabled}
@@ -531,7 +531,7 @@ export default function EditorByIdPage() {
                   {startErrorMsg}
                 </span>
               </div>
-            </div>
+            </div> */}
           </div>
         </nav>
       </div>
@@ -917,23 +917,117 @@ export default function EditorByIdPage() {
 
     return (
       <div className="w-full">
+        <div className="space-y-1">
+          <form action={addQuestion} ref={addFormRef}>
+            <div className="pt-2">
+              {/* Question */}
+              <div className="sm:col-span-2">
+                <textarea
+                  required
+                  disabled={addQuestionLoading}
+                  name="question"
+                  id="question"
+                  rows={2}
+                  placeholder="Question"
+                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 dark:bg-zinc-800 dark:text-gray-200 shadow-sm dark:shadow-gray-700 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary dark:focus-primary-dark sm:text-sm sm:leading-6"
+                  defaultValue={questionToAdd ? questionToAdd.question : ""}
+                />
+              </div>
+
+              {/* Answer */}
+              <div className="space-y-2 sm:grid sm:grid-cols-12 sm:gap-4 sm:space-y-0 sm:py-5">
+                <div className="sm:col-span-9">
+                  <input
+                    required
+                    disabled={addQuestionLoading}
+                    id="answer"
+                    name="answer"
+                    placeholder="Answer"
+                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 dark:bg-zinc-800 dark:text-gray-200 shadow-sm dark:shadow-gray-700 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary dark:focus-primary-dark sm:text-sm sm:leading-6"
+                    defaultValue={questionToAdd ? questionToAdd.answer : ""}
+                  />
+                </div>
+
+                <div className="sm:col-span-2">
+                  <input
+                    required
+                    disabled={addQuestionLoading}
+                    type="number"
+                    name="points"
+                    id="points"
+                    placeholder="Points"
+                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 dark:bg-zinc-800 dark:text-gray-200 shadow-sm dark:shadow-gray-700 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary dark:focus-primary-dark sm:text-sm sm:leading-6"
+                    defaultValue={1}
+                  />
+                </div>
+
+                <div className="sm:col-span-1">
+                  {questionToAdd && (
+                    <button
+                      disabled={addQuestionLoading}
+                      className="rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
+                      onClick={() => removeQuestionFromAI()}
+                    >
+                      <>Skip</>
+                    </button>
+                  )}
+                  <button
+                    disabled={addQuestionLoading}
+                    type="submit"
+                    className=" justify-center rounded-md bg-primary dark:bg-primary-dark px-3 py-2 text-sm font-semibold text-white hover:bg-primary-hover dark:hover:bg-primary-dark-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+                  >
+                    <>Add</>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+
+        <div className="relative pb-2">
+          <div
+            className="absolute inset-0 flex items-center"
+            aria-hidden="true"
+          >
+            <div className="w-full border-t border-gray-300 dark:border-zinc-900" />
+          </div>
+          <div className="relative flex justify-center">
+            <span className="bg-white dark:bg-zinc-700 px-2 text-md text-gray-500 dark:text-zinc-200">
+              Get help from TriviaAI
+            </span>
+          </div>
+        </div>
+
         <form
           onSubmit={(e) => {
             setAiResponseLoading(true);
             handleSubmit(e);
           }}
-          className="w-full"
         >
-          <input
-            type="text"
-            name="topic"
-            id="topic"
-            className="w-full rounded-md border border-gray-400 focus:border-gray-400 dark:border-zinc-700 py-3 text-gray-900 dark:text-gray-200 placeholder:text-gray-400 sm:text-sm sm:leading-6 focus:ring-0"
-            placeholder="A trivia topic"
-            value={input}
-            onChange={handleInputChange}
-            autoComplete="off"
-          />
+          <div className="mt-2 flex rounded-md shadow-sm">
+            <div className="relative flex flex-grow items-stretch focus-within:z-10">
+              <input
+                type="topic"
+                id="topic"
+                value={input}
+                onChange={handleInputChange}
+                className={classNames(
+                  aiResponse ? "rounded-l-md" : "rounded-md",
+                  "block bg-transparent w-full border-0 py-4 pl-4 ring-1 ring-inset ring-gray-300 dark:ring-zinc-900 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-md sm:leading-6"
+                )}
+                placeholder="Type in a topic or theme you want inspiration..."
+                autoComplete="off"
+              />
+            </div>
+            {aiResponse && (
+              <button
+                type="button"
+                className="relative -ml-px inline-flex items-center gap-x-1.5 rounded-r-md px-5 py-2 text-sm font-semibold  ring-2 ring-inset ring-gray-300 dark:ring-zinc-900 hover:bg-gray-50 dark:hover:bg-zinc-500"
+              >
+                Skip
+              </button>
+            )}
+          </div>
         </form>
       </div>
     );
