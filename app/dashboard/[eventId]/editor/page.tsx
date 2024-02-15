@@ -88,7 +88,7 @@ export default function EditorByIdPage() {
   const [startErrorMsg, setStartErrorMsg] = useState("");
 
   // TriviaAI
-  const [aiResponse, setAiResponse] = useState<TriviaItem[]>();
+  const [aiResponse, setAiResponse] = useState<TriviaItem[]>([]);
   const [aiResponseLoading, setAiResponseLoading] = useState(false);
 
   // Other
@@ -611,7 +611,7 @@ export default function EditorByIdPage() {
          * Ensure rounds are rendered in horizonal scroll view when wider than container
          */}
         {rounds?.map((item) => (
-          <span className="isolate inline-flex rounded-md my-1 w-full">
+          <span key={item.id} className="isolate inline-flex rounded-md my-1 w-full">
             <button
               type="button"
               className={classNames(
