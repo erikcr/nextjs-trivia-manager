@@ -24,6 +24,7 @@ import { RoundsWithQuestions } from "@/types/app.types";
 // Components
 import Notification from "@/components/Notification";
 import RoundSlideout from "@/components/slideouts/RoundSlideout";
+import ThemeSwitcher from "@/components/ThemeSwitcher";
 
 function classNames(...classes: any[]) {
   return classes.filter(Boolean).join(" ");
@@ -345,7 +346,7 @@ export default function EditorByIdPage() {
       {/**
        * Main content
        */}
-      <main className="fixed top-32 md:top-16 bottom-0 left-1/4 right-1/4 border-x border-gray-400 dark:border-zinc-700 text-gray-900 dark:text-gray-200">
+      <main className="fixed top-32 md:top-16 bottom-0 left-1/4 right-0 border-l border-gray-400 dark:border-zinc-700 text-gray-900 dark:text-gray-200">
         <MainContent />
       </main>
 
@@ -359,7 +360,10 @@ export default function EditorByIdPage() {
       {/**
        * Bottom input for TriviaAI
        */}
-      <div className="fixed bottom-0 z-10 left-1/4 right-1/4 w-1/2 flex rounded-t-md h-72 shrink-0 px-2 pt-2 gap-x-4 bg-white dark:bg-zinc-700 border border-gray-400 dark:border-zinc-700 shadow-2 text-gray-900 dark:text-gray-200">
+      {/* <div className="fixed bottom-0 z-10 left-1/4 right-1/4 w-1/2 flex rounded-t-md h-72 shrink-0 px-2 pt-2 gap-x-4 bg-gray-300 dark:bg-zinc-700 border border-gray-400 dark:border-zinc-700 shadow-2 text-gray-900 dark:text-gray-200">
+        <BottomContent />
+      </div> */}
+      <div className="fixed bottom-0 z-10 left-1/4 flex rounded-t-md h-72 shrink-0 px-2 pt-2 gap-x-4 bg-gray-300 dark:bg-zinc-700 border border-gray-400 dark:border-zinc-700 shadow-2 text-gray-900 dark:text-gray-200">
         <BottomContent />
       </div>
 
@@ -513,6 +517,9 @@ export default function EditorByIdPage() {
                 {event?.status}
               </span>
             )}
+
+            <ThemeSwitcher />
+
             {/* <div className="relative flex flex-col items-center group">
               <button
                 type="button"
@@ -606,16 +613,15 @@ export default function EditorByIdPage() {
           <span className="block text-sm font-semibold">Add round</span>
         </button>
 
-        {/**
-         * TODO
-         * Ensure rounds are rendered in horizonal scroll view when wider than container
-         */}
         {rounds?.map((item) => (
-          <span key={item.id} className="isolate inline-flex rounded-md my-1 w-full">
+          <span
+            key={item.id}
+            className="isolate inline-flex rounded-md my-1 w-full"
+          >
             <button
               type="button"
               className={classNames(
-                "relative -ml-px inline-flex items-center rounded-l-md px-3 py-2 text-sm font-semibold border-r border-gray-400 dark:border-zinc-500 bg-gray-200 dark:bg-zinc-700 hover:bg-gray-100 dark:hover:bg-zinc-600 focus:z-10"
+                "relative -ml-px inline-flex items-center rounded-l-md px-3 py-2 text-sm font-semibold border-r border-gray-400 dark:border-zinc-500 bg-gray-300 hover:bg-gray-400 dark:bg-zinc-700 dark:hover:bg-zinc-600 focus:z-10"
               )}
             >
               <PencilSquareIcon
@@ -633,7 +639,7 @@ export default function EditorByIdPage() {
               className={classNames(
                 item.id === activeRound?.id
                   ? "bg-primary dark:bg-primary-dark"
-                  : "bg-gray-200 dark:bg-zinc-700 hover:bg-gray-100 dark:hover:bg-primary-dark",
+                  : "bg-gray-300 dark:bg-zinc-700 hover:bg-primary dark:hover:bg-primary-dark",
                 "w-full relative inline-flex items-center rounded-r-md px-3 py-2 text-sm font-medium"
               )}
               aria-current={item.id === activeRound?.id ? "page" : undefined}
@@ -1044,18 +1050,16 @@ export default function EditorByIdPage() {
             className="absolute inset-0 flex items-center"
             aria-hidden="true"
           >
-            <div className="w-full border-t border-gray-300 dark:border-zinc-900" />
+            <div className="w-full border-t border-gray-500 dark:border-zinc-900" />
           </div>
           <div className="relative flex justify-center">
-            <span className="bg-white dark:bg-zinc-700 px-2 text-md text-gray-500 dark:text-zinc-200">
+            <span className="bg-gray-300 dark:bg-zinc-700 px-2 text-md text-gray-500 dark:text-zinc-200">
               Get help from TriviaAI
             </span>
           </div>
         </div>
 
-        <form
-          onSubmit={handleSubmit}
-        >
+        <form onSubmit={handleSubmit}>
           <div className="mt-5 flex rounded-md shadow-sm">
             <div className="relative flex flex-grow items-stretch focus-within:z-10">
               <input
@@ -1065,7 +1069,7 @@ export default function EditorByIdPage() {
                 onChange={handleInputChange}
                 className={classNames(
                   aiResponse ? "rounded-l-md" : "rounded-md",
-                  "block bg-transparent w-full border-0 py-4 pl-4 ring-1 ring-inset ring-gray-300 dark:ring-zinc-900 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-md sm:leading-6"
+                  "block bg-transparent w-full border-0 py-4 pl-4 ring-1 ring-inset ring-gray-500 dark:ring-zinc-900 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-md sm:leading-6"
                 )}
                 placeholder="Type in a topic or theme you want inspiration..."
                 autoComplete="off"
@@ -1074,7 +1078,7 @@ export default function EditorByIdPage() {
             {aiResponse && (
               <button
                 type="button"
-                className="relative -ml-px inline-flex items-center gap-x-1.5 rounded-r-md px-5 py-2 text-sm font-semibold  ring-2 ring-inset ring-gray-300 dark:ring-zinc-900 hover:bg-gray-50 dark:hover:bg-zinc-500"
+                className="relative -ml-px inline-flex items-center gap-x-1.5 rounded-r-md px-5 py-2 text-sm font-semibold ring-1 ring-inset ring-gray-500 dark:ring-zinc-900 hover:bg-gray-50 dark:hover:bg-zinc-500"
                 onClick={() => removeQuestionFromAI()}
               >
                 Skip
