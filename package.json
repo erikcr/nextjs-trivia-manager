@@ -22,7 +22,7 @@
     "next": "14.0.3",
     "next-qrcode": "^2.5.1",
     "next-themes": "^0.2.1",
-    "openai": "^4.19.0",
+    "openai": "^4.28.0",
     "react": "^18",
     "react-dom": "^18"
   },
