@@ -993,7 +993,10 @@ export default function EditorByIdPage() {
     return (
       <div className="w-full">
         <div className="space-y-1">
-          <form action={addQuestion} ref={addFormRef}>
+          <form
+            action={questionToEdit ? updateQuestion : addQuestion}
+            ref={addFormRef}
+          >
             <div className="pt-2">
               {/* Question */}
               <div className="sm:col-span-2">
@@ -1005,7 +1008,7 @@ export default function EditorByIdPage() {
                   rows={2}
                   placeholder="Question"
                   className="block w-full rounded-md border-0 py-1.5 text-gray-900 dark:bg-zinc-800 dark:text-gray-200 shadow-sm dark:shadow-gray-700 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary dark:focus-primary-dark sm:text-sm sm:leading-6"
-                  defaultValue={questionToAdd ? questionToAdd.question : ""}
+                  defaultValue={questionToEdit ? questionToEdit.question : ""}
                 />
               </div>
 
@@ -1019,7 +1022,7 @@ export default function EditorByIdPage() {
                     name="answer"
                     placeholder="Answer"
                     className="block w-full rounded-md border-0 py-1.5 text-gray-900 dark:bg-zinc-800 dark:text-gray-200 shadow-sm dark:shadow-gray-700 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary dark:focus-primary-dark sm:text-sm sm:leading-6"
-                    defaultValue={questionToAdd ? questionToAdd.answer : ""}
+                    defaultValue={questionToEdit ? questionToEdit.answer : ""}
                   />
                 </div>
 
@@ -1032,7 +1035,9 @@ export default function EditorByIdPage() {
                     id="points"
                     placeholder="Points"
                     className="block w-full rounded-md border-0 py-1.5 text-gray-900 dark:bg-zinc-800 dark:text-gray-200 shadow-sm dark:shadow-gray-700 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary dark:focus-primary-dark sm:text-sm sm:leading-6"
-                    defaultValue={1}
+                    defaultValue={
+                      questionToEdit ? Number(questionToEdit.points) : 1
+                    }
                   />
                 </div>
 
@@ -1040,9 +1045,9 @@ export default function EditorByIdPage() {
                   <button
                     disabled={addQuestionLoading}
                     type="submit"
-                    className=" justify-center rounded-md bg-primary dark:bg-primary-dark px-3 py-2 text-sm font-semibold text-white hover:bg-primary-hover dark:hover:bg-primary-dark-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+                    className="w-full justify-center rounded-md bg-primary dark:bg-primary-dark px-3 py-2 text-sm font-semibold text-white hover:bg-primary-hover dark:hover:bg-primary-dark-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
                   >
-                    <>Add</>
+                    {questionToEdit ? <>Save</> : <>Add</>}
                   </button>
                 </div>
               </div>
