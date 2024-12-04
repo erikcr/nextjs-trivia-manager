@@ -5,11 +5,11 @@ import { usePathname, useRouter } from "next/navigation";
 import Image from "next/image";
 import { ArrowRightOnRectangleIcon } from "@heroicons/react/24/outline";
 
-import logoTriviaLynx from "@/public/logos/trivialynx-logo.svg";
-import logoTriviaLynxDark from "@/public/logos/trivialynx-logo-dark.svg";
+import logoTriviaLynx from "@/assets/logos/trivialynx-logo.svg";
+import logoTriviaLynxDark from "@/assets/logos/trivialynx-logo-dark.svg";
 
 // Supabase
-import { createClient } from "@/utils/supabase/client";
+import { createClient } from "@/lib/supabase/client";
 
 // Components
 import ThemeSwitcher from "@/components/ThemeSwitcher";

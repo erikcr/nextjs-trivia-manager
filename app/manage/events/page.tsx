@@ -14,8 +14,8 @@ import {
 
 // Supabase
 import { User } from "@supabase/supabase-js";
-import { createClient } from "@/utils/supabase/client";
-import { Tables } from "@/types/database.types";
+import { createClient } from "@/lib/supabase/client";
+import { Tables } from "@/lib/types/database.types";
 
 // Components
 import Notification from "@/components/Notification";

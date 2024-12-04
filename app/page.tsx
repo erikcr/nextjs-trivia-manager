@@ -8,11 +8,11 @@ import { Dialog } from "@headlessui/react";
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 import { ChevronRightIcon } from "@heroicons/react/20/solid";
 
-import { createClient } from "@/utils/supabase/client";
+import { createClient } from "@/lib/supabase/client";
 
-import logoTriviaLynx from "@/public/logos/trivialynx-logo.svg";
-import logoTriviaLynxDark from "@/public/logos/trivialynx-logo-dark.svg";
-import appScreenshot from "@/public/app-screenshot.png";
+import logoTriviaLynx from "@/assets/logos/trivialynx-logo.svg";
+import logoTriviaLynxDark from "@/assets/logos/trivialynx-logo-dark.svg";
+import appScreenshot from "@/assets/app-screenshot.png";
 
 const navigation: any[] = [];
 

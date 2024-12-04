@@ -1,9 +1,9 @@
 import { headers, cookies } from "next/headers";
-import { createClient } from "@/utils/supabase/server";
+import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import Image from "next/image";
 
-import headerLogo from "@/public/logos/trivialynx-logo.svg";
+import headerLogo from "@/assets/logos/trivialynx-logo.svg";
 import { XCircleIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { Transition } from "@headlessui/react";
 import { Fragment } from "react";

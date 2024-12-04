@@ -1,6 +1,6 @@
 import Image from "next/image";
 
-import headerLogo from "@/public/logos/trivialynx-logo.svg";
+import headerLogo from "@/assets/logos/trivialynx-logo.svg";
 
 export default function MagicLinkPage({}: {}) {
   return (

@@ -10,14 +10,14 @@ import {
   XCircleIcon,
 } from "@heroicons/react/24/outline";
 
-import logoTriviaLynx from "@/public/logos/trivialynx-logo.svg";
-import logoTriviaLynxDark from "@/public/logos/trivialynx-logo-dark.svg";
+import logoTriviaLynx from "@/assets/logos/trivialynx-logo.svg";
+import logoTriviaLynxDark from "@/assets/logos/trivialynx-logo-dark.svg";
 
 // Supabase
 import { User } from "@supabase/supabase-js";
-import { createClient } from "@/utils/supabase/client";
-import { Tables } from "@/types/database.types";
-import { TeamScoresSorted } from "@/types/app.types";
+import { createClient } from "@/lib/supabase/client";
+import { Tables } from "@/lib/types/database.types";
+import { TeamScoresSorted } from "@/lib/types/app.types";
 
 function classNames(...classes: any[]) {
   return classes.filter(Boolean).join(" ");

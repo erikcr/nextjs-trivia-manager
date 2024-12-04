@@ -13,14 +13,14 @@ import {
 } from "@heroicons/react/24/outline";
 import { useChat } from "ai/react";
 
-import logoTriviaLynx from "@/public/logos/trivialynx-logo.svg";
-import logoTriviaLynxDark from "@/public/logos/trivialynx-logo-dark.svg";
+import logoTriviaLynx from "@/assets/logos/trivialynx-logo.svg";
+import logoTriviaLynxDark from "@/assets/logos/trivialynx-logo-dark.svg";
 
 // Supabase
 import { PostgrestError, User } from "@supabase/supabase-js";
-import { createClient } from "@/utils/supabase/client";
-import { Tables } from "@/types/database.types";
-import { RoundsWithQuestions } from "@/types/app.types";
+import { createClient } from "@/lib/supabase/client";
+import { Tables } from "@/lib/types/database.types";
+import { RoundsWithQuestions } from "@/lib/types/app.types";
 
 // Components
 import Notification from "@/components/Notification";

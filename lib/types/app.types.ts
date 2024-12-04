@@ -1,5 +1,5 @@
 import { Tables } from "./database.types";
-import { createClient } from "@/utils/supabase/client";
+import { createClient } from "@/lib/supabase/client";
 import { PostgrestError, QueryResult, QueryData, QueryError } from '@supabase/supabase-js'
 
 const supabase = createClient();
