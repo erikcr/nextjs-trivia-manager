@@ -1,4 +1,4 @@
-import { cookies } from "next/headers";
+import { headers, cookies } from "next/headers";
 import { createClient } from "@/utils/supabase/server";
 import { redirect } from "next/navigation";
 import Image from "next/image";
@@ -8,29 +8,54 @@ import { XCircleIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { Transition } from "@headlessui/react";
 import { Fragment } from "react";
 
-export default function LoginScreen({
-  searchParams,
-}: {
-  searchParams?: { [key: string]: string | string[] | undefined };
-}) {
-  const signIn = async (formData: FormData) => {
+export default function LoginScreen() {
+  // const sendMagicLink = async (formData: FormData) => {
+  //   "use server";
+
+  //   const email = formData.get("email") as string;
+
+  //   if (!email) {
+  //     return redirect("?error=Email is empty");
+  //   }
+
+  //   const origin = headers().get("origin");
+  //   const supabase = createClient();
+
+  //   const { data, error } = await supabase.auth.signInWithOtp({
+  //     email,
+  //     options: {
+  //       emailRedirectTo: `${origin}`,
+  //     },
+  //   });
+
+  //   if (error) {
+  //     return redirect(`?error=${error?.message}`);
+  //   } else {
+  //     return redirect(`${origin}/home`);
+  //   }
+  // };
+
+  const signInAsUser = async (formData: FormData) => {
     "use server";
 
     const email = formData.get("email") as string;
-    const password = formData.get("password") as string;
-    const cookieStore = cookies();
-    const supabase = createClient(cookieStore);
 
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-
-    if (error) {
-      return redirect("/auth/magic?message=Could not authenticate user");
+    if (!email) {
+      return redirect("?error=Email is empty");
     }
 
-    return redirect("/manage/events");
+    const supabase = createClient();
+
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email: email,
+      password: "password",
+    });
+
+    if (data.user) {
+      return redirect("/home?sv-status=testing");
+    } else {
+      return redirect(`?error=${error?.message}`);
+    }
   };
 
   return (
@@ -49,7 +74,7 @@ export default function LoginScreen({
         </div>
 
         <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-          <form className="space-y-6" action={signIn} method="POST">
+          <form className="space-y-6" action={signInAsUser} method="POST">
             <div>
               <label
                 htmlFor="email"
@@ -142,13 +167,13 @@ export default function LoginScreen({
         </div>
       </div>
 
-      {searchParams?.message && (
+      {/* {searchParams?.message && (
         <div
           aria-live="assertive"
           className="pointer-events-none fixed inset-0 flex items-end px-4 py-6 sm:items-start sm:p-6"
         >
           <div className="flex w-full flex-col items-center space-y-4 sm:items-end">
-            {/* Notification panel, dynamically insert this into the live region when it needs to be displayed */}
+            Notification panel, dynamically insert this into the live region when it needs to be displayed
             <div className="pointer-events-auto w-full max-w-sm overflow-hidden rounded-lg bg-white shadow-lg ring-1 ring-black ring-opacity-5">
               <div className="p-4">
                 <div className="flex items-start">
@@ -171,7 +196,7 @@ export default function LoginScreen({
             </div>
           </div>
         </div>
-      )}
+      )} */}
     </>
   );
 }

@@ -1,26 +1,22 @@
-import { headers, cookies } from "next/headers";
+
 import { createClient } from "@/utils/supabase/server";
 import { redirect } from "next/navigation";
 import Image from "next/image";
 
 import headerLogo from "@/public/logos/trivialynx-logo.svg";
+import { cookies, headers } from "next/headers";
 
 export default function SignupScreen({}: {}) {
   const signUp = async (formData: FormData) => {
     "use server";
 
-    const origin = headers().get("origin");
     const email = formData.get("email") as string;
     const password = formData.get("password") as string;
-    const cookieStore = cookies();
-    const supabase = createClient(cookieStore);
+    const supabase = createClient();
 
     const { error } = await supabase.auth.signUp({
       email,
       password,
-      options: {
-        emailRedirectTo: `${origin}/api/auth/callback`,
-      },
     });
 
     if (error) {
