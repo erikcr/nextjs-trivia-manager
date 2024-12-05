@@ -207,10 +207,10 @@ export default function EditorByIdPage() {
                   setRoundSlideoutOpen={setRoundSlideoutOpen}
                 />
 
-                <div className="flex-1 min-h-0 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 flex flex-col gap-2 ">
+                <div className="flex-1 min-h-0 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 flex flex-col ">
                   <h2 className="text-lg font-semibold py-2 px-4">AI Question Generator</h2>
 
-                  <div className="flex-shrink-0 px-4 border-b border-gray-200 dark:border-gray-700">
+                  <div className="flex-shrink-0 px-4 pb-2 border-b border-gray-200 dark:border-gray-700">
                     <TopicInput onSubmit={handleGenerateQuestions} loading={isGenerating} />
                   </div>
 
