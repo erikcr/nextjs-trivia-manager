@@ -1,7 +1,8 @@
 import { create } from 'zustand';
-import { Database } from '@/lib/types/database.types';
-import { createClient } from '@/lib/supabase/client';
+
 import { useUserStore } from '@/lib/store/user-store';
+import { createClient } from '@/lib/supabase/client';
+import { Database } from '@/lib/types/database.types';
 
 type Tables = Database['public']['Tables'];
 export type Round = Tables['round']['Row'];
@@ -21,7 +22,7 @@ export interface RoundStoreState {
   questionToEdit: Question | null;
   addRoundLoading: boolean;
   addQuestionLoading: boolean;
-  
+
   // Basic setters
   setRounds: (rounds: Round[]) => void;
   setQuestions: (questions: Question[]) => void;
@@ -81,7 +82,7 @@ export const useRoundStore = create<RoundStoreState>((set, get) => ({
     try {
       set({ loading: true, error: null });
       const user = useUserStore.getState().user;
-      
+
       if (!user) throw new Error('No user');
 
       const { data, error } = await supabase
@@ -105,27 +106,29 @@ export const useRoundStore = create<RoundStoreState>((set, get) => ({
       set({ loading: true, error: null, addRoundLoading: true });
       const user = useUserStore.getState().user;
       const currentRounds = get().rounds;
-      
+
       if (!user) throw new Error('No user');
 
       const { data, error } = await supabase
         .from('round')
-        .insert([{ 
-          ...round, 
-          created_by: user.id, 
-          updated_by: user.id,
-          sequence_number: (currentRounds?.length || 0) + 1
-        }])
+        .insert([
+          {
+            ...round,
+            created_by: user.id,
+            updated_by: user.id,
+            sequence_number: (currentRounds?.length || 0) + 1,
+          },
+        ])
         .select()
         .single();
 
       if (error) throw error;
-      
+
       // Update the rounds array with the new round
       if (data) {
         set({ rounds: [...currentRounds, data] });
       }
-      
+
       return data;
     } catch (error) {
       set({ error: error as Error });
@@ -140,7 +143,7 @@ export const useRoundStore = create<RoundStoreState>((set, get) => ({
     try {
       set({ loading: true, error: null });
       const user = useUserStore.getState().user;
-      
+
       if (!user) throw new Error('No user');
 
       const { data, error } = await supabase
@@ -164,10 +167,7 @@ export const useRoundStore = create<RoundStoreState>((set, get) => ({
   deleteRound: async (id) => {
     try {
       set({ loading: true, error: null });
-      const { error } = await supabase
-        .from('round')
-        .delete()
-        .eq('id', id);
+      const { error } = await supabase.from('round').delete().eq('id', id);
 
       if (error) throw error;
       return true;
@@ -184,7 +184,7 @@ export const useRoundStore = create<RoundStoreState>((set, get) => ({
     try {
       set({ loading: true, error: null });
       const user = useUserStore.getState().user;
-      
+
       if (!user) throw new Error('No user');
 
       const { data, error } = await supabase
@@ -207,12 +207,22 @@ export const useRoundStore = create<RoundStoreState>((set, get) => ({
     try {
       set({ loading: true, error: null, addQuestionLoading: true });
       const user = useUserStore.getState().user;
-      
+      const activeRound = get().activeRound;
+      const questions = get().questions;
+
       if (!user) throw new Error('No user');
+      if (!activeRound) throw new Error('No active round');
 
       const { data, error } = await supabase
         .from('question')
-        .insert([{ ...question, created_by: user.id, updated_by: user.id }])
+        .insert([
+          {
+            ...question,
+            created_by: user.id,
+            updated_by: user.id,
+            sequence_number: (questions?.length || 0) + 1,
+          },
+        ])
         .select()
         .single();
 
@@ -231,7 +241,7 @@ export const useRoundStore = create<RoundStoreState>((set, get) => ({
     try {
       set({ loading: true, error: null });
       const user = useUserStore.getState().user;
-      
+
       if (!user) throw new Error('No user');
 
       const { data, error } = await supabase
@@ -255,10 +265,7 @@ export const useRoundStore = create<RoundStoreState>((set, get) => ({
   deleteQuestion: async (id) => {
     try {
       set({ loading: true, error: null });
-      const { error } = await supabase
-        .from('question')
-        .delete()
-        .eq('id', id);
+      const { error } = await supabase.from('question').delete().eq('id', id);
 
       if (error) throw error;
       return true;
@@ -284,7 +291,7 @@ export const useRoundStore = create<RoundStoreState>((set, get) => ({
         },
         () => {
           get().fetchRounds(eventId);
-        }
+        },
       )
       .subscribe();
 
@@ -307,7 +314,7 @@ export const useRoundStore = create<RoundStoreState>((set, get) => ({
         },
         () => {
           get().fetchQuestions(roundId);
-        }
+        },
       )
       .subscribe();
 

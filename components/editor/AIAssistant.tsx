@@ -1,25 +1,25 @@
 'use client';
 
 import { useState } from 'react';
-import { Dialog, Transition } from '@headlessui/react';
 import { Fragment } from 'react';
+
+import { DialogTitle } from '../ui/dialog';
+import { Dialog, DialogPanel, Transition, TransitionChild } from '@headlessui/react';
 import { SparklesIcon } from '@heroicons/react/24/outline';
 
 interface AIAssistantProps {
   isOpen: boolean;
   setIsOpen: (open: boolean) => void;
-  onQuestionsGenerated: (questions: Array<{
-    question: string;
-    answer: string;
-    points?: number;
-  }>) => void;
+  onQuestionsGenerated: (
+    questions: Array<{
+      question: string;
+      answer: string;
+      points?: number;
+    }>,
+  ) => void;
 }
 
-export default function AIAssistant({
-  isOpen,
-  setIsOpen,
-  onQuestionsGenerated,
-}: AIAssistantProps) {
+export default function AIAssistant({ isOpen, setIsOpen, onQuestionsGenerated }: AIAssistantProps) {
   const [prompt, setPrompt] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -34,7 +34,7 @@ export default function AIAssistant({
           points: 10,
         },
         {
-          question: 'Who wrote the Half-Blood Prince\'s potions book?',
+          question: "Who wrote the Half-Blood Prince's potions book?",
           answer: 'Severus Snape',
           points: 10,
         },
@@ -53,7 +53,7 @@ export default function AIAssistant({
   return (
     <Transition appear show={isOpen} as={Fragment}>
       <Dialog as="div" className="relative z-50" onClose={() => setIsOpen(false)}>
-        <Transition.Child
+        <TransitionChild
           as={Fragment}
           enter="ease-out duration-300"
           enterFrom="opacity-0"
@@ -63,11 +63,11 @@ export default function AIAssistant({
           leaveTo="opacity-0"
         >
           <div className="fixed inset-0 bg-black bg-opacity-25" />
-        </Transition.Child>
+        </TransitionChild>
 
         <div className="fixed inset-0 overflow-y-auto">
           <div className="flex min-h-full items-center justify-center p-4 text-center">
-            <Transition.Child
+            <TransitionChild
               as={Fragment}
               enter="ease-out duration-300"
               enterFrom="opacity-0 scale-95"
@@ -76,17 +76,15 @@ export default function AIAssistant({
               leaveFrom="opacity-100 scale-100"
               leaveTo="opacity-0 scale-95"
             >
-              <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white dark:bg-zinc-900 p-6 text-left align-middle shadow-xl transition-all">
-                <Dialog.Title
-                  as="h3"
-                  className="text-lg font-medium leading-6 text-gray-900 dark:text-gray-100 flex items-center gap-2"
-                >
+              <DialogPanel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white dark:bg-zinc-900 p-6 text-left align-middle shadow-xl transition-all">
+                <DialogTitle className="text-lg font-medium leading-6 text-gray-900 dark:text-gray-100 flex items-center gap-2">
                   <SparklesIcon className="h-5 w-5 text-primary dark:text-primary-dark" />
                   AI Question Generator
-                </Dialog.Title>
+                </DialogTitle>
                 <div className="mt-2">
                   <p className="text-sm text-gray-500 dark:text-gray-400">
-                    Describe the topic or type of questions you want to generate. Be specific for better results.
+                    Describe the topic or type of questions you want to generate. Be specific for
+                    better results.
                   </p>
                 </div>
 
@@ -117,8 +115,8 @@ export default function AIAssistant({
                     {loading ? 'Generating...' : 'Generate Questions'}
                   </button>
                 </div>
-              </Dialog.Panel>
-            </Transition.Child>
+              </DialogPanel>
+            </TransitionChild>
           </div>
         </div>
       </Dialog>

@@ -4,11 +4,18 @@ import { useEffect, useRef, useState } from 'react';
 
 import { useParams } from 'next/navigation';
 
+import { Message } from 'ai';
+import { cx } from '@/lib/utils';
+
 import EditorHeader from '@/components/editor/EditorHeader';
 import QuestionGrid from '@/components/editor/QuestionGrid';
 import RoundNavigation from '@/components/editor/RoundNavigation';
 import QuestionSlideout from '@/components/slideouts/QuestionSlideout';
 import RoundSlideout from '@/components/slideouts/RoundSlideout';
+import TopicInput from '@/components/ai/TopicInput';
+import GeneratedQuestions from '@/components/ai/GeneratedQuestions';
+import ChatMessage from '@/components/ai/ChatMessage';
+import ChatInput from '@/components/ai/ChatInput';
 // Store
 import { useEventStore } from '@/lib/store/event-store';
 import { useRoundStore } from '@/lib/store/round-store';
@@ -37,6 +44,17 @@ export default function EditorByIdPage() {
   const [roundToEdit, setRoundToEdit] = useState<any>(null);
   const [questionToEdit, setQuestionToEdit] = useState<any>(null);
 
+  // AI states
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [generatedQuestions, setGeneratedQuestions] = useState<Array<{
+    question: string;
+    answer: string;
+    points?: number;
+    selected?: boolean;
+  }>>([]);
+
+  const [messages, setMessages] = useState<Message[]>([]);
+
   // Refs
   const addFormRef = useRef<HTMLFormElement>(null);
 
@@ -63,6 +81,53 @@ export default function EditorByIdPage() {
     } catch (error) {
       console.error('Error adding questions:', error);
     }
+  };
+
+  const handleGenerateQuestions = async (topic: string) => {
+    setIsGenerating(true);
+    try {
+      // TODO: Replace with actual AI call
+      // Simulating API call
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      setGeneratedQuestions([
+        {
+          question: "What was the first spacecraft to land on Mars?",
+          answer: "Viking 1",
+          points: 10,
+          selected: false
+        },
+        {
+          question: "Who was the first American woman in space?",
+          answer: "Sally Ride",
+          points: 10,
+          selected: false
+        },
+        {
+          question: "What is the largest planet in our solar system?",
+          answer: "Jupiter",
+          points: 10,
+          selected: false
+        }
+      ]);
+    } catch (error) {
+      console.error('Error generating questions:', error);
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  const handleSelectQuestion = (index: number) => {
+    setGeneratedQuestions(prev => 
+      prev.map((q, i) => i === index ? { ...q, selected: !q.selected } : q)
+    );
+  };
+
+  const handleAddSelectedQuestions = async () => {
+    const selectedQuestions = generatedQuestions.filter(q => q.selected);
+    if (selectedQuestions.length === 0) return;
+
+    await handleAddQuestions(selectedQuestions);
+    setGeneratedQuestions(prev => prev.map(q => ({ ...q, selected: false })));
   };
 
   const handleQuestionClick = (question: any) => {
@@ -131,12 +196,36 @@ export default function EditorByIdPage() {
 
           <div className="mx-auto max-w-7xl p-4 sm:p-6 lg:p-8">
             {activeRound ? (
-              <QuestionGrid
-                questions={questions}
-                loading={questionsLoading}
-                onQuestionClick={handleQuestionClick}
-                onAddQuestion={handleAddQuestions}
-              />
+              <div className="grid grid-cols-1 lg:grid-cols-[3fr,2fr] gap-6">
+                <div>
+                  <QuestionGrid
+                    questions={questions}
+                    loading={questionsLoading}
+                    onQuestionClick={handleQuestionClick}
+                    onAddQuestion={handleAddQuestions}
+                  />
+                </div>
+                
+                <div className="space-y-4">
+                  <h2 className="text-lg font-semibold">AI Question Generator</h2>
+                  <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 h-[600px] flex flex-col">
+                    <div className="p-4 border-b border-gray-200 dark:border-gray-700">
+                      <TopicInput 
+                        onSubmit={handleGenerateQuestions}
+                        loading={isGenerating}
+                      />
+                    </div>
+                    <div className="flex-1 overflow-y-auto p-4">
+                      <GeneratedQuestions
+                        questions={generatedQuestions}
+                        loading={isGenerating}
+                        onSelect={handleSelectQuestion}
+                        onAddSelected={handleAddSelectedQuestions}
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
             ) : (
               <div className="flex h-96 items-center justify-center">
                 <div className="text-center">
