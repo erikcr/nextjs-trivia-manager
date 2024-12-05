@@ -32,7 +32,7 @@ export default function RoundSlideout({
   user: User | null;
   rounds: RoundsWithQuestions | undefined;
   setRounds: Function;
-  roundToEdit: Tables<"round"> | undefined;
+  roundToEdit: Tables<"round"> | null;
   setRoundToEdit: Function;
   roundSlideoutOpen: boolean;
   setRoundSlideoutOpen: Function;
