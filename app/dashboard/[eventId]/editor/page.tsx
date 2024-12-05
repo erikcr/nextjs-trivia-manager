@@ -191,38 +191,31 @@ export default function EditorByIdPage() {
   }
 
   return (
-    <div className="flex h-full flex-col">
+    <div className="flex min-h-screen flex-col">
       <EditorHeader event={currentEvent} />
+      <main className="flex-1 pt-4">
+        <div className="mx-auto max-w-7xl px-4 pb-12 sm:px-6 lg:px-8">
+          {activeRound ? (
+            <div className="grid h-[calc(100vh-9rem)] grid-cols-1 lg:grid-cols-[1fr,2fr] gap-6">
+              {/* Left Column - AI Generator */}
+              <div className="flex max-h-full flex-col overflow-hidden gap-3">
+                <RoundNavigation
+                  rounds={rounds}
+                  activeRound={activeRound}
+                  setActiveRound={setActiveRound}
+                  setRoundToEdit={setRoundToEdit}
+                  setRoundSlideoutOpen={setRoundSlideoutOpen}
+                />
 
-      <div className="flex flex-1 items-stretch overflow-hidden">
-        <main className="flex-1 overflow-y-auto">
-          <RoundNavigation
-            rounds={rounds}
-            activeRound={activeRound}
-            setActiveRound={setActiveRound}
-            setRoundToEdit={setRoundToEdit}
-            setRoundSlideoutOpen={setRoundSlideoutOpen}
-          />
+                <div className="flex-1 min-h-0 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 flex flex-col gap-2 ">
+                  <h2 className="text-lg font-semibold py-2 px-4">AI Question Generator</h2>
 
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            {activeRound ? (
-              <div className="grid grid-cols-1 lg:grid-cols-[3fr,2fr] gap-6">
-                <div>
-                  <QuestionGrid
-                    questions={questions}
-                    loading={questionsLoading}
-                    onQuestionClick={handleQuestionClick}
-                    setQuestionSlideoutOpen={() => setQuestionSlideoutOpen(true)}
-                  />
-                </div>
+                  <div className="flex-shrink-0 px-4 border-b border-gray-200 dark:border-gray-700">
+                    <TopicInput onSubmit={handleGenerateQuestions} loading={isGenerating} />
+                  </div>
 
-                <div className="space-y-4">
-                  <h2 className="text-lg font-semibold">AI Question Generator</h2>
-                  <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 h-[600px] flex flex-col">
-                    <div className="p-4 border-b border-gray-200 dark:border-gray-700">
-                      <TopicInput onSubmit={handleGenerateQuestions} loading={isGenerating} />
-                    </div>
-                    <div className="flex-1 overflow-y-auto p-4">
+                  <div className="flex-1 overflow-y-auto">
+                    <div className="p-4">
                       <GeneratedQuestions
                         questions={generatedQuestions}
                         loading={isGenerating}
@@ -234,30 +227,42 @@ export default function EditorByIdPage() {
                   </div>
                 </div>
               </div>
-            ) : (
-              <div className="flex h-96 items-center justify-center">
-                <div className="text-center">
-                  <h3 className="mt-2 text-sm font-semibold text-gray-900 dark:text-gray-100">
-                    No round selected
-                  </h3>
-                  <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                    Get started by creating a new round or selecting an existing one.
-                  </p>
-                  <div className="mt-6">
-                    <button
-                      type="button"
-                      onClick={() => setRoundSlideoutOpen(true)}
-                      className="inline-flex items-center rounded-md bg-primary dark:bg-primary-dark px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary-hover dark:hover:bg-primary-dark-hover"
-                    >
-                      Create new round
-                    </button>
-                  </div>
+
+              {/* Right Column - Question Grid */}
+              <div className="flex max-h-full flex-col overflow-hidden">
+                <div className="flex-1 overflow-y-auto">
+                  <QuestionGrid
+                    questions={questions}
+                    loading={questionsLoading}
+                    onQuestionClick={handleQuestionClick}
+                    setQuestionSlideoutOpen={() => setQuestionSlideoutOpen(true)}
+                  />
                 </div>
               </div>
-            )}
-          </div>
-        </main>
-      </div>
+            </div>
+          ) : (
+            <div className="flex h-96 items-center justify-center">
+              <div className="text-center">
+                <h3 className="mt-2 text-sm font-semibold text-gray-900 dark:text-gray-100">
+                  No round selected
+                </h3>
+                <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                  Get started by creating a new round or selecting an existing one.
+                </p>
+                <div className="mt-6">
+                  <button
+                    type="button"
+                    onClick={() => setRoundSlideoutOpen(true)}
+                    className="inline-flex items-center rounded-md bg-primary dark:bg-primary-dark px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary-hover dark:hover:bg-primary-dark-hover"
+                  >
+                    Create new round
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      </main>
 
       {/* Slideouts */}
       <RoundSlideout
