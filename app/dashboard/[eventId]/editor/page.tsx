@@ -23,6 +23,7 @@ import Notification from '@/components/Notification';
 import ThemeSwitcher from '@/components/ThemeSwitcher';
 import RoundSlideout from '@/components/slideouts/RoundSlideout';
 import { DialogTitle } from '@/components/ui/dialog';
+import { useEventStore } from '@/lib/store/event-store';
 import { useRoundStore } from '@/lib/store/round-store';
 import { useUserStore } from '@/lib/store/user-store';
 import { RoundsWithQuestions } from '@/lib/types/app.types';
@@ -40,14 +41,18 @@ type TriviaItem = {
 export default function EditorByIdPage() {
   const { eventId } = useParams();
 
+  const router = useRouter();
+
   const { user } = useUserStore();
 
-  // Store
+  // Event Store
+  const { currentEvent, loading: eventLoading, fetchEvent, startEvent } = useEventStore();
+
+  // Round Store
   const {
-    rounds: storeRounds,
-    questions: storeQuestions,
-    loading: storeLoading,
-    error: storeError,
+    rounds,
+    questions,
+    loading,
     activeRound,
     roundToEdit,
     questionToEdit,
@@ -65,12 +70,6 @@ export default function EditorByIdPage() {
     deleteQuestion: deleteStoreQuestion,
   } = useRoundStore();
 
-  // Mobile responsiveness
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-
-  // Event
-  const [event, setEvent] = useState<Tables<'event'>>();
-
   // Notification
   const [notifShow, setNotifShow] = useState(false);
   const [notifTitle, setNotifTitle] = useState('');
@@ -79,10 +78,6 @@ export default function EditorByIdPage() {
   // Modal
   const [startConfirmShow, setStartConfirmShow] = useState(false);
   const cancelButtonRef = useRef(null);
-
-  // Tooltip
-  const [startDisabled, setStartDisabled] = useState(true);
-  const [startErrorMsg, setStartErrorMsg] = useState('');
 
   // TriviaAI
   const [aiResponse, setAiResponse] = useState<TriviaItem[]>();
@@ -137,7 +132,7 @@ export default function EditorByIdPage() {
       round_id: activeRound.id,
       created_by: user.id,
       updated_by: user.id,
-      sequence_number: (storeQuestions?.length || 0) + 1,
+      sequence_number: (questions?.length || 0) + 1,
     });
 
     if (newQuestion) {
@@ -145,6 +140,15 @@ export default function EditorByIdPage() {
       if (addFormRef.current) {
         addFormRef.current.reset();
       }
+    }
+  };
+
+  const handleStartEvent = async () => {
+    if (!currentEvent?.id) return;
+
+    const updatedEvent = await startEvent(currentEvent.id);
+    if (updatedEvent) {
+      router.push(`/dashboard/${updatedEvent.id}/ongoing`);
     }
   };
 
@@ -162,26 +166,20 @@ export default function EditorByIdPage() {
     }
   }, [activeRound]);
 
-  // useEffect(() => {
-  //   setStartErrorMsg('');
-  //   setStartDisabled(false);
-
-  //   if (!storeRounds?.length) {
-  //     setStartErrorMsg('Please add at least one round to start.');
-  //     setStartDisabled(true);
-  //   } else {
-  //     if (getQuestions().length === 0) {
-  //       setStartErrorMsg(`The round ${emptyRound.name} doesn't have any questions.`);
-  //       setStartDisabled(true);
-  //     }
-  //   }
-  // }, [storeRounds]);
-
   useEffect(() => {
-    if (user) {
+    if (user && eventId) {
+      fetchEvent(eventId as string);
       fetchRounds(eventId as string);
     }
-  }, [user]);
+  }, [user, eventId]);
+
+  useEffect(() => {
+    if (currentEvent?.status === 'ongoing') {
+      router.push(`/dashboard/${currentEvent.id}/ongoing`);
+    } else if (currentEvent?.status === 'completed') {
+      router.push(`/dashboard/${currentEvent.id}/final`);
+    }
+  }, [currentEvent]);
 
   return (
     <>
@@ -242,7 +240,7 @@ export default function EditorByIdPage() {
        */}
       <RoundSlideout
         user={user}
-        rounds={storeRounds}
+        rounds={rounds}
         setRounds={setActiveRound}
         roundToEdit={roundToEdit}
         setRoundToEdit={setRoundToEdit}
@@ -305,7 +303,7 @@ export default function EditorByIdPage() {
                     <button
                       type="button"
                       className="inline-flex w-full justify-center rounded-md bg-primary hover:bg-primary-hover dark:bg-primary-dark dark:hover:bg-primary-dark-hover px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary sm:col-start-2"
-                      // onClick={() => startEvent()}
+                      onClick={handleStartEvent}
                     >
                       Let&apos;s go
                       <RocketLaunchIcon className="h-5 w-5 pl-1 mr-2" />
@@ -365,7 +363,7 @@ export default function EditorByIdPage() {
           </div>
 
           <div className="flex lg:gap-x-12 text-xl">
-            <p>{event?.name}</p>
+            <p>{currentEvent?.name}</p>
           </div>
 
           <div className="flex lg:hidden">
@@ -379,7 +377,7 @@ export default function EditorByIdPage() {
           </div>
 
           <div className="hidden lg:flex lg:flex-1 lg:justify-end">
-            {event !== undefined && (
+            {currentEvent !== undefined && (
               <Listbox value={selected} onChange={setSelected}>
                 {({ open }) => (
                   <>
@@ -501,7 +499,7 @@ export default function EditorByIdPage() {
          * TODO
          * Ensure rounds are rendered in horizonal scroll view when wider than container
          */}
-        {storeRounds?.map((item) => (
+        {rounds?.map((item) => (
           <div key={item.id} className="inline-flex rounded-md shadow-sm mr-4">
             <button
               className={classNames(
@@ -543,7 +541,7 @@ export default function EditorByIdPage() {
           <span className="block text-sm font-semibold">Add round</span>
         </button>
 
-        {storeRounds?.map((item) => (
+        {rounds?.map((item) => (
           <span key={item.id} className="isolate inline-flex rounded-md my-1 w-full">
             <button
               type="button"
@@ -611,7 +609,7 @@ export default function EditorByIdPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200 dark:divide-zinc-700">
-                  {storeLoading && (
+                  {loading && (
                     <tr className="animate-pulse">
                       <td className="py-4 pl-4 pr-3 text-sm font-medium sm:pl-6 lg:pl-8">
                         <div className="bg-gray-200 dark:bg-gray-700 group flex justify-between gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold" />
@@ -623,7 +621,7 @@ export default function EditorByIdPage() {
                     </tr>
                   )}
 
-                  {!storeLoading && !storeQuestions?.length && (
+                  {!loading && !questions?.length && (
                     <tr>
                       <td className="py-4 pl-4 pr-3 text-sm font-medium sm:pl-6 lg:pl-8">
                         No questions yet.
@@ -633,7 +631,7 @@ export default function EditorByIdPage() {
                     </tr>
                   )}
 
-                  {storeQuestions?.map((item) => (
+                  {questions?.map((item) => (
                     <tr key={item.id}>
                       <td className="py-4 pl-4 pr-3 text-sm sm:pl-6 lg:pl-8">
                         {item.question_text}

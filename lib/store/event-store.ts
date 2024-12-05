@@ -13,15 +13,19 @@ export type EventUpdate = Tables['event']['Update'];
 
 export interface EventStoreState {
   events: Event[];
+  currentEvent: Event | null;
   loading: boolean;
   error: Error | null;
   setEvents: (events: Event[]) => void;
+  setCurrentEvent: (event: Event | null) => void;
   setLoading: (loading: boolean) => void;
   setError: (error: Error | null) => void;
   fetchEvents: () => Promise<void>;
+  fetchEvent: (id: string) => Promise<void>;
   createEvent: (event: Partial<EventInsert>) => Promise<Event | null>;
   updateEvent: (id: string, updates: Partial<EventUpdate>) => Promise<Event | null>;
   deleteEvent: (id: string) => Promise<boolean>;
+  startEvent: (id: string) => Promise<Event | null>;
   subscribeToEvents: () => void;
   unsubscribeFromEvents: () => void;
 }
@@ -30,11 +34,13 @@ const supabase = createClient();
 
 export const useEventStore = create<EventStoreState>((set, get) => ({
   events: [],
+  currentEvent: null,
   loading: false,
   error: null,
 
   // Basic setters
   setEvents: (events) => set({ events }),
+  setCurrentEvent: (event) => set({ currentEvent: event }),
   setLoading: (loading) => set({ loading }),
   setError: (error) => set({ error }),
 
@@ -49,13 +55,34 @@ export const useEventStore = create<EventStoreState>((set, get) => ({
       const { data, error } = await supabase
         .from('event')
         .select('*')
-        .or(`created_by.eq.${user.id}`)
-        .order('scheduled_at', { ascending: true });
-
-        console.log(data);
+        .eq('owner', user.id);
 
       if (error) throw error;
-      set({ events: data as Event[] });
+      set({ events: data || [] });
+    } catch (error) {
+      set({ error: error as Error });
+    } finally {
+      set({ loading: false });
+    }
+  },
+
+  // Fetch single event
+  fetchEvent: async (id) => {
+    try {
+      set({ loading: true, error: null });
+      const user = useUserStore.getState().user;
+      
+      if (!user) throw new Error('No user');
+
+      const { data, error } = await supabase
+        .from('event')
+        .select('*')
+        .eq('id', id)
+        .eq('owner', user.id)
+        .single();
+
+      if (error) throw error;
+      set({ currentEvent: data });
     } catch (error) {
       set({ error: error as Error });
     } finally {
@@ -164,6 +191,33 @@ export const useEventStore = create<EventStoreState>((set, get) => ({
     } catch (error) {
       set({ error: error as Error });
       return false;
+    } finally {
+      set({ loading: false });
+    }
+  },
+
+  // Start event
+  startEvent: async (id) => {
+    try {
+      set({ loading: true, error: null });
+      const user = useUserStore.getState().user;
+      
+      if (!user) throw new Error('No user');
+
+      const { data, error } = await supabase
+        .from('event')
+        .update({ status: 'ONGOING' })
+        .eq('id', id)
+        .eq('owner', user.id)
+        .select()
+        .single();
+
+      if (error) throw error;
+      set({ currentEvent: data });
+      return data;
+    } catch (error) {
+      set({ error: error as Error });
+      return null;
     } finally {
       set({ loading: false });
     }
