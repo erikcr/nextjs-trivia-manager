@@ -2,14 +2,12 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import { toast } from 'sonner';
 
 // Supabase
 import { User } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/client";
 import { Tables } from "@/lib/types/database.types";
-
-// Components
-import Notification from "@/components/Notification";
 
 function classNames(...classes: any[]) {
   return classes.filter(Boolean).join(" ");
@@ -25,12 +23,6 @@ export default function SettingsPage() {
   // User
   const [user, setUser] = useState<User | null>(null);
 
-  // Notifications
-  const [notifShow, setNotifShow] = useState(false);
-  const [notifTitle, setNotifTitle] = useState("");
-  const [notifDesc, setNotifDesc] = useState("");
-  const [notifType, setNotifType] = useState("");
-
   const updateEmail = async (formData: FormData) => {
     const email = formData.get("email") as string;
 
@@ -42,10 +34,9 @@ export default function SettingsPage() {
       console.error(error);
     } else if (data) {
       console.log(data);
-      setNotifTitle("Email updated");
-      setNotifDesc("Click the link sent to your new email to confirm change.");
-      setNotifType("success");
-      setNotifShow(true);
+      toast.success('Email updated', {
+        description: 'Click the link sent to your new email to confirm change.'
+      });
     }
   };
 
@@ -59,11 +50,7 @@ export default function SettingsPage() {
     console.log(error);
 
     if (data) {
-      setNotifTitle("Password updated");
-      setNotifDesc("");
-      setNotifType("success");
-      setNotifShow(true);
-
+      toast.success('Password updated');
       passwordForm.current?.reset();
     }
   };
@@ -254,17 +241,6 @@ export default function SettingsPage() {
           </form>
         </div> */}
       </div>
-
-      {/**
-       * Action notification
-       */}
-      <Notification
-        title={notifTitle}
-        type={notifType}
-        description={notifDesc}
-        show={notifShow}
-        setShow={setNotifShow}
-      />
     </>
   );
 }

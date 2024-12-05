@@ -7,19 +7,12 @@ import { useParams } from 'next/navigation';
 import { DialogTitle } from '../ui/dialog';
 import { Dialog, DialogPanel, Transition, TransitionChild } from '@headlessui/react';
 import { XMarkIcon } from '@heroicons/react/24/outline';
-// Supabase
-import { User } from '@supabase/supabase-js';
+import { toast } from 'sonner';
 
-// Components
-import Notification from '@/components/Notification';
 // Store
 import { useRoundStore } from '@/lib/store/round-store';
 import { RoundsWithQuestions } from '@/lib/types/app.types';
 import { Tables } from '@/lib/types/database.types';
-
-function classNames(...classes: any[]) {
-  return classes.filter(Boolean).join(' ');
-}
 
 export default function RoundSlideout({
   roundToEdit,
@@ -37,11 +30,6 @@ export default function RoundSlideout({
   // Round Store
   const { createRound, updateRound, setActiveRound } = useRoundStore();
 
-  // Notification
-  const [notifShow, setNotifShow] = useState(false);
-  const [notifTitle, setNotifTitle] = useState('');
-  const [notifType, setNotifType] = useState('');
-
   const handleClose = () => {
     setRoundSlideoutOpen(false);
     setRoundToEdit(null);
@@ -55,9 +43,7 @@ export default function RoundSlideout({
     });
 
     if (newRound) {
-      setNotifTitle('Round added');
-      setNotifType('success');
-      setNotifShow(true);
+      toast.success('Round added');
       setRoundSlideoutOpen(false);
       setActiveRound(newRound);
       setRoundToEdit(null);
@@ -73,9 +59,7 @@ export default function RoundSlideout({
     });
 
     if (updatedRound) {
-      setNotifTitle('Round updated');
-      setNotifType('success');
-      setNotifShow(true);
+      toast.success('Round updated');
       setRoundSlideoutOpen(false);
       setRoundToEdit(null);
     }
@@ -83,10 +67,6 @@ export default function RoundSlideout({
 
   return (
     <>
-      {notifShow && (
-        <Notification title={notifTitle} type={notifType} show={notifShow} setShow={setNotifShow} />
-      )}
-
       <Transition show={roundSlideoutOpen} as={Fragment}>
         <Dialog as="div" className="relative z-50" onClose={handleClose}>
           <div className="fixed inset-0" />

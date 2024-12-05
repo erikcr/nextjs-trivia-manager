@@ -20,7 +20,7 @@ import { Tables } from "@/lib/types/database.types";
 import { ResponsesWithTeam } from "@/lib/types/app.types";
 
 // Components
-import Notification from "@/components/Notification";
+import { toast } from "sonner";
 import QrCodePopover from "@/components/QrCodePopover";
 
 function classNames(...classes: any[]) {
@@ -84,6 +84,9 @@ export default function EventOngoingPage() {
 
     if (!error) {
       getResponses();
+      toast.success(isCorrect ? 'Response marked as correct' : 'Response marked as incorrect');
+    } else {
+      toast.error('Failed to update response');
     }
   };
 

@@ -129,7 +129,7 @@ export default function EditorByIdPage() {
             setRoundSlideoutOpen={setRoundSlideoutOpen}
           />
 
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="mx-auto max-w-7xl p-4 sm:p-6 lg:p-8">
             {activeRound ? (
               <QuestionGrid
                 questions={questions}

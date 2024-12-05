@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
+import { Toaster } from 'sonner';
 
 import './globals.css';
 
@@ -32,6 +33,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" className="h-full" suppressHydrationWarning>
       <body className={cx(inter.className, 'h-full bg-gray-100 dark:bg-zinc-900')}>
         <Provider>
+          <Toaster richColors closeButton />
           <div>{children}</div>
         </Provider>
       </body>

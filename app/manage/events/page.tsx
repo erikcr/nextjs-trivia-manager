@@ -14,11 +14,8 @@ import {
   XMarkIcon,
 } from '@heroicons/react/24/outline';
 import { AlertDialog } from '@radix-ui/react-alert-dialog';
-import { set } from 'date-fns';
+import { toast } from 'sonner';
 
-// Components
-import Notification from '@/components/Notification';
-import { Alert, AlertActions, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
 import { Event, useEventStore } from '@/lib/store/event-store';
@@ -36,11 +33,6 @@ export default function EventsPage() {
   const [eventToDelete, setEventToDelete] = useState<Event>();
   const [deleteEventConfirmShow, setDeleteEventConfirmShow] = useState(false);
 
-  // Notifications
-  const [notifShow, setNotifShow] = useState(false);
-  const [notifTitle, setNotifTitle] = useState('');
-  const [notifType, setNotifType] = useState<'success' | 'error'>('success');
-
   useEffect(() => {
     fetchEvents();
   }, [fetchEvents]);
@@ -56,15 +48,11 @@ export default function EventsPage() {
     });
 
     if (newEvent) {
-      setNotifTitle('Event created');
-      setNotifType('success');
-      setNotifShow(true);
+      toast.success('Event created');
       setEventSlideout(false);
       router.push(`/dashboard/${newEvent.id}/editor`);
     } else {
-      setNotifTitle('Failed to create event');
-      setNotifType('error');
-      setNotifShow(true);
+      toast.error('Failed to create event');
     }
     setAddEventLoading(false);
   };
@@ -82,15 +70,11 @@ export default function EventsPage() {
     });
 
     if (updatedEvent) {
-      setNotifTitle('Event updated');
-      setNotifType('success');
-      setNotifShow(true);
+      toast.success('Event updated');
       setEventSlideout(false);
       setEventToEdit(undefined);
     } else {
-      setNotifTitle('Failed to update event');
-      setNotifType('error');
-      setNotifShow(true);
+      toast.error('Failed to update event');
     }
     setAddEventLoading(false);
   };
@@ -102,13 +86,9 @@ export default function EventsPage() {
     if (success) {
       setDeleteEventConfirmShow(false);
       setEventToDelete(undefined);
-      setNotifTitle('Event deleted');
-      setNotifType('success');
-      setNotifShow(true);
+      toast.success('Event deleted');
     } else {
-      setNotifTitle('Failed to delete event');
-      setNotifType('error');
-      setNotifShow(true);
+      toast.error('Failed to delete event');
     }
   };
 
@@ -199,28 +179,21 @@ export default function EventsPage() {
       {/**
        * Event panel slideout
        */}
-      <Alert open={deleteEventConfirmShow} onClose={setDeleteEventConfirmShow}>
-        <AlertTitle>Confirm event delete</AlertTitle>
-        <AlertDescription>
-          <p className="text-sm text-gray-500 dark:text-gray-300">
+      <AlertDialog open={deleteEventConfirmShow}>
+        <AlertDialogTitle>Confirm event delete</AlertDialogTitle>
+        <div className="text-sm text-gray-500 dark:text-gray-300">
+          <p>
             You are about to delete <b>{eventToDelete?.name}</b>. Are you sure?
           </p>
-          <p className="text-sm text-gray-500 dark:text-gray-300">
-            This will delete all rounds and questions you created for this event.
-          </p>
-        </AlertDescription>
-        <AlertActions>
+          <p>This will delete all rounds and questions you created for this event.</p>
+        </div>
+        <div className="mt-4 flex justify-end space-x-2">
           <Button onClick={() => setDeleteEventConfirmShow(false)}>Cancel</Button>
-          <Button color="red" onClick={() => setDeleteEventConfirmShow(false)}>
+          <Button color="red" onClick={handleDeleteEvent}>
             Delete
           </Button>
-        </AlertActions>
-      </Alert>
-
-      {/**
-       * Action notification
-       */}
-      <Notification title={notifTitle} type={notifType} show={notifShow} setShow={setNotifShow} />
+        </div>
+      </AlertDialog>
     </>
   );
 }
