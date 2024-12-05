@@ -9,17 +9,15 @@ export default function QuestionGrid({
   questions,
   loading,
   onQuestionClick,
-  onAddQuestion,
+  setQuestionSlideoutOpen,
 }: {
   questions: Question[];
   loading: boolean;
   onQuestionClick: (question: Question) => void;
-  onAddQuestion: (questions: Array<{ question: string; answer: string; points?: number }>) => void;
+  setQuestionSlideoutOpen: () => void;
 }) {
-  const [aiAssistantOpen, setAiAssistantOpen] = useState(false);
-
   return (
-    <div className="">
+    <div className="pt-1 sm:pt-2 lg:pt-4">
       <div className="sm:flex sm:items-center">
         <div className="sm:flex-auto">
           <h1 className="text-lg font-semibold">Questions</h1>
@@ -31,7 +29,7 @@ export default function QuestionGrid({
         <div className="mt-4 sm:ml-16 sm:mt-0 sm:flex-none flex gap-2">
           <button
             type="button"
-            onClick={onQuestionClick}
+            onClick={setQuestionSlideoutOpen}
             className="block rounded-md bg-primary dark:bg-primary-dark px-3 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-primary-hover dark:hover:bg-primary-dark-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
           >
             Add Question
@@ -109,12 +107,6 @@ export default function QuestionGrid({
           </div>
         </div>
       </div>
-
-      <AIAssistant
-        isOpen={aiAssistantOpen}
-        setIsOpen={setAiAssistantOpen}
-        onQuestionsGenerated={onAddQuestion}
-      />
     </div>
   );
 }

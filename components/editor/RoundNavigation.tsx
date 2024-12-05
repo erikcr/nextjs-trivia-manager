@@ -1,7 +1,9 @@
 'use client';
 
-import { PencilSquareIcon } from '@heroicons/react/24/outline';
-import { RoundsWithQuestions } from '@/lib/types/app.types';
+import { Fragment } from 'react';
+import { Menu, MenuButton, MenuItem, MenuItems, Transition } from '@headlessui/react';
+import { ChevronDownIcon, PencilSquareIcon, PlusIcon } from '@heroicons/react/24/outline';
+import { Round } from '@/lib/store/round-store';
 import { Tables } from '@/lib/types/database.types';
 
 function classNames(...classes: any[]) {
@@ -9,10 +11,10 @@ function classNames(...classes: any[]) {
 }
 
 interface RoundNavigationProps {
-  rounds: RoundsWithQuestions | undefined;
-  activeRound: Tables<'round'> | null;
-  setActiveRound: (round: Tables<'round'>) => void;
-  setRoundToEdit: (round: Tables<'round'>) => void;
+  rounds: Round[] | null;
+  activeRound: Round | null;
+  setActiveRound: (round: Round) => void;
+  setRoundToEdit: (round: Round) => void;
   setRoundSlideoutOpen: (open: boolean) => void;
 }
 
@@ -24,100 +26,76 @@ export default function RoundNavigation({
   setRoundSlideoutOpen,
 }: RoundNavigationProps) {
   return (
-    <nav className="sticky top-0 z-40 bg-white dark:bg-zinc-900 border-b border-gray-200 dark:border-zinc-700">
-      {/* Desktop Round Navigation */}
-      <div className="hidden lg:block overflow-x-auto">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="relative flex h-16 justify-between">
-            <div className="flex px-2 lg:px-0">
-              <div className="flex items-center">
-                {rounds?.map((item) => (
-                  <div key={item.id} className="inline-flex rounded-md shadow-sm mr-4">
-                    <button
-                      className={classNames(
-                        activeRound?.id === item.id
-                          ? 'bg-primary hover:bg-primary-hover text-white dark:bg-primary-dark dark:hover:bg-primary-dark-hover'
-                          : 'ring-1 ring-inset ring-gray-300 dark:ring-zinc-700 bg-white hover:bg-gray-50 dark:bg-zinc-800 dark:hover:bg-zinc-700',
-                        'relative inline-flex items-center rounded-l-md px-3 py-2 text-sm font-semibold ring-1 ring-inset ring-gray-300 dark:ring-zinc-700 focus:z-10'
-                      )}
-                      onClick={() => setActiveRound(item)}
-                    >
-                      {item.name}
-                    </button>
+    <nav className="bg-white dark:bg-zinc-900 pt-1 sm:pt-2 lg:pt-4">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="relative flex h-14 items-center justify-between">
+          <div className="flex items-center gap-4">
+            <Menu as="div" className="relative">
+              <MenuButton
+                className={classNames(
+                  'inline-flex items-center gap-x-1 rounded-md px-3 py-2 text-sm font-semibold ring-1 ring-inset',
+                  'ring-gray-300 dark:ring-zinc-700 bg-white hover:bg-gray-50 dark:bg-zinc-800 dark:hover:bg-zinc-700'
+                )}
+              >
+                {activeRound?.name || 'Select Round'}
+                <ChevronDownIcon className="-mr-1 h-5 w-5" aria-hidden="true" />
+              </MenuButton>
 
-                    <button
-                      type="button"
-                      className={classNames(
-                        activeRound?.id === item.id
-                          ? 'bg-primary hover:bg-primary-hover text-white dark:bg-primary-dark dark:hover:bg-primary-dark-hover'
-                          : 'ring-1 ring-inset ring-gray-300 dark:ring-zinc-700 bg-white hover:bg-gray-50 dark:bg-zinc-800 dark:hover:bg-zinc-700',
-                        'relative -ml-px inline-flex items-center rounded-r-md px-2 py-2 text-sm font-semibold ring-1 ring-inset ring-gray-300 dark:ring-zinc-700 focus:z-10'
-                      )}
-                      onClick={() => {
-                        setRoundToEdit(item);
-                        setRoundSlideoutOpen(true);
-                      }}
-                    >
-                      <PencilSquareIcon className="h-5 w-5" aria-hidden="true" />
-                    </button>
+              <Transition
+                as={Fragment}
+                enter="transition ease-out duration-100"
+                enterFrom="transform opacity-0 scale-95"
+                enterTo="transform opacity-100 scale-100"
+                leave="transition ease-in duration-75"
+                leaveFrom="transform opacity-100 scale-100"
+                leaveTo="transform opacity-0 scale-95"
+              >
+                <MenuItems className="absolute left-0 z-10 mt-2 w-56 origin-top-left rounded-md bg-white dark:bg-zinc-800 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                  <div className="max-h-[60vh] overflow-y-auto py-1">
+                    {rounds?.map((round) => (
+                      <MenuItem key={round.id}>
+                        {({ active }) => (
+                          <div className="group flex items-center px-4 py-2">
+                            <button
+                              className={classNames(
+                                active ? 'bg-gray-100 dark:bg-zinc-700 text-gray-900 dark:text-white' : 'text-gray-700 dark:text-gray-300',
+                                'flex-1 text-left text-sm'
+                              )}
+                              onClick={() => setActiveRound(round)}
+                            >
+                              {round.name}
+                            </button>
+                            <button
+                              onClick={() => {
+                                setRoundToEdit(round);
+                                setRoundSlideoutOpen(true);
+                              }}
+                              className={classNames(
+                                'ml-2 p-1 rounded-md',
+                                active ? 'text-gray-700 dark:text-gray-300' : 'text-gray-400 dark:text-gray-500',
+                                'opacity-0 group-hover:opacity-100 transition-opacity'
+                              )}
+                            >
+                              <PencilSquareIcon className="h-4 w-4" aria-hidden="true" />
+                            </button>
+                          </div>
+                        )}
+                      </MenuItem>
+                    ))}
                   </div>
-                ))}
+                </MenuItems>
+              </Transition>
+            </Menu>
 
-                <button
-                  type="button"
-                  onClick={() => setRoundSlideoutOpen(true)}
-                  className="relative inline-flex items-center gap-x-1.5 rounded-md bg-primary hover:bg-primary-hover dark:bg-primary-dark dark:hover:bg-primary-dark-hover px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
-                >
-                  Add Round
-                </button>
-              </div>
-            </div>
+            <button
+              type="button"
+              onClick={() => setRoundSlideoutOpen(true)}
+              className="inline-flex items-center gap-x-1.5 rounded-md bg-primary hover:bg-primary-hover dark:bg-primary-dark dark:hover:bg-primary-dark-hover px-3 py-2 text-sm font-semibold text-white"
+            >
+              <PlusIcon className="-ml-0.5 h-5 w-5" aria-hidden="true" />
+              Add Round
+            </button>
           </div>
-        </div>
-      </div>
-
-      {/* Mobile Round Navigation */}
-      <div className="lg:hidden">
-        <div className="mx-auto max-w-7xl px-4 pb-4 pt-4 sm:px-6 lg:px-8">
-          {rounds?.map((item) => (
-            <span key={item.id} className="isolate inline-flex rounded-md my-1 w-full">
-              <button
-                type="button"
-                className={classNames(
-                  activeRound?.id === item.id
-                    ? 'bg-primary hover:bg-primary-hover text-white dark:bg-primary-dark dark:hover:bg-primary-dark-hover'
-                    : 'ring-1 ring-inset ring-gray-300 dark:ring-zinc-700 bg-white hover:bg-gray-50 dark:bg-zinc-800 dark:hover:bg-zinc-700',
-                  'relative -ml-px inline-flex grow items-center rounded-l-md px-3 py-2 text-sm font-semibold ring-1 ring-inset ring-gray-300 dark:ring-zinc-700 focus:z-10'
-                )}
-                onClick={() => setActiveRound(item)}
-              >
-                {item.name}
-              </button>
-              <button
-                type="button"
-                className={classNames(
-                  activeRound?.id === item.id
-                    ? 'bg-primary hover:bg-primary-hover text-white dark:bg-primary-dark dark:hover:bg-primary-dark-hover'
-                    : 'ring-1 ring-inset ring-gray-300 dark:ring-zinc-700 bg-white hover:bg-gray-50 dark:bg-zinc-800 dark:hover:bg-zinc-700',
-                  'relative -ml-px inline-flex items-center rounded-r-md px-2 py-2 text-sm font-semibold ring-1 ring-inset ring-gray-300 dark:ring-zinc-700 focus:z-10'
-                )}
-                onClick={() => {
-                  setRoundToEdit(item);
-                  setRoundSlideoutOpen(true);
-                }}
-              >
-                <PencilSquareIcon className="h-5 w-5" aria-hidden="true" />
-              </button>
-            </span>
-          ))}
-
-          <button
-            type="button"
-            onClick={() => setRoundSlideoutOpen(true)}
-            className="mt-2 relative inline-flex w-full items-center justify-center gap-x-1.5 rounded-md bg-primary hover:bg-primary-hover dark:bg-primary-dark dark:hover:bg-primary-dark-hover px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
-          >
-            Add Round
-          </button>
         </div>
       </div>
     </nav>

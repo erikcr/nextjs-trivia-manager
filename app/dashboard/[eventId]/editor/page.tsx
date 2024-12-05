@@ -5,21 +5,21 @@ import { useEffect, useRef, useState } from 'react';
 import { useParams } from 'next/navigation';
 
 import { Message } from 'ai';
-import { cx } from '@/lib/utils';
 
+import ChatInput from '@/components/ai/ChatInput';
+import ChatMessage from '@/components/ai/ChatMessage';
+import GeneratedQuestions from '@/components/ai/GeneratedQuestions';
+import TopicInput from '@/components/ai/TopicInput';
 import EditorHeader from '@/components/editor/EditorHeader';
 import QuestionGrid from '@/components/editor/QuestionGrid';
 import RoundNavigation from '@/components/editor/RoundNavigation';
 import QuestionSlideout from '@/components/slideouts/QuestionSlideout';
 import RoundSlideout from '@/components/slideouts/RoundSlideout';
-import TopicInput from '@/components/ai/TopicInput';
-import GeneratedQuestions from '@/components/ai/GeneratedQuestions';
-import ChatMessage from '@/components/ai/ChatMessage';
-import ChatInput from '@/components/ai/ChatInput';
 // Store
 import { useEventStore } from '@/lib/store/event-store';
-import { useRoundStore } from '@/lib/store/round-store';
+import { Question, useRoundStore } from '@/lib/store/round-store';
 import { useUserStore } from '@/lib/store/user-store';
+import { cx } from '@/lib/utils';
 
 export default function EditorByIdPage() {
   const { eventId } = useParams();
@@ -42,16 +42,18 @@ export default function EditorByIdPage() {
   const [roundSlideoutOpen, setRoundSlideoutOpen] = useState(false);
   const [questionSlideoutOpen, setQuestionSlideoutOpen] = useState(false);
   const [roundToEdit, setRoundToEdit] = useState<any>(null);
-  const [questionToEdit, setQuestionToEdit] = useState<any>(null);
+  const [questionToEdit, setQuestionToEdit] = useState<Question | null>(null);
 
   // AI states
   const [isGenerating, setIsGenerating] = useState(false);
-  const [generatedQuestions, setGeneratedQuestions] = useState<Array<{
-    question: string;
-    answer: string;
-    points?: number;
-    selected?: boolean;
-  }>>([]);
+  const [generatedQuestions, setGeneratedQuestions] = useState<
+    Array<{
+      question: string;
+      answer: string;
+      points?: number;
+      selected?: boolean;
+    }>
+  >([]);
 
   const [messages, setMessages] = useState<Message[]>([]);
 
@@ -88,26 +90,27 @@ export default function EditorByIdPage() {
     try {
       // TODO: Replace with actual AI call
       // Simulating API call
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      await new Promise((resolve) => setTimeout(resolve, 2000));
       setGeneratedQuestions([
         {
-          question: "What was the first spacecraft to land on Mars?",
-          answer: "Viking 1",
+          question:
+            'What was the first spacecraft to land on Mars but I need to test a much shorter?',
+          answer: 'Viking 1',
           points: 10,
-          selected: false
+          selected: false,
         },
         {
-          question: "Who was the first American woman in space?",
-          answer: "Sally Ride",
+          question: 'Who was the first American woman in space?',
+          answer: 'Sally Ride',
           points: 10,
-          selected: false
+          selected: false,
         },
         {
-          question: "What is the largest planet in our solar system?",
-          answer: "Jupiter",
+          question: 'What is the largest planet in our solar system?',
+          answer: 'Jupiter',
           points: 10,
-          selected: false
-        }
+          selected: false,
+        },
       ]);
     } catch (error) {
       console.error('Error generating questions:', error);
@@ -117,17 +120,24 @@ export default function EditorByIdPage() {
   };
 
   const handleSelectQuestion = (index: number) => {
-    setGeneratedQuestions(prev => 
-      prev.map((q, i) => i === index ? { ...q, selected: !q.selected } : q)
+    setGeneratedQuestions((prev) =>
+      prev.map((q, i) => (i === index ? { ...q, selected: !q.selected } : q)),
     );
   };
 
   const handleAddSelectedQuestions = async () => {
-    const selectedQuestions = generatedQuestions.filter(q => q.selected);
+    const selectedQuestions = generatedQuestions.filter((q) => q.selected);
     if (selectedQuestions.length === 0) return;
 
     await handleAddQuestions(selectedQuestions);
-    setGeneratedQuestions(prev => prev.map(q => ({ ...q, selected: false })));
+    setGeneratedQuestions((prev) => prev.map((q) => ({ ...q, selected: false })));
+  };
+
+  const handleUpdateGeneratedQuestion = (
+    index: number,
+    updates: Partial<{ question: string; answer: string; points?: number; selected?: boolean }>,
+  ) => {
+    setGeneratedQuestions((prev) => prev.map((q, i) => (i === index ? { ...q, ...updates } : q)));
   };
 
   const handleQuestionClick = (question: any) => {
@@ -194,7 +204,7 @@ export default function EditorByIdPage() {
             setRoundSlideoutOpen={setRoundSlideoutOpen}
           />
 
-          <div className="mx-auto max-w-7xl p-4 sm:p-6 lg:p-8">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             {activeRound ? (
               <div className="grid grid-cols-1 lg:grid-cols-[3fr,2fr] gap-6">
                 <div>
@@ -202,18 +212,15 @@ export default function EditorByIdPage() {
                     questions={questions}
                     loading={questionsLoading}
                     onQuestionClick={handleQuestionClick}
-                    onAddQuestion={handleAddQuestions}
+                    setQuestionSlideoutOpen={() => setQuestionSlideoutOpen(true)}
                   />
                 </div>
-                
+
                 <div className="space-y-4">
                   <h2 className="text-lg font-semibold">AI Question Generator</h2>
                   <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 h-[600px] flex flex-col">
                     <div className="p-4 border-b border-gray-200 dark:border-gray-700">
-                      <TopicInput 
-                        onSubmit={handleGenerateQuestions}
-                        loading={isGenerating}
-                      />
+                      <TopicInput onSubmit={handleGenerateQuestions} loading={isGenerating} />
                     </div>
                     <div className="flex-1 overflow-y-auto p-4">
                       <GeneratedQuestions
@@ -221,6 +228,7 @@ export default function EditorByIdPage() {
                         loading={isGenerating}
                         onSelect={handleSelectQuestion}
                         onAddSelected={handleAddSelectedQuestions}
+                        onUpdateQuestion={handleUpdateGeneratedQuestion}
                       />
                     </div>
                   </div>

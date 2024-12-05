@@ -6,11 +6,11 @@ import { DialogTitle } from '../ui/dialog';
 import { Dialog, DialogPanel, Transition, TransitionChild } from '@headlessui/react';
 import { XMarkIcon } from '@heroicons/react/24/outline';
 
-import { useRoundStore } from '@/lib/store/round-store';
+import { Question, useRoundStore } from '@/lib/store/round-store';
 
 interface QuestionSlideoutProps {
-  questionToEdit: any;
-  setQuestionToEdit: (question: any) => void;
+  questionToEdit: Question | null;
+  setQuestionToEdit: (question: Question | null) => void;
   questionSlideoutOpen: boolean;
   setQuestionSlideoutOpen: (open: boolean) => void;
   onSave: () => void;
@@ -127,7 +127,7 @@ export default function QuestionSlideout({
                                   name="answer"
                                   required
                                   className="block w-full rounded-md border-0 py-1.5 text-gray-900 dark:text-gray-200 dark:bg-zinc-800 shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-gray-700 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary dark:focus:ring-primary-dark sm:text-sm sm:leading-6"
-                                  defaultValue={questionToEdit?.answer_text}
+                                  defaultValue={questionToEdit?.correct_answer}
                                 />
                               </div>
                             </div>
