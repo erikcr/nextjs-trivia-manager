@@ -1,8 +1,8 @@
 import { create } from 'zustand';
 
-import { Database } from '@/lib/types/database.types';
-import { createClient } from '@/lib/supabase/client';
 import { useUserStore } from '@/lib/store/user-store';
+import { createClient } from '@/lib/supabase/client';
+import { Database } from '@/lib/types/database.types';
 
 type Tables = Database['public']['Tables'];
 
@@ -49,13 +49,10 @@ export const useEventStore = create<EventStoreState>((set, get) => ({
     try {
       set({ loading: true, error: null });
       const user = useUserStore.getState().user;
-      
+
       if (!user) throw new Error('No user');
 
-      const { data, error } = await supabase
-        .from('event')
-        .select('*')
-        .eq('owner', user.id);
+      const { data, error } = await supabase.from('event').select('*').eq('created_by', user.id);
 
       if (error) throw error;
       set({ events: data || [] });
@@ -71,14 +68,14 @@ export const useEventStore = create<EventStoreState>((set, get) => ({
     try {
       set({ loading: true, error: null });
       const user = useUserStore.getState().user;
-      
+
       if (!user) throw new Error('No user');
 
       const { data, error } = await supabase
         .from('event')
         .select('*')
         .eq('id', id)
-        .eq('owner', user.id)
+        .eq('created_by', user.id)
         .single();
 
       if (error) throw error;
@@ -95,7 +92,7 @@ export const useEventStore = create<EventStoreState>((set, get) => ({
     try {
       set({ loading: true, error: null });
       const user = useUserStore.getState().user;
-      
+
       if (!user) throw new Error('No user');
 
       const newEvent: EventInsert = {
@@ -107,11 +104,7 @@ export const useEventStore = create<EventStoreState>((set, get) => ({
         updated_by: user.id,
       };
 
-      const { data, error } = await supabase
-        .from('event')
-        .insert([newEvent])
-        .select()
-        .single();
+      const { data, error } = await supabase.from('event').insert([newEvent]).select().single();
 
       if (error) throw error;
 
@@ -134,7 +127,7 @@ export const useEventStore = create<EventStoreState>((set, get) => ({
     try {
       set({ loading: true, error: null });
       const user = useUserStore.getState().user;
-      
+
       if (!user) throw new Error('No user');
 
       const updateData: EventUpdate = {
@@ -154,9 +147,7 @@ export const useEventStore = create<EventStoreState>((set, get) => ({
 
       // Update local state
       const updatedEvent = data as Event;
-      const events = get().events.map(e => 
-        e.id === id ? updatedEvent : e
-      );
+      const events = get().events.map((e) => (e.id === id ? updatedEvent : e));
       set({ events });
 
       return updatedEvent;
@@ -173,18 +164,15 @@ export const useEventStore = create<EventStoreState>((set, get) => ({
     try {
       set({ loading: true, error: null });
       const user = useUserStore.getState().user;
-      
+
       if (!user) throw new Error('No user');
 
-      const { error } = await supabase
-        .from('event')
-        .delete()
-        .eq('id', id);
+      const { error } = await supabase.from('event').delete().eq('id', id);
 
       if (error) throw error;
 
       // Update local state
-      const events = get().events.filter(e => e.id !== id);
+      const events = get().events.filter((e) => e.id !== id);
       set({ events });
 
       return true;
@@ -201,14 +189,14 @@ export const useEventStore = create<EventStoreState>((set, get) => ({
     try {
       set({ loading: true, error: null });
       const user = useUserStore.getState().user;
-      
+
       if (!user) throw new Error('No user');
 
       const { data, error } = await supabase
         .from('event')
         .update({ status: 'ONGOING' })
         .eq('id', id)
-        .eq('owner', user.id)
+        .eq('created_by', user.id)
         .select()
         .single();
 
@@ -241,7 +229,7 @@ export const useEventStore = create<EventStoreState>((set, get) => ({
         async (payload) => {
           // Refresh the events list when changes occur
           get().fetchEvents();
-        }
+        },
       )
       .subscribe();
 

@@ -104,16 +104,28 @@ export const useRoundStore = create<RoundStoreState>((set, get) => ({
     try {
       set({ loading: true, error: null, addRoundLoading: true });
       const user = useUserStore.getState().user;
+      const currentRounds = get().rounds;
       
       if (!user) throw new Error('No user');
 
       const { data, error } = await supabase
         .from('round')
-        .insert([{ ...round, created_by: user.id, updated_by: user.id }])
+        .insert([{ 
+          ...round, 
+          created_by: user.id, 
+          updated_by: user.id,
+          sequence_number: (currentRounds?.length || 0) + 1
+        }])
         .select()
         .single();
 
       if (error) throw error;
+      
+      // Update the rounds array with the new round
+      if (data) {
+        set({ rounds: [...currentRounds, data] });
+      }
+      
       return data;
     } catch (error) {
       set({ error: error as Error });
