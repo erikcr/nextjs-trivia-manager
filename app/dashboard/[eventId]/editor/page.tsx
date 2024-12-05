@@ -53,7 +53,7 @@ export default function EditorByIdPage() {
   const [session, setSession] = useState<any>(undefined);
 
   // Event
-  const [event, setEvent] = useState<Tables<"v002_events_stag">>();
+  const [event, setEvent] = useState<Tables<"event">>();
   const [eLoading, setELoading] = useState(true);
   const [eError, setEError] = useState<PostgrestError>();
 
@@ -61,16 +61,15 @@ export default function EditorByIdPage() {
   const [rounds, setRounds] = useState<RoundsWithQuestions>();
   const [rLoading, setRLoading] = useState(true);
   const [rError, setRError] = useState<PostgrestError>();
-  const [activeRound, setActiveRound] = useState<Tables<"v002_rounds_stag">>();
+  const [activeRound, setActiveRound] = useState<Tables<"round">>();
   const [addRoundLoading, setAddRoundLoading] = useState(false);
   const [roundSlideoutOpen, setRoundSlideoutOpen] = useState(false);
-  const [roundToEdit, setRoundToEdit] = useState<Tables<"v002_rounds_stag">>();
+  const [roundToEdit, setRoundToEdit] = useState<Tables<"round">>();
 
   // Questions
-  const [questions, setQuestions] = useState<Tables<"v002_questions_stag">[]>();
+  const [questions, setQuestions] = useState<Tables<"question">[]>();
   const [qLoading, setQLoading] = useState(true);
-  const [questionToEdit, setQuestionToEdit] =
-    useState<Tables<"v002_questions_stag">>();
+  const [questionToEdit, setQuestionToEdit] = useState<Tables<"question">>();
   const [qError, setQError] = useState<PostgrestError>();
   const questionToEditFormRef = useRef<HTMLFormElement | undefined>();
   const [questionToAdd, setQuestionToAdd] = useState<TriviaItem>();
@@ -100,7 +99,7 @@ export default function EditorByIdPage() {
   // Questions
   const deleteQuestion = async () => {
     const { data, error } = await supabase
-      .from("v002_questions_stag")
+      .from("question")
       .delete()
       .eq("id", questionToEdit?.id);
 
@@ -114,7 +113,7 @@ export default function EditorByIdPage() {
 
   const updateQuestion = async (formData: FormData) => {
     const { data, error } = await supabase
-      .from("v002_questions_stag")
+      .from("question")
       .update([
         {
           question: formData.get("question"),
@@ -136,7 +135,7 @@ export default function EditorByIdPage() {
 
   const addQuestion = async (formData: FormData) => {
     const { data, error } = await supabase
-      .from("v002_questions_stag")
+      .from("question")
       .insert([
         {
           question: formData.get("question"),
@@ -159,7 +158,7 @@ export default function EditorByIdPage() {
 
   const getQuestions = async () => {
     const { data, error } = await supabase
-      .from("v002_questions_stag")
+      .from("question")
       .select()
       .order("id")
       .eq("round_id", activeRound?.id)
@@ -173,7 +172,7 @@ export default function EditorByIdPage() {
         if (round.id === activeRound?.id) {
           return {
             ...round,
-            v002_questions_stag: data,
+            question: data,
           };
         } else {
           return round;
@@ -186,8 +185,8 @@ export default function EditorByIdPage() {
 
   const getRounds = async () => {
     const { data, error } = await supabase
-      .from("v002_rounds_stag")
-      .select("*, v002_questions_stag ( id )")
+      .from("round")
+      .select("*, question ( id )")
       .order("order_num")
       .eq("event_id", eventId)
       .eq("owner", user?.id);
@@ -213,7 +212,7 @@ export default function EditorByIdPage() {
 
   const startEvent = async () => {
     const { data, error } = await supabase
-      .from("v002_events_stag")
+      .from("event")
       .update({ status: "ONGOING" })
       .eq("id", event?.id)
       .eq("owner", user?.id)
@@ -229,7 +228,7 @@ export default function EditorByIdPage() {
 
   const getEvent = async () => {
     const { data, error } = await supabase
-      .from("v002_events_stag")
+      .from("event")
       .select()
       .eq("id", eventId)
       .eq("owner", user?.id);
@@ -237,7 +236,7 @@ export default function EditorByIdPage() {
     if (data) {
       if (data[0].status === "ONGOING") {
         router.push(`/dashboard/${data[0].id}/ongoing`);
-      } else if (data[0].status === "COMPLETE") {
+      } else if (data[0].status === "completed") {
         router.push(`/dashboard/${data[0].id}/final`);
       } else {
         setEvent(data[0]);
@@ -277,7 +276,7 @@ export default function EditorByIdPage() {
       setStartErrorMsg("Please add at least one round to start.");
       setStartDisabled(true);
     } else {
-      const emptyRound = rounds.find((i) => i.v002_questions_stag.length <= 0);
+      const emptyRound = rounds.find((i) => i.question.length <= 0);
       if (emptyRound) {
         setStartErrorMsg(
           `The round ${emptyRound.name} doesn't have any questions.`
@@ -724,7 +723,7 @@ export default function EditorByIdPage() {
             <button
               type="button"
               className={classNames(
-                "relative -ml-px inline-flex items-center rounded-l-md px-3 py-2 text-sm font-semibold border-r border-gray-400 dark:border-zinc-500 bg-gray-300 hover:bg-gray-400 dark:bg-zinc-700 dark:hover:bg-zinc-600 focus:z-10"
+                "relative -ml-px inline-flex items-center rounded-l-md bg-indigo-600 px-3 py-2 text-sm font-semibold border-r border-gray-400 dark:border-zinc-500 bg-gray-300 hover:bg-gray-400 dark:bg-zinc-700 dark:hover:bg-zinc-600 focus:z-10"
               )}
             >
               <PencilSquareIcon
@@ -883,7 +882,7 @@ export default function EditorByIdPage() {
                       name="question"
                       id="question"
                       rows={5}
-                      className="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
+                      className="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-md sm:leading-6"
                       defaultValue={questionToEdit?.question}
                     />
                   </div>

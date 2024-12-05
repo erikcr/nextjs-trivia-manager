@@ -1,7 +1,10 @@
-"use client";
+'use client';
 
-import { ThemeProvider } from "next-themes";
-import { useState, useEffect } from "react";
+import { useEffect, useState } from 'react';
+
+import { ThemeProvider } from 'next-themes';
+
+import { useAuth } from '@/lib/hooks/use-auth';
 
 type Props = {
   children: string | React.JSX.Element | React.JSX.Element[];
@@ -9,6 +12,8 @@ type Props = {
 
 const Provider = ({ children }: Props) => {
   const [mounted, setMounted] = useState<boolean>(false);
+  // Initialize auth
+  useAuth();
 
   useEffect(() => {
     setMounted(true);
@@ -19,8 +24,8 @@ const Provider = ({ children }: Props) => {
   }
 
   return (
-    <ThemeProvider enableSystem={true} attribute="class">
-      {children}
+    <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+      <>{children}</>
     </ThemeProvider>
   );
 };

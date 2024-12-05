@@ -6,478 +6,363 @@ export type Json =
   | { [key: string]: Json | undefined }
   | Json[]
 
-export interface Database {
+export type Database = {
   public: {
     Tables: {
-      v001_events_stag: {
+      base_table: {
         Row: {
-          date_of_event: string
-          description: string | null
-          id: number
-          inserted_at: string
-          join_code: number
-          location: string | null
-          name: string
-          owner: string
-          status: Database["public"]["Enums"]["event_status"]
+          created_at: string
+          created_by: string
           updated_at: string
+          updated_by: string
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          updated_at?: string
+          updated_by: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          updated_at?: string
+          updated_by?: string
+        }
+        Relationships: []
+      }
+      event: {
+        Row: {
+          created_at: string
+          created_by: string
+          description: string | null
+          id: string
+          join_code: string
+          location: string | null
+          max_teams: number | null
+          name: string
+          scheduled_at: string
+          status: Database["public"]["Enums"]["event_status"]
+          team_size_limit: number | null
+          updated_at: string
+          updated_by: string
           venue: string | null
         }
         Insert: {
-          date_of_event: string
+          created_at?: string
+          created_by: string
           description?: string | null
-          id?: number
-          inserted_at?: string
-          join_code?: number
+          id?: string
+          join_code: string
           location?: string | null
+          max_teams?: number | null
           name: string
-          owner: string
+          scheduled_at: string
           status?: Database["public"]["Enums"]["event_status"]
+          team_size_limit?: number | null
           updated_at?: string
+          updated_by: string
           venue?: string | null
         }
         Update: {
-          date_of_event?: string
+          created_at?: string
+          created_by?: string
           description?: string | null
-          id?: number
-          inserted_at?: string
-          join_code?: number
+          id?: string
+          join_code?: string
           location?: string | null
+          max_teams?: number | null
           name?: string
-          owner?: string
+          scheduled_at?: string
           status?: Database["public"]["Enums"]["event_status"]
+          team_size_limit?: number | null
           updated_at?: string
+          updated_by?: string
           venue?: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "v001_events_stag_owner_fkey"
-            columns: ["owner"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          }
-        ]
+        Relationships: []
       }
-      v001_questions_stag: {
+      question: {
         Row: {
-          answer: string
-          id: number
-          inserted_at: string
-          owner: string
+          correct_answer: string
+          created_at: string
+          created_by: string
+          id: string
           points: number
-          question: string
-          round_id: number
+          question_text: string
+          round_id: string
+          sequence_number: number
           status: Database["public"]["Enums"]["question_status"]
+          time_limit_seconds: number | null
           updated_at: string
+          updated_by: string
         }
         Insert: {
-          answer: string
-          id?: number
-          inserted_at?: string
-          owner: string
+          correct_answer: string
+          created_at?: string
+          created_by: string
+          id?: string
           points: number
-          question: string
-          round_id: number
+          question_text: string
+          round_id: string
+          sequence_number: number
           status?: Database["public"]["Enums"]["question_status"]
+          time_limit_seconds?: number | null
           updated_at?: string
+          updated_by: string
         }
         Update: {
-          answer?: string
-          id?: number
-          inserted_at?: string
-          owner?: string
+          correct_answer?: string
+          created_at?: string
+          created_by?: string
+          id?: string
           points?: number
-          question?: string
-          round_id?: number
+          question_text?: string
+          round_id?: string
+          sequence_number?: number
           status?: Database["public"]["Enums"]["question_status"]
+          time_limit_seconds?: number | null
           updated_at?: string
+          updated_by?: string
         }
         Relationships: [
           {
-            foreignKeyName: "v001_questions_stag_owner_fkey"
-            columns: ["owner"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "v001_questions_stag_round_id_fkey"
+            foreignKeyName: "question_round_id_fkey"
             columns: ["round_id"]
             isOneToOne: false
-            referencedRelation: "v001_rounds_stag"
+            referencedRelation: "round"
             referencedColumns: ["id"]
-          }
+          },
         ]
       }
-      v001_responses_stag: {
+      response: {
         Row: {
-          id: number
-          inserted_at: string
+          created_at: string
+          created_by: string
+          id: string
           is_correct: boolean | null
-          question_id: number
+          points_awarded: number | null
+          question_id: string
+          response_time_seconds: number | null
           submitted_answer: string
-          team_id: number
+          team_id: string
           updated_at: string
+          updated_by: string
         }
         Insert: {
-          id?: number
-          inserted_at?: string
+          created_at?: string
+          created_by: string
+          id?: string
           is_correct?: boolean | null
-          question_id: number
+          points_awarded?: number | null
+          question_id: string
+          response_time_seconds?: number | null
           submitted_answer: string
-          team_id: number
+          team_id: string
           updated_at?: string
+          updated_by: string
         }
         Update: {
-          id?: number
-          inserted_at?: string
+          created_at?: string
+          created_by?: string
+          id?: string
           is_correct?: boolean | null
-          question_id?: number
+          points_awarded?: number | null
+          question_id?: string
+          response_time_seconds?: number | null
           submitted_answer?: string
-          team_id?: number
+          team_id?: string
           updated_at?: string
+          updated_by?: string
         }
         Relationships: [
           {
-            foreignKeyName: "v001_responses_stag_question_id_fkey"
+            foreignKeyName: "response_question_id_fkey"
             columns: ["question_id"]
             isOneToOne: false
-            referencedRelation: "v001_questions_stag"
+            referencedRelation: "question"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "v001_responses_stag_team_id_fkey"
+            foreignKeyName: "response_team_id_fkey"
             columns: ["team_id"]
             isOneToOne: false
-            referencedRelation: "v001_teams_stag"
-            referencedColumns: ["id"]
-          }
-        ]
-      }
-      v001_rounds_stag: {
-        Row: {
-          description: string | null
-          event_id: number
-          id: number
-          inserted_at: string
-          name: string
-          order_num: number
-          owner: string
-          status: Database["public"]["Enums"]["round_status"]
-          updated_at: string
-        }
-        Insert: {
-          description?: string | null
-          event_id: number
-          id?: number
-          inserted_at?: string
-          name: string
-          order_num: number
-          owner: string
-          status?: Database["public"]["Enums"]["round_status"]
-          updated_at?: string
-        }
-        Update: {
-          description?: string | null
-          event_id?: number
-          id?: number
-          inserted_at?: string
-          name?: string
-          order_num?: number
-          owner?: string
-          status?: Database["public"]["Enums"]["round_status"]
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "v001_rounds_stag_event_id_fkey"
-            columns: ["event_id"]
-            isOneToOne: false
-            referencedRelation: "v001_events_stag"
+            referencedRelation: "team"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "v001_rounds_stag_owner_fkey"
-            columns: ["owner"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          }
-        ]
-      }
-      v001_teams_stag: {
-        Row: {
-          event_id: number
-          id: number
-          inserted_at: string
-          name: string
-          updated_at: string
-        }
-        Insert: {
-          event_id: number
-          id?: number
-          inserted_at?: string
-          name: string
-          updated_at?: string
-        }
-        Update: {
-          event_id?: number
-          id?: number
-          inserted_at?: string
-          name?: string
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "v001_teams_stag_event_id_fkey"
-            columns: ["event_id"]
-            isOneToOne: false
-            referencedRelation: "v001_events_stag"
-            referencedColumns: ["id"]
-          }
-        ]
-      }
-      v002_events_stag: {
-        Row: {
-          date_of_event: string
-          description: string | null
-          id: number
-          inserted_at: string
-          join_code: number
-          location: string | null
-          name: string
-          owner: string
-          status: Database["public"]["Enums"]["event_status"]
-          updated_at: string
-          venue: string | null
-        }
-        Insert: {
-          date_of_event: string
-          description?: string | null
-          id?: number
-          inserted_at?: string
-          join_code?: number
-          location?: string | null
-          name: string
-          owner: string
-          status?: Database["public"]["Enums"]["event_status"]
-          updated_at?: string
-          venue?: string | null
-        }
-        Update: {
-          date_of_event?: string
-          description?: string | null
-          id?: number
-          inserted_at?: string
-          join_code?: number
-          location?: string | null
-          name?: string
-          owner?: string
-          status?: Database["public"]["Enums"]["event_status"]
-          updated_at?: string
-          venue?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "v002_events_stag_owner_fkey"
-            columns: ["owner"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          }
-        ]
-      }
-      v002_questions_stag: {
-        Row: {
-          answer: string
-          id: number
-          inserted_at: string
-          owner: string
-          points: number
-          question: string
-          round_id: number
-          status: Database["public"]["Enums"]["question_status"]
-          updated_at: string
-        }
-        Insert: {
-          answer: string
-          id?: number
-          inserted_at?: string
-          owner: string
-          points: number
-          question: string
-          round_id: number
-          status?: Database["public"]["Enums"]["question_status"]
-          updated_at?: string
-        }
-        Update: {
-          answer?: string
-          id?: number
-          inserted_at?: string
-          owner?: string
-          points?: number
-          question?: string
-          round_id?: number
-          status?: Database["public"]["Enums"]["question_status"]
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "v002_questions_stag_owner_fkey"
-            columns: ["owner"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "v002_questions_stag_round_id_fkey"
-            columns: ["round_id"]
-            isOneToOne: false
-            referencedRelation: "v002_rounds_stag"
-            referencedColumns: ["id"]
-          }
-        ]
-      }
-      v002_responses_stag: {
-        Row: {
-          id: number
-          inserted_at: string
-          is_correct: boolean | null
-          question_id: number
-          submitted_answer: string
-          team_id: number
-          updated_at: string
-        }
-        Insert: {
-          id?: number
-          inserted_at?: string
-          is_correct?: boolean | null
-          question_id: number
-          submitted_answer: string
-          team_id: number
-          updated_at?: string
-        }
-        Update: {
-          id?: number
-          inserted_at?: string
-          is_correct?: boolean | null
-          question_id?: number
-          submitted_answer?: string
-          team_id?: number
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "v002_responses_stag_question_id_fkey"
-            columns: ["question_id"]
-            isOneToOne: false
-            referencedRelation: "v002_questions_stag"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "v002_responses_stag_team_id_fkey"
+            foreignKeyName: "response_team_id_fkey"
             columns: ["team_id"]
             isOneToOne: false
-            referencedRelation: "v002_teams_stag"
-            referencedColumns: ["id"]
-          }
+            referencedRelation: "team_score"
+            referencedColumns: ["team_id"]
+          },
         ]
       }
-      v002_rounds_stag: {
+      round: {
         Row: {
+          created_at: string
+          created_by: string
           description: string | null
-          event_id: number
-          id: number
-          inserted_at: string
+          event_id: string
+          id: string
           name: string
-          order_num: number
-          owner: string
+          sequence_number: number
           status: Database["public"]["Enums"]["round_status"]
+          time_limit_seconds: number | null
           updated_at: string
+          updated_by: string
         }
         Insert: {
+          created_at?: string
+          created_by: string
           description?: string | null
-          event_id: number
-          id?: number
-          inserted_at?: string
+          event_id: string
+          id?: string
           name: string
-          order_num: number
-          owner: string
+          sequence_number: number
           status?: Database["public"]["Enums"]["round_status"]
+          time_limit_seconds?: number | null
           updated_at?: string
+          updated_by: string
         }
         Update: {
+          created_at?: string
+          created_by?: string
           description?: string | null
-          event_id?: number
-          id?: number
-          inserted_at?: string
+          event_id?: string
+          id?: string
           name?: string
-          order_num?: number
-          owner?: string
+          sequence_number?: number
           status?: Database["public"]["Enums"]["round_status"]
+          time_limit_seconds?: number | null
           updated_at?: string
+          updated_by?: string
         }
         Relationships: [
           {
-            foreignKeyName: "v002_rounds_stag_event_id_fkey"
+            foreignKeyName: "round_event_id_fkey"
             columns: ["event_id"]
             isOneToOne: false
-            referencedRelation: "v002_events_stag"
+            referencedRelation: "event"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      team: {
+        Row: {
+          created_at: string
+          created_by: string
+          event_id: string
+          id: string
+          name: string
+          updated_at: string
+          updated_by: string
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          event_id: string
+          id?: string
+          name: string
+          updated_at?: string
+          updated_by: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          event_id?: string
+          id?: string
+          name?: string
+          updated_at?: string
+          updated_by?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "team_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "event"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      team_member: {
+        Row: {
+          created_at: string
+          created_by: string
+          id: string
+          is_captain: boolean
+          team_id: string
+          updated_at: string
+          updated_by: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          id?: string
+          is_captain?: boolean
+          team_id: string
+          updated_at?: string
+          updated_by: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          id?: string
+          is_captain?: boolean
+          team_id?: string
+          updated_at?: string
+          updated_by?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "team_member_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "team"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "v002_rounds_stag_owner_fkey"
-            columns: ["owner"]
+            foreignKeyName: "team_member_team_id_fkey"
+            columns: ["team_id"]
             isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          }
-        ]
-      }
-      v002_teams_stag: {
-        Row: {
-          event_id: number
-          id: number
-          inserted_at: string
-          name: string
-          updated_at: string
-        }
-        Insert: {
-          event_id: number
-          id?: number
-          inserted_at?: string
-          name: string
-          updated_at?: string
-        }
-        Update: {
-          event_id?: number
-          id?: number
-          inserted_at?: string
-          name?: string
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "v002_teams_stag_event_id_fkey"
-            columns: ["event_id"]
-            isOneToOne: false
-            referencedRelation: "v002_events_stag"
-            referencedColumns: ["id"]
-          }
+            referencedRelation: "team_score"
+            referencedColumns: ["team_id"]
+          },
         ]
       }
     }
     Views: {
-      [_ in never]: never
+      team_score: {
+        Row: {
+          avg_response_time: number | null
+          correct_answers: number | null
+          event_id: string | null
+          team_id: string | null
+          team_name: string | null
+          total_points: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "team_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "event"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
       [_ in never]: never
     }
     Enums: {
-      event_status: "PENDING" | "ONGOING" | "COMPLETE"
-      question_status: "PENDING" | "ONGOING" | "COMPLETE"
-      round_status: "PENDING" | "ONGOING" | "COMPLETE"
+      event_status: "pending" | "ongoing" | "completed"
+      question_status: "pending" | "ongoing" | "completed"
+      round_status: "pending" | "ongoing" | "completed"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -485,14 +370,16 @@ export interface Database {
   }
 }
 
+type PublicSchema = Database[Extract<keyof Database, "public">]
+
 export type Tables<
   PublicTableNameOrOptions extends
-    | keyof (Database["public"]["Tables"] & Database["public"]["Views"])
+    | keyof (PublicSchema["Tables"] & PublicSchema["Views"])
     | { schema: keyof Database },
   TableName extends PublicTableNameOrOptions extends { schema: keyof Database }
     ? keyof (Database[PublicTableNameOrOptions["schema"]]["Tables"] &
         Database[PublicTableNameOrOptions["schema"]]["Views"])
-    : never = never
+    : never = never,
 > = PublicTableNameOrOptions extends { schema: keyof Database }
   ? (Database[PublicTableNameOrOptions["schema"]]["Tables"] &
       Database[PublicTableNameOrOptions["schema"]]["Views"])[TableName] extends {
@@ -500,67 +387,82 @@ export type Tables<
     }
     ? R
     : never
-  : PublicTableNameOrOptions extends keyof (Database["public"]["Tables"] &
-      Database["public"]["Views"])
-  ? (Database["public"]["Tables"] &
-      Database["public"]["Views"])[PublicTableNameOrOptions] extends {
-      Row: infer R
-    }
-    ? R
+  : PublicTableNameOrOptions extends keyof (PublicSchema["Tables"] &
+        PublicSchema["Views"])
+    ? (PublicSchema["Tables"] &
+        PublicSchema["Views"])[PublicTableNameOrOptions] extends {
+        Row: infer R
+      }
+      ? R
+      : never
     : never
-  : never
 
 export type TablesInsert<
   PublicTableNameOrOptions extends
-    | keyof Database["public"]["Tables"]
+    | keyof PublicSchema["Tables"]
     | { schema: keyof Database },
   TableName extends PublicTableNameOrOptions extends { schema: keyof Database }
     ? keyof Database[PublicTableNameOrOptions["schema"]]["Tables"]
-    : never = never
+    : never = never,
 > = PublicTableNameOrOptions extends { schema: keyof Database }
   ? Database[PublicTableNameOrOptions["schema"]]["Tables"][TableName] extends {
       Insert: infer I
     }
     ? I
     : never
-  : PublicTableNameOrOptions extends keyof Database["public"]["Tables"]
-  ? Database["public"]["Tables"][PublicTableNameOrOptions] extends {
-      Insert: infer I
-    }
-    ? I
+  : PublicTableNameOrOptions extends keyof PublicSchema["Tables"]
+    ? PublicSchema["Tables"][PublicTableNameOrOptions] extends {
+        Insert: infer I
+      }
+      ? I
+      : never
     : never
-  : never
 
 export type TablesUpdate<
   PublicTableNameOrOptions extends
-    | keyof Database["public"]["Tables"]
+    | keyof PublicSchema["Tables"]
     | { schema: keyof Database },
   TableName extends PublicTableNameOrOptions extends { schema: keyof Database }
     ? keyof Database[PublicTableNameOrOptions["schema"]]["Tables"]
-    : never = never
+    : never = never,
 > = PublicTableNameOrOptions extends { schema: keyof Database }
   ? Database[PublicTableNameOrOptions["schema"]]["Tables"][TableName] extends {
       Update: infer U
     }
     ? U
     : never
-  : PublicTableNameOrOptions extends keyof Database["public"]["Tables"]
-  ? Database["public"]["Tables"][PublicTableNameOrOptions] extends {
-      Update: infer U
-    }
-    ? U
+  : PublicTableNameOrOptions extends keyof PublicSchema["Tables"]
+    ? PublicSchema["Tables"][PublicTableNameOrOptions] extends {
+        Update: infer U
+      }
+      ? U
+      : never
     : never
-  : never
 
 export type Enums<
   PublicEnumNameOrOptions extends
-    | keyof Database["public"]["Enums"]
+    | keyof PublicSchema["Enums"]
     | { schema: keyof Database },
   EnumName extends PublicEnumNameOrOptions extends { schema: keyof Database }
     ? keyof Database[PublicEnumNameOrOptions["schema"]]["Enums"]
-    : never = never
+    : never = never,
 > = PublicEnumNameOrOptions extends { schema: keyof Database }
   ? Database[PublicEnumNameOrOptions["schema"]]["Enums"][EnumName]
-  : PublicEnumNameOrOptions extends keyof Database["public"]["Enums"]
-  ? Database["public"]["Enums"][PublicEnumNameOrOptions]
-  : never
+  : PublicEnumNameOrOptions extends keyof PublicSchema["Enums"]
+    ? PublicSchema["Enums"][PublicEnumNameOrOptions]
+    : never
+
+export type CompositeTypes<
+  PublicCompositeTypeNameOrOptions extends
+    | keyof PublicSchema["CompositeTypes"]
+    | { schema: keyof Database },
+  CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
+    schema: keyof Database
+  }
+    ? keyof Database[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
+    : never = never,
+> = PublicCompositeTypeNameOrOptions extends { schema: keyof Database }
+  ? Database[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
+  : PublicCompositeTypeNameOrOptions extends keyof PublicSchema["CompositeTypes"]
+    ? PublicSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
+    : never

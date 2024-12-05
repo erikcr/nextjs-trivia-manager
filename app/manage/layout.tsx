@@ -1,34 +1,26 @@
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
-import { usePathname, useRouter } from "next/navigation";
-import Image from "next/image";
-import { ArrowRightOnRectangleIcon } from "@heroicons/react/24/outline";
+import { useEffect, useState } from 'react';
 
-import logoTriviaLynx from "@/assets/logos/trivialynx-logo.svg";
-import logoTriviaLynxDark from "@/assets/logos/trivialynx-logo-dark.svg";
+import Image from 'next/image';
+import { usePathname, useRouter } from 'next/navigation';
 
-// Supabase
-import { createClient } from "@/lib/supabase/client";
+import { ArrowRightOnRectangleIcon } from '@heroicons/react/24/outline';
 
+import logoTriviaLynxDark from '@/assets/logos/trivialynx-logo-dark.svg';
+import logoTriviaLynx from '@/assets/logos/trivialynx-logo.svg';
 // Components
-import ThemeSwitcher from "@/components/ThemeSwitcher";
+import ThemeSwitcher from '@/components/ThemeSwitcher';
+// Supabase
+import { createClient } from '@/lib/supabase/client';
 
 const navigation: any[] = [
-  { name: "Events", href: "/manage/events", display: true },
+  { name: 'Events', href: '/manage/events', display: true },
   // { name: "Calendar", href: "/manage/calendar", display: true },
-  { name: "Settings", href: "/manage/settings", display: true },
+  { name: 'Settings', href: '/manage/settings', display: true },
 ];
 
-function classNames(...classes: any[]) {
-  return classes.filter(Boolean).join(" ");
-}
-
-export default function ManageLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function ManageLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
   const supabase = createClient();
@@ -38,7 +30,7 @@ export default function ManageLayout({
   const signOut = () => {
     supabase.auth.signOut();
 
-    router.push("/");
+    router.push('/');
   };
 
   useEffect(() => {
@@ -48,7 +40,7 @@ export default function ManageLayout({
       if (data.session) {
         setAuthenticated(true);
       } else {
-        router.push("/auth/magic");
+        router.push('/auth/magic');
       }
     };
 
@@ -67,7 +59,7 @@ export default function ManageLayout({
             <div className="flex h-16 items-center justify-between px-4 sm:px-0">
               <div className="flex items-center">
                 <div className="flex-shrink-0 pt-2">
-                  <button onClick={() => router.push("/manage/events")}>
+                  <button onClick={() => router.push('/manage/events')}>
                     <Image
                       src={logoTriviaLynx}
                       alt="Next.js Trivia Manager"
@@ -110,7 +102,7 @@ export default function ManageLayout({
 
                   <button
                     className="inline-block h-8 w-8 ml-2 overflow-hidden rounded-full bg-gray-900 dark:bg-gray-400"
-                    onClick={() => router.push("/manage/settings")}
+                    onClick={() => router.push('/manage/settings')}
                   >
                     <svg
                       className="h-full w-full text-gray-300 dark:text-gray-200 dark:hover:text-white"

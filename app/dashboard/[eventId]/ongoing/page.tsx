@@ -42,18 +42,16 @@ export default function EventOngoingPage() {
   const [user, setUser] = useState<User | null>(null);
 
   // Event
-  const [event, setEvent] = useState<Tables<"v002_events_stag">>();
+  const [event, setEvent] = useState<Tables<"event">>();
 
   // Rounds
-  const [rounds, setRounds] = useState<Tables<"v002_rounds_stag">[]>();
-  const [activeRound, setActiveRound] = useState<Tables<"v002_rounds_stag">>();
+  const [rounds, setRounds] = useState<Tables<"round">[]>();
+  const [activeRound, setActiveRound] = useState<Tables<"round">>();
 
   // Questions
-  const [questions, setQuestions] = useState<Tables<"v002_questions_stag">[]>();
-  const [activeQuestion, setActiveQuestion] =
-    useState<Tables<"v002_questions_stag">>();
-  const [nextQuestion, setNextQuestion] =
-    useState<Tables<"v002_questions_stag">>();
+  const [questions, setQuestions] = useState<Tables<"question">[]>();
+  const [activeQuestion, setActiveQuestion] = useState<Tables<"question">>();
+  const [nextQuestion, setNextQuestion] = useState<Tables<"question">>();
 
   // Responses
   const [responses, setResponses] = useState<ResponsesWithTeam>();
@@ -68,8 +66,8 @@ export default function EventOngoingPage() {
   // Responses functions
   const getResponses = async () => {
     const { data, error } = await supabase
-      .from("v002_responses_stag")
-      .select("*, v002_teams_stag( name )")
+      .from("response")
+      .select("*, team( name )")
       .eq("question_id", activeQuestion?.id)
       .order("id");
 
@@ -80,7 +78,7 @@ export default function EventOngoingPage() {
 
   const approveResponse = async (responseId: number, isCorrect: boolean) => {
     const { data, error } = await supabase
-      .from("v002_responses_stag")
+      .from("response")
       .update({ is_correct: isCorrect })
       .eq("id", responseId);
 
@@ -100,7 +98,7 @@ export default function EventOngoingPage() {
           {
             event: "*",
             schema: "public",
-            table: "v002_responses_stag",
+            table: "response",
             filter: `question_id=eq.${activeQuestion?.id}`,
           },
           () => {
@@ -113,12 +111,12 @@ export default function EventOngoingPage() {
 
   // Questions functions
   const updateQuestionOngoing = async () => {
-    if (activeRound?.status === "PENDING") {
+    if (activeRound?.status === "pending") {
       startRound();
     }
 
     const { data, error } = await supabase
-      .from("v002_questions_stag")
+      .from("question")
       .update({ status: "ONGOING" })
       .eq("id", nextQuestion?.id);
 
@@ -136,7 +134,7 @@ export default function EventOngoingPage() {
    */
   const getQuestions = async () => {
     const { data, error } = await supabase
-      .from("v002_questions_stag")
+      .from("question")
       .select()
       .order("id")
       .eq("round_id", activeRound?.id)
@@ -150,7 +148,7 @@ export default function EventOngoingPage() {
         setActiveQuestion(activeQuestion);
       }
 
-      const nextQuestion = data.find((item) => item.status === "PENDING");
+      const nextQuestion = data.find((item) => item.status === "pending");
       const ongoingQuestions = data.find((item) => item.status === "ONGOING");
       if (nextQuestion) {
         setNextQuestion(nextQuestion);
@@ -172,7 +170,7 @@ export default function EventOngoingPage() {
           {
             event: "*",
             schema: "public",
-            table: "v002_questions_stag",
+            table: "question",
             filter: `round_id=eq.${activeRound?.id}`,
           },
           () => {
@@ -186,7 +184,7 @@ export default function EventOngoingPage() {
   // Rounds functions
   const startRound = async () => {
     const { data, error } = await supabase
-      .from("v002_rounds_stag")
+      .from("round")
       .update({ status: "ONGOING" })
       .eq("id", activeRound?.id);
   };
@@ -194,23 +192,23 @@ export default function EventOngoingPage() {
   const closeRound = async () => {
     questions?.map(async (item) => {
       const { data, error } = await supabase
-        .from("v002_questions_stag")
-        .update({ status: "COMPLETE" })
+        .from("question")
+        .update({ status: "completed" })
         .eq("id", item.id);
     });
 
     const { data, error } = await supabase
-      .from("v002_rounds_stag")
-      .update({ status: "COMPLETE" })
+      .from("round")
+      .update({ status: "completed" })
       .eq("id", activeRound?.id);
 
-    const nextRound = rounds?.find((i) => i.status === "PENDING");
+    const nextRound = rounds?.find((i) => i.status === "pending");
     setActiveRound(nextRound);
   };
 
   const getRounds = async () => {
     const { data, error } = await supabase
-      .from("v002_rounds_stag")
+      .from("round")
       .select()
       .eq("event_id", event?.id)
       .eq("owner", user?.id)
@@ -220,7 +218,7 @@ export default function EventOngoingPage() {
       setRounds(data);
 
       const findFirstOngoing = data.find((i) => i.status === "ONGOING");
-      const findFirstPending = data.find((i) => i.status === "PENDING");
+      const findFirstPending = data.find((i) => i.status === "pending");
       if (findFirstOngoing) {
         setActiveRound(findFirstOngoing);
       } else if (findFirstPending) {
@@ -230,10 +228,10 @@ export default function EventOngoingPage() {
       }
 
       const roundsComplete = data?.every(
-        (item) => item.status === "COMPLETE"
+        (item) => item.status === "completed"
       );
 
-      if (roundsComplete && event?.status !== "COMPLETE") {
+      if (roundsComplete && event?.status !== "completed") {
         setTopHeaderButton("END_EVENT");
       } else {
         setTopHeaderButton("");
@@ -252,7 +250,7 @@ export default function EventOngoingPage() {
           {
             event: "*",
             schema: "public",
-            table: "v002_rounds_stag",
+            table: "round",
             filter: `id=eq.${activeRound?.id}`,
           },
           () => {
@@ -266,8 +264,8 @@ export default function EventOngoingPage() {
   // Event functions
   const endEvent = async () => {
     const { data, error } = await supabase
-      .from("v002_events_stag")
-      .update({ status: "COMPLETE" })
+      .from("event")
+      .update({ status: "completed" })
       .eq("id", eventId);
 
     setTopHeaderButton("");
@@ -277,7 +275,7 @@ export default function EventOngoingPage() {
 
   const getEvent = async () => {
     const { data, error } = await supabase
-      .from("v002_events_stag")
+      .from("event")
       .select()
       .eq("id", eventId)
       .eq("owner", user?.id);
@@ -441,13 +439,13 @@ export default function EventOngoingPage() {
                 activeQuestion?.id === item.id
                   ? "bg-gray-100 dark:bg-zinc-800"
                   : "",
-                item.status !== "PENDING"
+                item.status !== "pending"
                   ? "hover:bg-gray-100 dark:hover:bg-zinc-800"
                   : "",
                 "relative flex justify-between gap-x-6 px-4 py-2 sm:px-6"
               )}
               onClick={
-                item.status !== "PENDING"
+                item.status !== "pending"
                   ? () => setActiveQuestion(item)
                   : () => {}
               }
@@ -469,7 +467,7 @@ export default function EventOngoingPage() {
                     className={classNames(
                       item.status === "ONGOING"
                         ? "bg-green-100 dark:bg-green-900"
-                        : item.status === "PENDING"
+                        : item.status === "pending"
                         ? "bg-blue-100 dark:bg-blue-900"
                         : "bg-gray-100 dark:bg-zinc-800",
                       "inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ring-1 ring-inset"
@@ -534,14 +532,14 @@ export default function EventOngoingPage() {
                   {item.submitted_answer}
                 </p>
                 <p className="truncate text-xs leading-5">
-                  {/* {item.v002_teams_stag.name} */}
+                  {/* {item.team.name} */}
                 </p>
               </div>
             </div>
             <dl className="flex w-full flex-none items-center justify-between px-4 sm:w-auto">
               <div
                 className={classNames(
-                  activeRound?.status !== "COMPLETE"
+                  activeRound?.status !== "completed"
                     ? "flex w-16 gap-x-2.5"
                     : "hidden bg-red-300"
                 )}

@@ -8,7 +8,7 @@ import { Dialog } from "@headlessui/react";
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 import { ChevronRightIcon } from "@heroicons/react/20/solid";
 
-import { createClient } from "@/lib/supabase/client";
+import { useUserStore } from "@/lib/store/user-store";
 
 import logoTriviaLynx from "@/assets/logos/trivialynx-logo.svg";
 import logoTriviaLynxDark from "@/assets/logos/trivialynx-logo-dark.svg";
@@ -17,23 +17,10 @@ import appScreenshot from "@/assets/app-screenshot.png";
 const navigation: any[] = [];
 
 export default function Example() {
-  const supabase = createClient();
   const router = useRouter();
+  const { user, setUser } = useUserStore();
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [session, setSession] = useState<any>(undefined);
-
-  useEffect(() => {
-    const getSession = async () => {
-      const { data } = await supabase.auth.getSession();
-
-      if (data.session) {
-        setSession(data.session);
-      }
-    };
-
-    getSession();
-  });
 
   return (
     <div className="">
@@ -80,7 +67,7 @@ export default function Example() {
             ))}
           </div>
           <div className="hidden lg:flex lg:flex-1 lg:justify-end">
-            {session === undefined ? (
+            {user === null ? (
               <Link
                 href="/auth/magic"
                 className="text-sm font-semibold leading-6 text-gray-900 dark:text-gray-200"
@@ -137,7 +124,7 @@ export default function Example() {
                   ))}
                 </div>
                 <div className="py-6">
-                  {session === undefined ? (
+                  {user === null ? (
                     <Link
                       href="/auth/magic"
                       className="-mx-3 block rounded-lg px-3 py-2.5 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50"

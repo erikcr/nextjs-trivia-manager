@@ -35,7 +35,7 @@ export default function EventFinalPage() {
   const [user, setUser] = useState<User | null>(null);
 
   // Event
-  const [event, setEvent] = useState<Tables<"v002_events_stag">>();
+  const [event, setEvent] = useState<Tables<"event">>();
 
   // Teams
   const [activeTeam, setActiveTeam] = useState<TeamScoresSorted>();
@@ -67,7 +67,7 @@ export default function EventFinalPage() {
   // Event functions
   const getEvent = async () => {
     const { data, error } = await supabase
-      .from("v002_events_stag")
+      .from("event")
       .select()
       .eq("id", eventId)
       .eq("owner", user?.id);

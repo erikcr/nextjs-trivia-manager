@@ -2,7 +2,6 @@
 
 import { Fragment, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { Dialog, Transition, Menu } from "@headlessui/react";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 
 // Supabase
@@ -13,6 +12,8 @@ import { RoundsWithQuestions } from "@/lib/types/app.types";
 
 // Components
 import Notification from "@/components/Notification";
+import { Dialog, DialogPanel, Transition, TransitionChild } from "@headlessui/react";
+import { DialogTitle } from "../ui/dialog";
 
 function classNames(...classes: any[]) {
   return classes.filter(Boolean).join(" ");
@@ -31,7 +32,7 @@ export default function RoundSlideout({
   user: User | null;
   rounds: RoundsWithQuestions | undefined;
   setRounds: Function;
-  roundToEdit: Tables<"v002_rounds_stag"> | undefined;
+  roundToEdit: Tables<"round"> | undefined;
   setRoundToEdit: Function;
   roundSlideoutOpen: boolean;
   setRoundSlideoutOpen: Function;
@@ -52,7 +53,7 @@ export default function RoundSlideout({
 
   const addRound = async (formData: FormData) => {
     const { data, error } = await supabase
-      .from("v002_rounds_stag")
+      .from("round")
       .insert([
         {
           name: formData.get("round-name"),
@@ -62,7 +63,7 @@ export default function RoundSlideout({
           owner: user?.id,
         },
       ])
-      .select("*, v002_questions_stag ( id )");
+      .select("*, question ( id )");
 
     if (!error) {
       setNotifTitle("Round added");
@@ -83,7 +84,7 @@ export default function RoundSlideout({
 
   const updateRound = async (formData: FormData) => {
     const { data, error } = await supabase
-      .from("v002_rounds_stag")
+      .from("round")
       .update([
         {
           name: formData.get("round-name"),
@@ -91,7 +92,7 @@ export default function RoundSlideout({
         },
       ])
       .eq("id", roundToEdit?.id)
-      .select("*, v002_questions_stag ( id )");
+      .select("*, question ( id )");
 
     if (!error) {
       setNotifTitle("Round updated");
@@ -117,7 +118,7 @@ export default function RoundSlideout({
 
   const deleteRound = async () => {
     const { data, error } = await supabase
-      .from("v002_rounds_stag")
+      .from("round")
       .delete()
       .eq("id", roundToEdit?.id);
 
@@ -158,7 +159,7 @@ export default function RoundSlideout({
       {/**
        * Round panel slideout
        */}
-      <Transition.Root show={roundSlideoutOpen} as={Fragment}>
+      <Transition show={roundSlideoutOpen} as={Fragment}>
         <Dialog
           as="div"
           className="relative z-50"
@@ -167,7 +168,7 @@ export default function RoundSlideout({
             setRoundToEdit(undefined);
           }}
         >
-          <Transition.Child
+          <TransitionChild
             as={Fragment}
             enter="ease-in-out duration-500"
             enterFrom="opacity-0"
@@ -177,12 +178,12 @@ export default function RoundSlideout({
             leaveTo="opacity-0"
           >
             <div className="fixed inset-0 bg-gray-500 bg-opacity-75 dark:bg-zinc-800 dark:bg-opacity-75 transition-opacity" />
-          </Transition.Child>
+          </TransitionChild>
 
           <div className="fixed inset-0 overflow-hidden">
             <div className="absolute inset-0 overflow-hidden">
               <div className="pointer-events-none fixed inset-y-0 right-0 flex max-w-full pl-10 sm:pl-16">
-                <Transition.Child
+                <TransitionChild
                   as={Fragment}
                   enter="transform transition ease-in-out duration-500 sm:duration-700"
                   enterFrom="translate-x-full"
@@ -191,7 +192,7 @@ export default function RoundSlideout({
                   leaveFrom="translate-x-0"
                   leaveTo="translate-x-full"
                 >
-                  <Dialog.Panel className="bg-gray-50 dark:bg-zinc-900 pointer-events-auto w-screen max-w-2xl">
+                  <DialogPanel className="bg-gray-50 dark:bg-zinc-900 pointer-events-auto w-screen max-w-2xl">
                     <form
                       className="flex h-full flex-col overflow-y-scroll shadow-xl"
                       action={(e) => {
@@ -203,9 +204,9 @@ export default function RoundSlideout({
                         <div className="bg-gray-50 dark:bg-zinc-900 px-4 py-6 sm:px-6">
                           <div className="flex items-start justify-between space-x-3">
                             <div className="space-y-1">
-                              <Dialog.Title className="text-base font-semibold leading-6">
+                              <DialogTitle className="text-base font-semibold leading-6">
                                 {roundToEdit ? "Update" : "New"} round
-                              </Dialog.Title>
+                              </DialogTitle>
                               <p className="text-sm text-gray-500 dark:text-gray-400">
                                 {roundToEdit
                                   ? "Make changes to the round details."
@@ -320,13 +321,13 @@ export default function RoundSlideout({
                         </div>
                       </div>
                     </form>
-                  </Dialog.Panel>
-                </Transition.Child>
+                  </DialogPanel>
+                </TransitionChild>
               </div>
             </div>
           </div>
         </Dialog>
-      </Transition.Root>
+      </Transition>
     </>
   );
 }

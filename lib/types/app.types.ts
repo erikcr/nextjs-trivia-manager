@@ -8,25 +8,25 @@ interface SidebarItem {
   type: string;
   label?: string;
   destination?: string;
-  rounds?: Tables<"v002_rounds_stag">[];
+  rounds?: Tables<"round">[];
 }
 export interface SidebarList extends Array<SidebarItem> { }
 
 const roundsWithQuestions = supabase
-  .from("v002_rounds_stag")
-  .select(`*, v002_questions_stag ( id )`);
+  .from("round")
+  .select(`*, question ( id )`);
 export type RoundsWithQuestions = QueryData<typeof roundsWithQuestions>;
 
 const teamsWithResponsesQuery = supabase
-  .from("v002_teams_stag")
+  .from("team")
   .select(`
     id,
     name,
-    v002_responses_stag (
+    response (
       id,
       is_correct,
       submitted_answer,
-      v002_questions_stag (
+      question (
         points
       )
     )
@@ -34,15 +34,15 @@ const teamsWithResponsesQuery = supabase
 export type TeamsWithResponses = QueryData<typeof teamsWithResponsesQuery>;
 
 const teamWithResponsesQuery = supabase
-  .from("v002_teams_stag")
+  .from("team")
   .select(`
     id,
     name,
-    v002_responses_stag (
+    response (
       id,
       is_correct,
       submitted_answer,
-      v002_questions_stag (
+      question (
         points
       )
     )
@@ -51,12 +51,12 @@ const teamWithResponsesQuery = supabase
 export type TeamWithResponses = QueryData<typeof teamWithResponsesQuery>[0];
 
 const responsesWithTeamQuery = supabase
-  .from("v002_responses_stag")
+  .from("response")
   .select(`
     id,
     is_correct,
     submitted_answer,
-    v002_teams_stag (
+    team (
       id,
       name
     )
@@ -64,23 +64,23 @@ const responsesWithTeamQuery = supabase
 export type ResponsesWithTeam = QueryData<typeof responsesWithTeamQuery>;
 
 const responseWithQuestionsQuery = supabase
-  .from("v002_responses_stag")
+  .from("response")
   .select(`
     id,
     submitted_answer,
     is_correct,
-    question: v002_questions_stag (
+    question: question (
       points,
       question,
-      round: v002_rounds_stag (status)
+      round: round (status)
     )
   `)
   .limit(1);
-export type ResponeWithQuestions = QueryData<typeof responseWithQuestionsQuery>;
+export type ResponseWithQuestions = QueryData<typeof responseWithQuestionsQuery>;
 
 export type TeamScoresSorted = {
   id: string,
   name: string,
   team_total_points: number,
-  responses: ResponeWithQuestions
+  responses: ResponseWithQuestions
 }
