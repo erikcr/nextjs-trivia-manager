@@ -28,6 +28,7 @@ export interface EventStoreState {
   startEvent: (id: string) => Promise<Event | null>;
   subscribeToEvents: () => void;
   unsubscribeFromEvents: () => void;
+  startEventAction: (eventId: string) => Promise<void>;
 }
 
 const supabase = createClient();
@@ -206,6 +207,33 @@ export const useEventStore = create<EventStoreState>((set, get) => ({
     } catch (error) {
       set({ error: error as Error });
       return null;
+    } finally {
+      set({ loading: false });
+    }
+  },
+
+  startEventAction: async (eventId: string) => {
+    set({ loading: true });
+
+    try {
+      const { error } = await supabase
+        .from('event')
+        .update({ status: 'active', started_at: new Date().toISOString() })
+        .eq('id', eventId);
+
+      if (error) throw error;
+
+      // Fetch updated event
+      const { data: updatedEvent, error: fetchError } = await supabase
+        .from('event')
+        .select()
+        .eq('id', eventId)
+        .single();
+
+      if (fetchError) throw fetchError;
+      set({ currentEvent: updatedEvent });
+    } catch (error) {
+      console.error('Error starting event:', error);
     } finally {
       set({ loading: false });
     }

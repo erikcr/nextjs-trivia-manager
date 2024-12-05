@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 
 import { useParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 
 import { Message } from 'ai';
 
@@ -23,9 +24,10 @@ import { cx } from '@/lib/utils';
 
 export default function EditorByIdPage() {
   const { eventId } = useParams();
+  const router = useRouter();
 
   // Store
-  const { currentEvent, fetchEvent, loading: eventLoading, error: eventError } = useEventStore();
+  const { currentEvent, setCurrentEvent, startEventAction, fetchEvent, loading: eventLoading, error: eventError } = useEventStore();
   const {
     rounds,
     activeRound,
@@ -145,6 +147,12 @@ export default function EditorByIdPage() {
     setQuestionSlideoutOpen(true);
   };
 
+  const handleStartEvent = async () => {
+    if (!currentEvent?.id) return;
+    await startEventAction(currentEvent.id);
+    router.push(`/dashboard/${currentEvent.id}/ongoing`);
+  };
+
   useEffect(() => {
     if (eventId) {
       fetchEvent(eventId as string);
@@ -192,7 +200,8 @@ export default function EditorByIdPage() {
 
   return (
     <div className="flex min-h-screen flex-col">
-      <EditorHeader event={currentEvent} />
+      <EditorHeader event={currentEvent} onStartEvent={handleStartEvent} />
+
       <main className="flex-1 pt-4">
         <div className="mx-auto max-w-7xl px-4 pb-12 sm:px-6 lg:px-8">
           {activeRound ? (
