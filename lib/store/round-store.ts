@@ -11,10 +11,12 @@ export type RoundUpdate = Tables['round']['Update'];
 export type Question = Tables['question']['Row'];
 export type QuestionInsert = Tables['question']['Insert'];
 export type QuestionUpdate = Tables['question']['Update'];
+export type Response = Tables['response']['Row'];
 
 export interface RoundStoreState {
   rounds: Round[];
   questions: Question[];
+  responses: Response[];
   loading: boolean;
   error: Error | null;
   activeRound: Round | null;
@@ -22,10 +24,12 @@ export interface RoundStoreState {
   questionToEdit: Question | null;
   addRoundLoading: boolean;
   addQuestionLoading: boolean;
+  responseSubscription: any | null;
 
   // Basic setters
   setRounds: (rounds: Round[]) => void;
   setQuestions: (questions: Question[]) => void;
+  setResponses: (responses: Response[]) => void;
   setLoading: (loading: boolean) => void;
   setError: (error: Error | null) => void;
   setActiveRound: (round: Round | null) => void;
@@ -33,6 +37,7 @@ export interface RoundStoreState {
   setQuestionToEdit: (question: Question | null) => void;
   setAddRoundLoading: (loading: boolean) => void;
   setAddQuestionLoading: (loading: boolean) => void;
+  setResponseSubscription: (subscription: any | null) => void;
 
   // Round operations
   fetchRounds: (eventId: string) => Promise<void>;
@@ -46,6 +51,11 @@ export interface RoundStoreState {
   updateQuestion: (id: string, updates: Partial<QuestionUpdate>) => Promise<Question | null>;
   deleteQuestion: (id: string) => Promise<boolean>;
 
+  // Response operations
+  fetchResponses: (questionId: string) => Promise<void>;
+  subscribeToResponses: (questionId: string) => void;
+  unsubscribeFromResponses: () => void;
+
   // Real-time subscriptions
   subscribeToRounds: (eventId: string) => void;
   subscribeToQuestions: (roundId: string) => void;
@@ -58,6 +68,7 @@ const supabase = createClient();
 export const useRoundStore = create<RoundStoreState>((set, get) => ({
   rounds: [],
   questions: [],
+  responses: [],
   loading: false,
   error: null,
   activeRound: null,
@@ -65,10 +76,12 @@ export const useRoundStore = create<RoundStoreState>((set, get) => ({
   questionToEdit: null,
   addRoundLoading: false,
   addQuestionLoading: false,
+  responseSubscription: null,
 
   // Basic setters
   setRounds: (rounds) => set({ rounds }),
   setQuestions: (questions) => set({ questions }),
+  setResponses: (responses) => set({ responses }),
   setLoading: (loading) => set({ loading }),
   setError: (error) => set({ error }),
   setActiveRound: (round) => set({ activeRound: round }),
@@ -76,6 +89,7 @@ export const useRoundStore = create<RoundStoreState>((set, get) => ({
   setQuestionToEdit: (question) => set({ questionToEdit: question }),
   setAddRoundLoading: (loading) => set({ addRoundLoading: loading }),
   setAddQuestionLoading: (loading) => set({ addQuestionLoading: loading }),
+  setResponseSubscription: (subscription) => set({ responseSubscription: subscription }),
 
   // Fetch rounds for an event
   fetchRounds: async (eventId) => {
@@ -275,6 +289,62 @@ export const useRoundStore = create<RoundStoreState>((set, get) => ({
       return false;
     } finally {
       set({ loading: false });
+    }
+  },
+
+  // Fetch responses for a question
+  fetchResponses: async (questionId) => {
+    try {
+      set({ loading: true, error: null });
+      const user = useUserStore.getState().user;
+
+      if (!user) throw new Error('No user');
+
+      const { data, error } = await supabase
+        .from('response')
+        .select('*')
+        .eq('question_id', questionId)
+        .order('created_at', { ascending: true });
+
+      if (error) throw error;
+      set({ responses: data || [] });
+    } catch (error) {
+      set({ error: error as Error });
+    } finally {
+      set({ loading: false });
+    }
+  },
+
+  // Subscribe to real-time response updates
+  subscribeToResponses: (questionId) => {
+    const subscription = supabase
+      .channel(`responses:${questionId}`)
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'response',
+          filter: `question_id=eq.${questionId}`,
+        },
+        async (payload) => {
+          // Refetch all responses to ensure we have the latest state
+          const { fetchResponses } = get();
+          await fetchResponses(questionId);
+        },
+      )
+      .subscribe();
+
+    // Store subscription for cleanup
+    set({ responseSubscription: subscription });
+  },
+
+  // Cleanup response subscription
+  unsubscribeFromResponses: () => {
+    const state = get() as any;
+    if (state.responseSubscription) {
+      state.responseSubscription.unsubscribe();
+      set({ responseSubscription: null });
     }
   },
 

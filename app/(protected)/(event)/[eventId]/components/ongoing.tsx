@@ -14,6 +14,7 @@ import { Button } from '@/components/ui/button';
 import { useEventStore } from '@/lib/store/event-store';
 import { Question, useRoundStore } from '@/lib/store/round-store';
 import { useUserStore } from '@/lib/store/user-store';
+import { cx } from '@/lib/utils';
 
 export default function EventPageOngoing() {
   const router = useRouter();
@@ -29,8 +30,14 @@ export default function EventPageOngoing() {
     questions,
     loading: questionsLoading,
     createQuestion,
+    fetchResponses,
+    subscribeToResponses,
+    unsubscribeFromResponses,
   } = useRoundStore();
   const { user } = useUserStore();
+
+  // Local state
+  const [activeQuestion, setActiveQuestion] = useState<Question | null>(null);
 
   // Slideout states
   const [roundSlideoutOpen, setRoundSlideoutOpen] = useState(false);
@@ -48,91 +55,6 @@ export default function EventPageOngoing() {
       selected?: boolean;
     }>
   >([]);
-
-  const [messages, setMessages] = useState<Message[]>([]);
-
-  // Refs
-  const addFormRef = useRef<HTMLFormElement>(null);
-
-  const handleAddQuestions = async (
-    newQuestions: Array<{ question: string; answer: string; points?: number }>,
-  ) => {
-    if (!activeRound || !user) return;
-
-    try {
-      await Promise.all(
-        newQuestions.map((q) =>
-          createQuestion({
-            question_text: q.question,
-            correct_answer: q.answer,
-            points: q.points || 10,
-            round_id: activeRound.id,
-            created_by: user.id,
-            updated_by: user.id,
-          }),
-        ),
-      );
-
-      await fetchQuestions(activeRound.id);
-    } catch (error) {
-      console.error('Error adding questions:', error);
-    }
-  };
-
-  const handleGenerateQuestions = async (topic: string) => {
-    setIsGenerating(true);
-    try {
-      // TODO: Replace with actual AI call
-      // Simulating API call
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-      setQuestionSuggestions([
-        {
-          question:
-            'What was the first spacecraft to land on Mars but I need to test a much shorter?',
-          answer: 'Viking 1',
-          points: 10,
-          selected: false,
-        },
-        {
-          question: 'Who was the first American woman in space?',
-          answer: 'Sally Ride',
-          points: 10,
-          selected: false,
-        },
-        {
-          question: 'What is the largest planet in our solar system?',
-          answer: 'Jupiter',
-          points: 10,
-          selected: false,
-        },
-      ]);
-    } catch (error) {
-      console.error('Error generating questions:', error);
-    } finally {
-      setIsGenerating(false);
-    }
-  };
-
-  const handleSelectQuestion = (index: number) => {
-    setQuestionSuggestions((prev) =>
-      prev.map((q, i) => (i === index ? { ...q, selected: !q.selected } : q)),
-    );
-  };
-
-  const handleAddSelectedQuestions = async () => {
-    const selectedQuestions = generatedQuestions.filter((q) => q.selected);
-    if (selectedQuestions.length === 0) return;
-
-    await handleAddQuestions(selectedQuestions);
-    setQuestionSuggestions((prev) => prev.map((q) => ({ ...q, selected: false })));
-  };
-
-  const handleUpdateGeneratedQuestion = (
-    index: number,
-    updates: Partial<{ question: string; answer: string; points?: number; selected?: boolean }>,
-  ) => {
-    setQuestionSuggestions((prev) => prev.map((q, i) => (i === index ? { ...q, ...updates } : q)));
-  };
 
   const handleQuestionClick = (question: any) => {
     setQuestionToEdit(question);
@@ -171,19 +93,72 @@ export default function EventPageOngoing() {
   return (
     <>
       <main className="flex-1 pt-4">
-        <div className="mx-auto max-w-7xl px-1 pb-12 sm:px-2 lg:px-4">
+        <div className="mx-auto px-1 pb-12 sm:px-2 lg:px-8">
           <div className="grid h-[calc(100vh-9rem)] grid-cols-1 lg:grid-cols-[1fr,2fr] gap-6">
             <div className="flex max-h-full flex-col overflow-hidden gap-3">
-              <RoundNavigation
-                rounds={rounds}
-                activeRound={activeRound}
-                setActiveRound={setActiveRound}
-                setRoundToEdit={setRoundToEdit}
-                setRoundSlideoutOpen={setRoundSlideoutOpen}
-              />
+              <RoundNavigation setRoundSlideoutOpen={setRoundSlideoutOpen} />
 
               <div className="flex-1 min-h-0 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 flex flex-col ">
-                <h2 className="text-lg font-semibold py-2 px-4">Questions</h2>
+                <div className="flex-1 min-h-0 overflow-auto">
+                  <table className="min-w-full divide-y divide-gray-300 dark:divide-gray-700">
+                    <thead className="bg-gray-50 dark:bg-zinc-800 sticky top-0">
+                      <tr>
+                        <th
+                          scope="col"
+                          className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 dark:text-gray-200"
+                        >
+                          Question
+                        </th>
+                        <th
+                          scope="col"
+                          className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-gray-200"
+                        >
+                          Status
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
+                      {questions?.map((question) => (
+                        <tr
+                          key={question.id}
+                          onClick={() => {
+                            setActiveQuestion(question);
+                            fetchResponses(question.id);
+                            unsubscribeFromResponses(); // Cleanup previous subscription
+                            subscribeToResponses(question.id);
+                          }}
+                          className={cx(
+                            'cursor-pointer hover:bg-gray-50 dark:hover:bg-zinc-700',
+                            question.id === activeQuestion?.id
+                              ? 'bg-gray-100 dark:bg-zinc-700'
+                              : '',
+                          )}
+                        >
+                          <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm text-gray-900 dark:text-gray-200">
+                            {question.question_text}
+                          </td>
+                          <td className="whitespace-nowrap px-3 py-4 text-sm">
+                            <span
+                              className={cx(
+                                'inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset',
+                                {
+                                  'bg-yellow-50 text-yellow-800 ring-yellow-600/20 dark:bg-yellow-400/10 dark:text-yellow-500 dark:ring-yellow-400/20':
+                                    question.status === 'pending',
+                                  'bg-green-50 text-green-800 ring-green-600/20 dark:bg-green-400/10 dark:text-green-500 dark:ring-green-400/20':
+                                    question.status === 'ongoing',
+                                  'bg-gray-50 text-gray-800 ring-gray-600/20 dark:bg-gray-400/10 dark:text-gray-500 dark:ring-gray-400/20':
+                                    question.status === 'completed',
+                                },
+                              )}
+                            >
+                              {question.status.charAt(0).toUpperCase() + question.status.slice(1)}
+                            </span>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               </div>
             </div>
 

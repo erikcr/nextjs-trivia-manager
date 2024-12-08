@@ -15,7 +15,7 @@ export default function EventHeader() {
   return (
     <header className="bg-white dark:bg-zinc-900 border-b border-gray-200 dark:border-zinc-700">
       <nav
-        className="mx-auto flex max-w-7xl items-center justify-between p-3 lg:px-4"
+        className="mx-auto flex items-center justify-between p-3 lg:px-8"
         aria-label="Global"
       >
         <div className="flex lg:flex-1">

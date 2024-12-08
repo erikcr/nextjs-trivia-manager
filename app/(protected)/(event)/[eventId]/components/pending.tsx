@@ -2,12 +2,10 @@
 
 import { useEffect, useRef, useState } from 'react';
 
-import { useParams } from 'next/navigation';
 import { useRouter } from 'next/navigation';
 
 import { Message } from 'ai';
 
-import EventHeader from '@/components/event/header';
 import QuestionGrid from '@/components/event/question-grid';
 import QuestionSuggestions from '@/components/event/question-suggestions';
 import RoundNavigation from '@/components/event/round-navigation';
@@ -25,10 +23,7 @@ export default function EventPagePending() {
   // Store
   const { currentEvent, loading: eventLoading } = useEventStore();
   const {
-    rounds,
     activeRound,
-    setActiveRound,
-    fetchRounds,
     fetchQuestions,
     questions,
     loading: questionsLoading,
@@ -175,17 +170,11 @@ export default function EventPagePending() {
   return (
     <>
       <main className="flex-1 pt-4">
-        <div className="mx-auto max-w-7xl px-1 pb-12 sm:px-2 lg:px-4">
+        <div className="mx-auto px-1 pb-12 sm:px-2 lg:px-4">
           {activeRound ? (
             <div className="grid h-[calc(100vh-9rem)] grid-cols-1 lg:grid-cols-[1fr,2fr] gap-6">
               <div className="flex max-h-full flex-col overflow-hidden gap-3">
-                <RoundNavigation
-                  rounds={rounds}
-                  activeRound={activeRound}
-                  setActiveRound={setActiveRound}
-                  setRoundToEdit={setRoundToEdit}
-                  setRoundSlideoutOpen={setRoundSlideoutOpen}
-                />
+                <RoundNavigation setRoundSlideoutOpen={setRoundSlideoutOpen} />
 
                 <div className="flex-1 min-h-0 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 flex flex-col ">
                   <h2 className="text-lg font-semibold py-2 px-4">AI Question Generator</h2>
@@ -230,13 +219,7 @@ export default function EventPagePending() {
                   Get started by creating a new round or selecting an existing one.
                 </p>
 
-                <RoundNavigation
-                  rounds={rounds}
-                  activeRound={activeRound}
-                  setActiveRound={setActiveRound}
-                  setRoundToEdit={setRoundToEdit}
-                  setRoundSlideoutOpen={setRoundSlideoutOpen}
-                />
+                <RoundNavigation setRoundSlideoutOpen={setRoundSlideoutOpen} />
               </div>
             </div>
           )}

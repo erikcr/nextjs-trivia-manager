@@ -137,42 +137,30 @@ export type Database = {
       response: {
         Row: {
           created_at: string
-          created_by: string
           id: string
-          is_correct: boolean | null
           points_awarded: number | null
           question_id: string
           response_time_seconds: number | null
-          submitted_answer: string
           team_id: string
           updated_at: string
-          updated_by: string
         }
         Insert: {
           created_at?: string
-          created_by: string
           id?: string
-          is_correct?: boolean | null
           points_awarded?: number | null
           question_id: string
           response_time_seconds?: number | null
-          submitted_answer: string
           team_id: string
           updated_at?: string
-          updated_by: string
         }
         Update: {
           created_at?: string
-          created_by?: string
           id?: string
-          is_correct?: boolean | null
           points_awarded?: number | null
           question_id?: string
           response_time_seconds?: number | null
-          submitted_answer?: string
           team_id?: string
           updated_at?: string
-          updated_by?: string
         }
         Relationships: [
           {
@@ -188,13 +176,6 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "team"
             referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "response_team_id_fkey"
-            columns: ["team_id"]
-            isOneToOne: false
-            referencedRelation: "team_score"
-            referencedColumns: ["team_id"]
           },
         ]
       }
@@ -250,31 +231,19 @@ export type Database = {
       }
       team: {
         Row: {
-          created_at: string
-          created_by: string
           event_id: string
           id: string
           name: string
-          updated_at: string
-          updated_by: string
         }
         Insert: {
-          created_at?: string
-          created_by: string
           event_id: string
           id?: string
           name: string
-          updated_at?: string
-          updated_by: string
         }
         Update: {
-          created_at?: string
-          created_by?: string
           event_id?: string
           id?: string
           name?: string
-          updated_at?: string
-          updated_by?: string
         }
         Relationships: [
           {
@@ -283,78 +252,12 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "event"
             referencedColumns: ["id"]
-          },
-        ]
-      }
-      team_member: {
-        Row: {
-          created_at: string
-          created_by: string
-          id: string
-          is_captain: boolean
-          team_id: string
-          updated_at: string
-          updated_by: string
-          user_id: string
-        }
-        Insert: {
-          created_at?: string
-          created_by: string
-          id?: string
-          is_captain?: boolean
-          team_id: string
-          updated_at?: string
-          updated_by: string
-          user_id: string
-        }
-        Update: {
-          created_at?: string
-          created_by?: string
-          id?: string
-          is_captain?: boolean
-          team_id?: string
-          updated_at?: string
-          updated_by?: string
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "team_member_team_id_fkey"
-            columns: ["team_id"]
-            isOneToOne: false
-            referencedRelation: "team"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "team_member_team_id_fkey"
-            columns: ["team_id"]
-            isOneToOne: false
-            referencedRelation: "team_score"
-            referencedColumns: ["team_id"]
           },
         ]
       }
     }
     Views: {
-      team_score: {
-        Row: {
-          avg_response_time: number | null
-          correct_answers: number | null
-          event_id: string | null
-          team_id: string | null
-          team_name: string | null
-          total_points: number | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "team_event_id_fkey"
-            columns: ["event_id"]
-            isOneToOne: false
-            referencedRelation: "event"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
+      [_ in never]: never
     }
     Functions: {
       [_ in never]: never
