@@ -93,6 +93,7 @@ export const useRoundStore = create<RoundStoreState>((set, get) => ({
 
       if (error) throw error;
       set({ rounds: data || [] });
+      set({ activeRound: data?.[0] || null });
     } catch (error) {
       set({ error: error as Error });
     } finally {

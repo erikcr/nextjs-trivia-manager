@@ -1,6 +1,6 @@
 import { Question } from '@/lib/store/round-store';
 
-export default function QuestionGrid({
+export default function ResponseGrid({
   questions,
   loading,
   onQuestionClick,
@@ -16,16 +16,7 @@ export default function QuestionGrid({
       <div className="flex-shrink-0">
         <div className="sm:flex sm:items-center">
           <div className="sm:flex-auto">
-            <h1 className="text-lg font-semibold">Questions</h1>
-          </div>
-          <div className="mt-4 sm:ml-16 sm:mt-0 sm:flex-none flex gap-2">
-            <button
-              type="button"
-              onClick={setQuestionSlideoutOpen}
-              className="block rounded-md bg-primary dark:bg-primary-dark px-3 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-primary-hover dark:hover:bg-primary-dark-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
-            >
-              Add Question
-            </button>
+            <h1 className="text-lg font-semibold">Responses</h1>
           </div>
         </div>
       </div>
@@ -40,20 +31,12 @@ export default function QuestionGrid({
                     scope="col"
                     className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 dark:text-gray-200 sm:pl-6"
                   >
-                    Question
+                    Response
                   </th>
                   <th
                     scope="col"
                     className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-gray-200"
-                  >
-                    Answer
-                  </th>
-                  <th
-                    scope="col"
-                    className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-gray-200"
-                  >
-                    Points
-                  </th>
+                  >{' '}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200 dark:divide-gray-700 bg-white dark:bg-zinc-900 overflow-y-scroll">
@@ -76,7 +59,7 @@ export default function QuestionGrid({
                     </td>
                   </tr>
                 ) : (
-                  questions.map((question) => (
+                  responses.map((question) => (
                     <tr
                       key={question.id}
                       onClick={() => onQuestionClick(question)}

@@ -25,10 +25,8 @@ export interface EventStoreState {
   createEvent: (event: Partial<EventInsert>) => Promise<Event | null>;
   updateEvent: (id: string, updates: Partial<EventUpdate>) => Promise<Event | null>;
   deleteEvent: (id: string) => Promise<boolean>;
-  startEvent: (id: string) => Promise<Event | null>;
-  subscribeToEvents: () => void;
-  unsubscribeFromEvents: () => void;
-  startEventAction: (eventId: string) => Promise<void>;
+  startEvent: () => Promise<Event | null>;
+  endEvent: () => Promise<Event | null>;
 }
 
 const supabase = createClient();
@@ -80,7 +78,7 @@ export const useEventStore = create<EventStoreState>((set, get) => ({
         .single();
 
       if (error) throw error;
-      set({ currentEvent: data });
+      set({ currentEvent: data, loading: false });
     } catch (error) {
       set({ error: error as Error });
     } finally {
@@ -187,18 +185,18 @@ export const useEventStore = create<EventStoreState>((set, get) => ({
   },
 
   // Start event
-  startEvent: async (id) => {
+  startEvent: async () => {
     try {
       set({ loading: true, error: null });
       const user = useUserStore.getState().user;
 
       if (!user) throw new Error('No user');
+      if (!get().currentEvent) throw new Error('No current event');
 
       const { data, error } = await supabase
         .from('event')
-        .update({ status: 'ONGOING' })
-        .eq('id', id)
-        .eq('created_by', user.id)
+        .update({ status: 'ongoing' })
+        .eq('id', get().currentEvent?.id)
         .select()
         .single();
 
@@ -213,65 +211,29 @@ export const useEventStore = create<EventStoreState>((set, get) => ({
     }
   },
 
-  startEventAction: async (eventId: string) => {
-    set({ loading: true });
-
+  endEvent: async () => {
     try {
-      const { error } = await supabase
-        .from('event')
-        .update({ status: 'active', started_at: new Date().toISOString() })
-        .eq('id', eventId);
+      set({ loading: true, error: null });
+      const user = useUserStore.getState().user;
 
-      if (error) throw error;
+      if (!user) throw new Error('No user');
+      if (!get().currentEvent) throw new Error('No current event');
 
-      // Fetch updated event
-      const { data: updatedEvent, error: fetchError } = await supabase
+      const { data, error } = await supabase
         .from('event')
+        .update({ status: 'completed' })
+        .eq('id', get().currentEvent?.id)
         .select()
-        .eq('id', eventId)
         .single();
 
-      if (fetchError) throw fetchError;
-      set({ currentEvent: updatedEvent });
+      if (error) throw error;
+      set({ currentEvent: data });
+      return data;
     } catch (error) {
-      console.error('Error starting event:', error);
+      set({ error: error as Error });
+      return null;
     } finally {
       set({ loading: false });
     }
-  },
-
-  // Subscribe to real-time events
-  subscribeToEvents: () => {
-    const user = useUserStore.getState().user;
-    if (!user) return;
-
-    const subscription = supabase
-      .channel('event_changes')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'event',
-          filter: `created_by=eq.${user.id}`,
-        },
-        async (payload) => {
-          // Refresh the events list when changes occur
-          get().fetchEvents();
-        },
-      )
-      .subscribe();
-
-    // Store subscription for cleanup
-    (window as any).eventsSubscription = subscription;
-  },
-
-  // Cleanup subscription
-  unsubscribeFromEvents: () => {
-    const subscription = (window as any).eventsSubscription;
-    if (subscription) {
-      supabase.removeChannel(subscription);
-      (window as any).eventsSubscription = null;
-    }
-  },
+  }
 }));
