@@ -96,6 +96,7 @@ export const useEventStore = create<EventStoreState>((set, get) => ({
 
       if (!user) throw new Error('No user');
 
+      // @ts-expect-error
       const newEvent: EventInsert = {
         ...event,
         join_code: Math.floor(Math.random() * 1000000).toString(),

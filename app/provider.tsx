@@ -12,6 +12,7 @@ type Props = {
 
 const Provider = ({ children }: Props) => {
   const [mounted, setMounted] = useState<boolean>(false);
+  
   // Initialize auth
   useAuth();
 

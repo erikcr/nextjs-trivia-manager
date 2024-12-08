@@ -16,7 +16,7 @@ import appScreenshot from "@/assets/app-screenshot.png";
 
 const navigation: any[] = [];
 
-export default function Example() {
+export default function HomePage() {
   const router = useRouter();
   const { user, setUser } = useUserStore();
 
@@ -69,14 +69,14 @@ export default function Example() {
           <div className="hidden lg:flex lg:flex-1 lg:justify-end">
             {user === null ? (
               <Link
-                href="/auth/magic"
+                href="/magic"
                 className="text-sm font-semibold leading-6 text-gray-900 dark:text-gray-200"
               >
                 Log in <span aria-hidden="true">&rarr;</span>
               </Link>
             ) : (
               <Link
-                href="/manage/events"
+                href="/events"
                 className="text-sm font-semibold leading-6 text-gray-900 dark:text-gray-200"
               >
                 Dashboard <span aria-hidden="true">&rarr;</span>
@@ -126,14 +126,14 @@ export default function Example() {
                 <div className="py-6">
                   {user === null ? (
                     <Link
-                      href="/auth/magic"
+                      href="/magic"
                       className="-mx-3 block rounded-lg px-3 py-2.5 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50"
                     >
                       Log in
                     </Link>
                   ) : (
                     <Link
-                      href="/manage/events"
+                      href="/events"
                       className="-mx-3 block rounded-lg px-3 py-2.5 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50"
                     >
                       Dashboard
@@ -189,7 +189,7 @@ export default function Example() {
             </p>
             <div className="mt-10 flex items-center gap-x-6 hidden md:display">
               <a
-                href="/auth/magic"
+                href="/magic"
                 className="rounded-md bg-primary px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-primary-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
               >
                 Get started
