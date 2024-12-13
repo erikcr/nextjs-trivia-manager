@@ -41,9 +41,9 @@ export default function EventPagePending() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedQuestions, setQuestionSuggestions] = useState<
     Array<{
-      question: string;
-      answer: string;
-      points?: number;
+      question_text: string;
+      correct_answer: string;
+      points: number;
       selected?: boolean;
     }>
   >([]);
@@ -54,7 +54,7 @@ export default function EventPagePending() {
   const addFormRef = useRef<HTMLFormElement>(null);
 
   const handleAddQuestions = async (
-    newQuestions: Array<{ question: string; answer: string; points?: number }>,
+    newQuestions: Array<{ question_text: string; correct_answer: string; points: number }>,
   ) => {
     if (!activeRound || !user) return;
 
@@ -62,9 +62,9 @@ export default function EventPagePending() {
       await Promise.all(
         newQuestions.map((q) =>
           createQuestion({
-            question_text: q.question,
-            correct_answer: q.answer,
-            points: q.points || 10,
+            question_text: q.question_text,
+            correct_answer: q.correct_answer,
+            points: q.points,
             round_id: activeRound.id,
             created_by: user.id,
             updated_by: user.id,
@@ -78,33 +78,34 @@ export default function EventPagePending() {
     }
   };
 
+  // Add new function to call completion API
+  const generateQuestionsFromAPI = async (topic: string) => {
+    const response = await fetch('/api/completion', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ prompt: `Generate trivia questions about: ${topic}` }),
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to generate questions');
+    }
+
+    const data = await response.json();
+    return data.trivia;
+  };
+
   const handleGenerateQuestions = async (topic: string) => {
     setIsGenerating(true);
     try {
-      // TODO: Replace with actual AI call
-      // Simulating API call
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-      setQuestionSuggestions([
-        {
-          question:
-            'What was the first spacecraft to land on Mars but I need to test a much shorter?',
-          answer: 'Viking 1',
-          points: 10,
+      const questions = await generateQuestionsFromAPI(topic);
+      setQuestionSuggestions(
+        questions.map((q: any) => ({
+          ...q,
           selected: false,
-        },
-        {
-          question: 'Who was the first American woman in space?',
-          answer: 'Sally Ride',
-          points: 10,
-          selected: false,
-        },
-        {
-          question: 'What is the largest planet in our solar system?',
-          answer: 'Jupiter',
-          points: 10,
-          selected: false,
-        },
-      ]);
+        }))
+      );
     } catch (error) {
       console.error('Error generating questions:', error);
     } finally {

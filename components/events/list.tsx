@@ -102,7 +102,7 @@ export default function EventsList() {
                   </Transition>
                 </Menu>
               </div>
-              <a href={item.status === 'pending' ? `/${item.id}` : `/${item.id}/ongoing`}>
+              <a href={`/${item.id}`}>
                 <dl className="-my-3 divide-y divide-gray-100 dark:divide-gray-600 px-6 py-4 text-sm leading-6">
                   <div className="flex justify-between gap-x-4 py-3">
                     <dt className="text-gray-500 dark:text-gray-300">Date</dt>

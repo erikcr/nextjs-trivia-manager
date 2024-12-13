@@ -21,6 +21,7 @@ export interface RoundStoreState {
   error: Error | null;
   activeRound: Round | null;
   roundToEdit: Round | null;
+  activeQuestion: Question | null;
   questionToEdit: Question | null;
   addRoundLoading: boolean;
   addQuestionLoading: boolean;
@@ -34,6 +35,7 @@ export interface RoundStoreState {
   setError: (error: Error | null) => void;
   setActiveRound: (round: Round | null) => void;
   setRoundToEdit: (round: Round | null) => void;
+  setActiveQuestion: (question: Question | null) => void;
   setQuestionToEdit: (question: Question | null) => void;
   setAddRoundLoading: (loading: boolean) => void;
   setAddQuestionLoading: (loading: boolean) => void;
@@ -73,6 +75,7 @@ export const useRoundStore = create<RoundStoreState>((set, get) => ({
   error: null,
   activeRound: null,
   roundToEdit: null,
+  activeQuestion: null,
   questionToEdit: null,
   addRoundLoading: false,
   addQuestionLoading: false,
@@ -317,6 +320,12 @@ export const useRoundStore = create<RoundStoreState>((set, get) => ({
 
   // Subscribe to real-time response updates
   subscribeToResponses: (questionId) => {
+    // First unsubscribe from any existing subscription
+    const state = get() as any;
+    if (state.responseSubscription) {
+      state.responseSubscription.unsubscribe();
+    }
+
     const subscription = supabase
       .channel(`responses:${questionId}`)
       .on(
@@ -344,7 +353,29 @@ export const useRoundStore = create<RoundStoreState>((set, get) => ({
     const state = get() as any;
     if (state.responseSubscription) {
       state.responseSubscription.unsubscribe();
-      set({ responseSubscription: null });
+      set({ responseSubscription: null, responses: [] }); // Clear responses when unsubscribing
+    }
+  },
+
+  // Set active question and handle response subscription
+  setActiveQuestion: (question) => {
+    const prevQuestion = get().activeQuestion;
+    
+    // If we're changing questions, handle cleanup and new subscription
+    if (question?.id !== prevQuestion?.id) {
+      const { unsubscribeFromResponses, fetchResponses, subscribeToResponses } = get();
+      
+      // Cleanup previous subscription
+      unsubscribeFromResponses();
+
+      // Set new question
+      set({ activeQuestion: question });
+
+      // If we have a new question, setup new subscription
+      if (question) {
+        fetchResponses(question.id);
+        subscribeToResponses(question.id);
+      }
     }
   },
 

@@ -31,7 +31,7 @@ export default function QuestionGrid({
       </div>
 
       <div className="mt-4 flex-1 min-h-0">
-        <div className="h-full overflow-y-auto shadow border border-black border-opacity-5 dark:border-white dark:border-opacity-10 sm:rounded-lg">
+        <div className="h-full overflow-y-auto bg-white border border-gray-200 dark:border-white dark:border-opacity-10 sm:rounded-lg">
           <div className="h-full">
             <table className="min-w-full divide-y divide-gray-300 dark:divide-gray-700">
               <thead className="bg-gray-50 dark:bg-zinc-800 sticky top-0 z-10">

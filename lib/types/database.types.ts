@@ -138,28 +138,34 @@ export type Database = {
         Row: {
           created_at: string
           id: string
+          is_correct: Database["public"]["Enums"]["response_correct"] | null
           points_awarded: number | null
           question_id: string
           response_time_seconds: number | null
           team_id: string
+          text_response: string | null
           updated_at: string
         }
         Insert: {
           created_at?: string
           id?: string
+          is_correct?: Database["public"]["Enums"]["response_correct"] | null
           points_awarded?: number | null
           question_id: string
           response_time_seconds?: number | null
           team_id: string
+          text_response?: string | null
           updated_at?: string
         }
         Update: {
           created_at?: string
           id?: string
+          is_correct?: Database["public"]["Enums"]["response_correct"] | null
           points_awarded?: number | null
           question_id?: string
           response_time_seconds?: number | null
           team_id?: string
+          text_response?: string | null
           updated_at?: string
         }
         Relationships: [
@@ -265,6 +271,7 @@ export type Database = {
     Enums: {
       event_status: "pending" | "ongoing" | "completed"
       question_status: "pending" | "ongoing" | "completed"
+      response_correct: "true" | "partial" | "false"
       round_status: "pending" | "ongoing" | "completed"
     }
     CompositeTypes: {

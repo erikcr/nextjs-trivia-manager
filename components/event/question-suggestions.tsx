@@ -1,8 +1,8 @@
 import { cx } from '@/lib/utils';
 
 interface GeneratedQuestion {
-  question: string;
-  answer: string;
+  question_text: string;
+  correct_answer: string;
   points?: number;
   selected?: boolean;
 }
@@ -113,10 +113,10 @@ export default function QuestionSuggestions({
                 </button>
                 <div className="flex-1">
                   <h3 className="text-sm text-gray-900 dark:text-gray-100">
-                    {question.question}
+                    {question.question_text}
                   </h3>
                   <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                    {question.answer}
+                    {question.correct_answer}
                   </p>
                 </div>
               </div>
