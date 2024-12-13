@@ -1,138 +1,30 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { useRouter } from 'next/navigation';
 
-import { Message } from 'ai';
-
-import QuestionGrid from '@/components/event/question-grid';
-import QuestionSuggestions from '@/components/event/question-suggestions';
+import AIGenerator from '@/components/event/pending/ai-generator';
+import QuestionGrid from '@/components/event/pending/question-grid';
 import RoundNavigation from '@/components/event/round-navigation';
-import TopicInput from '@/components/event/topic-input';
 import QuestionSlideout from '@/components/slideouts/question';
 import RoundSlideout from '@/components/slideouts/round';
 import { Button } from '@/components/ui/button';
 import { useEventStore } from '@/lib/store/event-store';
 import { Question, useRoundStore } from '@/lib/store/round-store';
-import { useUserStore } from '@/lib/store/user-store';
 
 export default function EventPagePending() {
   const router = useRouter();
 
   // Store
   const { currentEvent, loading: eventLoading } = useEventStore();
-  const {
-    activeRound,
-    fetchQuestions,
-    questions,
-    loading: questionsLoading,
-    createQuestion,
-  } = useRoundStore();
-  const { user } = useUserStore();
+  const { activeRound, fetchQuestions, questions, loading: questionsLoading } = useRoundStore();
 
   // Slideout states
   const [roundSlideoutOpen, setRoundSlideoutOpen] = useState(false);
   const [questionSlideoutOpen, setQuestionSlideoutOpen] = useState(false);
   const [roundToEdit, setRoundToEdit] = useState<any>(null);
   const [questionToEdit, setQuestionToEdit] = useState<Question | null>(null);
-
-  // AI states
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [generatedQuestions, setQuestionSuggestions] = useState<
-    Array<{
-      question_text: string;
-      correct_answer: string;
-      points: number;
-      selected?: boolean;
-    }>
-  >([]);
-
-  const [messages, setMessages] = useState<Message[]>([]);
-
-  // Refs
-  const addFormRef = useRef<HTMLFormElement>(null);
-
-  const handleAddQuestions = async (
-    newQuestions: Array<{ question_text: string; correct_answer: string; points: number }>,
-  ) => {
-    if (!activeRound || !user) return;
-
-    try {
-      await Promise.all(
-        newQuestions.map((q) =>
-          createQuestion({
-            question_text: q.question_text,
-            correct_answer: q.correct_answer,
-            points: q.points,
-            round_id: activeRound.id,
-            created_by: user.id,
-            updated_by: user.id,
-          }),
-        ),
-      );
-
-      await fetchQuestions(activeRound.id);
-    } catch (error) {
-      console.error('Error adding questions:', error);
-    }
-  };
-
-  // Add new function to call completion API
-  const generateQuestionsFromAPI = async (topic: string) => {
-    const response = await fetch('/api/completion', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ prompt: `Generate trivia questions about: ${topic}` }),
-    });
-
-    if (!response.ok) {
-      throw new Error('Failed to generate questions');
-    }
-
-    const data = await response.json();
-    return data.trivia;
-  };
-
-  const handleGenerateQuestions = async (topic: string) => {
-    setIsGenerating(true);
-    try {
-      const questions = await generateQuestionsFromAPI(topic);
-      setQuestionSuggestions(
-        questions.map((q: any) => ({
-          ...q,
-          selected: false,
-        }))
-      );
-    } catch (error) {
-      console.error('Error generating questions:', error);
-    } finally {
-      setIsGenerating(false);
-    }
-  };
-
-  const handleSelectQuestion = (index: number) => {
-    setQuestionSuggestions((prev) =>
-      prev.map((q, i) => (i === index ? { ...q, selected: !q.selected } : q)),
-    );
-  };
-
-  const handleAddSelectedQuestions = async () => {
-    const selectedQuestions = generatedQuestions.filter((q) => q.selected);
-    if (selectedQuestions.length === 0) return;
-
-    await handleAddQuestions(selectedQuestions);
-    setQuestionSuggestions((prev) => prev.map((q) => ({ ...q, selected: false })));
-  };
-
-  const handleUpdateGeneratedQuestion = (
-    index: number,
-    updates: Partial<{ question: string; answer: string; points?: number; selected?: boolean }>,
-  ) => {
-    setQuestionSuggestions((prev) => prev.map((q, i) => (i === index ? { ...q, ...updates } : q)));
-  };
 
   const handleQuestionClick = (question: any) => {
     setQuestionToEdit(question);
@@ -177,25 +69,7 @@ export default function EventPagePending() {
               <div className="flex max-h-full flex-col overflow-hidden gap-3">
                 <RoundNavigation setRoundSlideoutOpen={setRoundSlideoutOpen} />
 
-                <div className="flex-1 min-h-0 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 flex flex-col ">
-                  <h2 className="text-lg font-semibold py-2 px-4">AI Question Generator</h2>
-
-                  <div className="flex-shrink-0 px-4 pb-2 border-b border-gray-200 dark:border-gray-700">
-                    <TopicInput onSubmit={handleGenerateQuestions} loading={isGenerating} />
-                  </div>
-
-                  <div className="flex-1 overflow-y-auto">
-                    <div className="p-4">
-                      <QuestionSuggestions
-                        questions={generatedQuestions}
-                        loading={isGenerating}
-                        onSelect={handleSelectQuestion}
-                        onAddSelected={handleAddSelectedQuestions}
-                        onUpdateQuestion={handleUpdateGeneratedQuestion}
-                      />
-                    </div>
-                  </div>
-                </div>
+                <AIGenerator />
               </div>
 
               {/* Right Column - Question Grid */}
