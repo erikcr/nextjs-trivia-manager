@@ -19,7 +19,7 @@ export default function EventHeader() {
         aria-label="Global"
       >
         <div className="flex lg:flex-1">
-          <a href="#" className="-m-1 p-1">
+          <a href="/events" className="-m-1 p-1">
             <span className="sr-only">TriviaLynx</span>
             <Image
               className="hidden dark:block h-6 w-auto"

@@ -4,12 +4,11 @@ import { useEffect, useRef, useState } from 'react';
 
 import { useRouter } from 'next/navigation';
 
-import ResponseGrid from '@/components/event/response-grid';
+import ResponseGrid from '@/components/event/ongoing/response-grid';
 import RoundNavigation from '@/components/event/round-navigation';
 import { Button } from '@/components/ui/button';
 import { useEventStore } from '@/lib/store/event-store';
 import { Question, useRoundStore } from '@/lib/store/round-store';
-import { useUserStore } from '@/lib/store/user-store';
 import { cx } from '@/lib/utils';
 
 export default function EventPageOngoing() {
@@ -20,21 +19,29 @@ export default function EventPageOngoing() {
   const {
     activeRound,
     fetchQuestions,
+    updateQuestionStatus,
     questions,
+    activeQuestion,
+    setActiveQuestion,
     loading: questionsLoading,
     fetchResponses,
     subscribeToResponses,
     unsubscribeFromResponses,
   } = useRoundStore();
 
-  // Local state
-  const [activeQuestion, setActiveQuestion] = useState<Question | null>(null);
+  const handleQuestionAction = (question: Question) => {
+    if (question.status === 'pending') {
+      updateQuestionStatus(question.id, 'ongoing');
+    } else if (question.status === 'ongoing') {
+      updateQuestionStatus(question.id, 'completed');
+    }
+  };
 
   useEffect(() => {
     if (activeRound) {
       fetchQuestions(activeRound.id);
     }
-  }, [activeRound, fetchQuestions]);
+  }, [activeRound]);
 
   if (eventLoading) {
     return <div className="flex h-screen items-center justify-center"></div>;
@@ -68,7 +75,7 @@ export default function EventPageOngoing() {
               <RoundNavigation />
 
               <div className="flex-1 min-h-0 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 flex flex-col ">
-                <div className="flex-1 min-h-0 overflow-auto">
+                <div className="flex-1 min-h-0 overflow-y-auto rounded-lg">
                   <table className="min-w-full divide-y divide-gray-300 dark:divide-gray-700">
                     <thead className="bg-gray-50 dark:bg-zinc-800 sticky top-0">
                       <tr>
@@ -76,7 +83,7 @@ export default function EventPageOngoing() {
                           scope="col"
                           className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-gray-200"
                         >
-                          Status
+                          Action
                         </th>
                         <th
                           scope="col"
@@ -88,39 +95,58 @@ export default function EventPageOngoing() {
                     </thead>
                     <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
                       {questions?.map((question) => (
-                        <tr
-                          key={question.id}
-                          onClick={() => {
-                            setActiveQuestion(question);
-                            fetchResponses(question.id);
-                            unsubscribeFromResponses(); // Cleanup previous subscription
-                            subscribeToResponses(question.id);
-                          }}
-                          className={cx(
-                            'cursor-pointer hover:bg-gray-50 dark:hover:bg-zinc-700',
-                            question.id === activeQuestion?.id
-                              ? 'bg-gray-100 dark:bg-zinc-700'
-                              : '',
-                          )}
-                        >
-                          <td className="whitespace-nowrap px-3 py-4 text-sm">
-                            <span
+                        <tr key={question.id} className="group">
+                          <td
+                            className={cx(
+                              'whitespace-nowrap px-3 py-4 text-sm',
+                              question.status !== 'pending'
+                                ? 'group-hover:bg-gray-50 dark:group-hover:bg-zinc-700'
+                                : '',
+                              question.id === activeQuestion?.id
+                                ? 'bg-gray-50 dark:bg-zinc-700'
+                                : '',
+                            )}
+                          >
+                            <button
+                              onClick={() => handleQuestionAction(question)}
                               className={cx(
                                 'inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset',
                                 {
                                   'bg-yellow-50 text-yellow-800 ring-yellow-600/20 dark:bg-yellow-400/10 dark:text-yellow-500 dark:ring-yellow-400/20':
                                     question.status === 'pending',
-                                  'bg-green-50 text-green-800 ring-green-600/20 dark:bg-green-400/10 dark:text-green-500 dark:ring-green-400/20':
+                                  'bg-blue-50 text-blue-800 ring-blue-600/20 dark:bg-blue-400/10 dark:text-blue-500 dark:ring-blue-400/20':
                                     question.status === 'ongoing',
                                   'bg-gray-50 text-gray-800 ring-gray-600/20 dark:bg-gray-400/10 dark:text-gray-500 dark:ring-gray-400/20':
                                     question.status === 'completed',
                                 },
                               )}
                             >
-                              {question.status.charAt(0).toUpperCase() + question.status.slice(1)}
-                            </span>
+                              {question.status === 'pending'
+                                ? 'Publish'
+                                : question.status === 'ongoing'
+                                  ? 'Close'
+                                  : 'Completed'}
+                            </button>
                           </td>
-                          <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm text-gray-900 dark:text-gray-200">
+                          <td
+                            onClick={() => {
+                              if (question.status !== 'pending') {
+                                setActiveQuestion(question);
+                                fetchResponses(question.id);
+                                unsubscribeFromResponses(); // Cleanup previous subscription
+                                subscribeToResponses(question.id);
+                              }
+                            }}
+                            className={cx(
+                              'py-4 pl-4 pr-3 text-sm text-gray-900 dark:text-gray-200',
+                              question.status !== 'pending'
+                                ? 'cursor-pointer group-hover:bg-gray-50 dark:group-hover:bg-zinc-700'
+                                : '',
+                              question.id === activeQuestion?.id
+                                ? 'bg-gray-50 dark:bg-zinc-700'
+                                : '',
+                            )}
+                          >
                             {question.question_text}
                           </td>
                         </tr>

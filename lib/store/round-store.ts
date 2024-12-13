@@ -52,6 +52,7 @@ export interface RoundStoreState {
   createQuestion: (question: Partial<QuestionInsert>) => Promise<Question | null>;
   updateQuestion: (id: string, updates: Partial<QuestionUpdate>) => Promise<Question | null>;
   deleteQuestion: (id: string) => Promise<boolean>;
+  updateQuestionStatus: (id: string, status: string) => Promise<void>;
 
   // Response operations
   fetchResponses: (questionId: string) => Promise<void>;
@@ -295,6 +296,32 @@ export const useRoundStore = create<RoundStoreState>((set, get) => ({
     }
   },
 
+  updateQuestionStatus: async (id, status) => {
+    const user = useUserStore.getState().user;
+
+    if (!user) throw new Error('No user');
+
+    try {
+      const { data, error } = await supabase
+        .from('question')
+        .update({ status, updated_by: user.id })
+        .eq('id', id)
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      // Update the questions array with the updated question
+      const questions = get().questions.map((question) =>
+        question.id === id ? data : question
+      );
+
+      set({ questions, activeQuestion: data });
+    } catch (error) {
+      set({ error: error as Error });
+    }
+  },
+
   // Fetch responses for a question
   fetchResponses: async (questionId) => {
     try {
@@ -360,11 +387,11 @@ export const useRoundStore = create<RoundStoreState>((set, get) => ({
   // Set active question and handle response subscription
   setActiveQuestion: (question) => {
     const prevQuestion = get().activeQuestion;
-    
+
     // If we're changing questions, handle cleanup and new subscription
     if (question?.id !== prevQuestion?.id) {
       const { unsubscribeFromResponses, fetchResponses, subscribeToResponses } = get();
-      
+
       // Cleanup previous subscription
       unsubscribeFromResponses();
 
@@ -415,6 +442,7 @@ export const useRoundStore = create<RoundStoreState>((set, get) => ({
           filter: `round_id=eq.${roundId}`,
         },
         () => {
+          console.log('question subscription triggered:', roundId);
           get().fetchQuestions(roundId);
         },
       )
