@@ -1,0 +1,214 @@
+-- Insert statements for responses
+\set ON_ERROR_STOP true
+
+INSERT INTO response (
+    question_id,
+    team_id,
+    text_response,
+    is_correct,
+    points_awarded,
+    response_time_seconds,
+    created_at,
+    updated_at
+) VALUES
+-- Sample responses for various questions
+(
+    '0f972d14-337d-4b7d-8436-e0310222862',
+    '0e94a23d-cacc-4bf1-a3a1-dc472230a813',
+    'The Wet Bandits',
+    'true',
+    100,
+    15,
+    :'current_timestamp',
+    :'current_timestamp'
+),
+(
+    '0f972d14-337d-4b7d-8436-e0310222862',
+    '181dff2c-b7d9-4862-ba88-1644f6d14a97',
+    'The Sticky Bandits',
+    'false',
+    0,
+    20,
+    :'current_timestamp',
+    :'current_timestamp'
+),
+(
+    '102933ac-b57d-4606-9ceb-42396dd0a660',
+    '3bd263a4-1ce9-4be2-a20d-f008c9e6f285',
+    'Will Ferrell',
+    'true',
+    100,
+    12,
+    :'current_timestamp',
+    :'current_timestamp'
+),
+(
+    '1224d7a7-f76c-4815-84bd-73c4e1bb28c0',
+    '49f03d9b-f857-49b9-b68c-d4a36bb5656c',
+    'Germany',
+    'true',
+    100,
+    18,
+    :'current_timestamp',
+    :'current_timestamp'
+),
+(
+    '14a39020-837f-48d6-ac85-19e4705ee54e',
+    '50986b5f-5c89-4f5c-9f1c-2fe1534a4ab9',
+    'Pointsetta',
+    'partial',
+    75,
+    25,
+    :'current_timestamp',
+    :'current_timestamp'
+),
+(
+    '187eab72-9153-465c-b2cb-7e187be24abf',
+    '527fbfb3-9f67-46a2-ae89-e7280a75036b',
+    'China',
+    'false',
+    0,
+    22,
+    :'current_timestamp',
+    :'current_timestamp'
+),
+(
+    '2b5d931c-6352-4347-92d5-dbb6cec0e1c2',
+    '5bf39dc8-a7b9-4916-be01-3e8662343510',
+    'Bing Crosby',
+    'true',
+    100,
+    8,
+    :'current_timestamp',
+    :'current_timestamp'
+),
+(
+    '312c481a-2cda-4336-83e0-c68d6968b8b6',
+    '63b3450f-44af-427b-b74f-41f8d4df50e2',
+    'Wham',
+    'partial',
+    75,
+    17,
+    :'current_timestamp',
+    :'current_timestamp'
+),
+(
+    '358f7364-cca0-423f-9731-1e34e8765fba',
+    '6a0d4a46-ac60-468c-a455-df3ef074e9fe',
+    '350',
+    'false',
+    0,
+    35,
+    :'current_timestamp',
+    :'current_timestamp'
+),
+(
+    '37236d14-ba11-4c0c-be1d-c55b211caf14',
+    '99fc979a-0f72-426a-a4de-373e7f6cfab7',
+    'Oppenheimer',
+    'true',
+    100,
+    10,
+    :'current_timestamp',
+    :'current_timestamp'
+),
+(
+    '4256c311-04ff-4821-bd08-c15dd3975298',
+    'a07c504e-33ef-4d88-b836-718a244d5850',
+    'Taylor Swift',
+    'true',
+    100,
+    5,
+    :'current_timestamp',
+    :'current_timestamp'
+),
+(
+    '49b633d5-908d-421b-aba2-2dd8c935078a',
+    'a78b7a2a-f242-42aa-b3dd-37c4467a663c',
+    'Paris, France',
+    'partial',
+    100,
+    28,
+    :'current_timestamp',
+    :'current_timestamp'
+),
+(
+    '4d35b4f3-8941-4784-b908-22785ac202e2',
+    'c5df4f86-e1e6-46f8-af71-5c48f3cf867a',
+    'The Crown',
+    'false',
+    0,
+    15,
+    :'current_timestamp',
+    :'current_timestamp'
+),
+(
+    '55cc8f9f-43ba-4736-ae33-ee44e957d3e3',
+    'cb237778-0a2a-4fab-9d21-9fc608e9e728',
+    'Grand Theft Auto VI',
+    'true',
+    150,
+    20,
+    :'current_timestamp',
+    :'current_timestamp'
+),
+(
+    '563845ae-a9a4-4000-bdea-546427906f52',
+    'da6753a3-dea1-46b6-9f57-32e786957392',
+    'X/Twitter',
+    'partial',
+    75,
+    12,
+    :'current_timestamp',
+    :'current_timestamp'
+),
+(
+    '58955e3d-24bb-46cb-b908-1f3187b26386',
+    'df45ad9f-f107-4607-969d-5117f9f1a79d',
+    'Kansas City Chiefs',
+    'true',
+    100,
+    8,
+    :'current_timestamp',
+    :'current_timestamp'
+),
+(
+    '60da2d3e-8b1d-4bab-9444-9538da2b6c3a',
+    'e7b7d4b9-71a3-4ddd-a3a7-b15ac0cbd09c',
+    'Lionel Messi',
+    'false',
+    0,
+    25,
+    :'current_timestamp',
+    :'current_timestamp'
+),
+(
+    '64aa812c-0652-427f-bcd5-78d74d97e06f',
+    'fe095c0e-1778-44cd-b4e1-e750435d93e8',
+    'United States of America',
+    'true',
+    200,
+    30,
+    :'current_timestamp',
+    :'current_timestamp'
+),
+(
+    '6d64ed2a-c398-43ab-a6f3-78c78e82ac07',
+    '0e94a23d-cacc-4bf1-a3a1-dc472230a813',
+    '1981',
+    'false',
+    0,
+    18,
+    :'current_timestamp',
+    :'current_timestamp'
+),
+(
+    '8323eae9-321c-4893-9424-00b0ade9ef0b',
+    '181dff2c-b7d9-4862-ba88-1644f6d14a97',
+    'The Cohen Brothers',
+    'partial',
+    100,
+    22,
+    :'current_timestamp',
+    :'current_timestamp'
+);

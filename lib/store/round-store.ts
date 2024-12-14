@@ -12,6 +12,7 @@ export type Question = Tables['question']['Row'];
 export type QuestionInsert = Tables['question']['Insert'];
 export type QuestionUpdate = Tables['question']['Update'];
 export type Response = Tables['response']['Row'];
+export type ResponseCorrect = Database["public"]["Enums"]["response_correct"];
 
 export interface RoundStoreState {
   rounds: Round[];
@@ -58,6 +59,7 @@ export interface RoundStoreState {
   fetchResponses: (questionId: string) => Promise<void>;
   subscribeToResponses: (questionId: string) => void;
   unsubscribeFromResponses: () => void;
+  markResponseCorrectness: (id: string, isCorrect: ResponseCorrect) => Promise<void>;
 
   // Real-time subscriptions
   subscribeToRounds: (eventId: string) => void;
@@ -325,7 +327,7 @@ export const useRoundStore = create<RoundStoreState>((set, get) => ({
   // Fetch responses for a question
   fetchResponses: async (questionId) => {
     try {
-      set({ loading: true, error: null });
+      set({ error: null });
       const user = useUserStore.getState().user;
 
       if (!user) throw new Error('No user');
@@ -403,6 +405,38 @@ export const useRoundStore = create<RoundStoreState>((set, get) => ({
         fetchResponses(question.id);
         subscribeToResponses(question.id);
       }
+    }
+  },
+
+  // Mark response as correct or incorrect
+  markResponseCorrectness: async (id, isCorrect) => {
+    try {
+      set({ error: null });
+      const user = useUserStore.getState().user;
+
+      if (!user) throw new Error('No user');
+
+      const { data, error } = await supabase
+        .from('response')
+        .update({
+          is_correct: isCorrect,
+        })
+        .eq('id', id)
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      // Update the questions array with the updated question
+      const responses = get().responses.map((response) =>
+        response.id === id ? data : response
+      );
+
+      set({ responses });
+    } catch (error) {
+      set({ error: error as Error });
+    } finally {
+      set({ loading: false });
     }
   },
 
