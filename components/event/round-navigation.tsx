@@ -15,7 +15,7 @@ interface RoundNavigationProps {
 
 export default function RoundNavigation({ setRoundSlideoutOpen }: RoundNavigationProps) {
   const { currentEvent } = useEventStore();
-  const { rounds, activeRound, setActiveRound, setRoundToEdit } = useRoundStore();
+  const { rounds, activeRound, setActiveRound, setRoundToEdit, setResponses } = useRoundStore();
 
   return (
     <nav>
@@ -59,7 +59,10 @@ export default function RoundNavigation({ setRoundSlideoutOpen }: RoundNavigatio
                               //   : 'text-gray-700 dark:text-gray-300',
                               'flex-1 text-left text-sm',
                             )}
-                            onClick={() => setActiveRound(round)}
+                            onClick={() => {
+                              setResponses([]);
+                              setActiveRound(round);
+                            }}
                           >
                             {round.name}
                           </button>
