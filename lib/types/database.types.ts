@@ -240,16 +240,19 @@ export type Database = {
           event_id: string
           id: string
           name: string
+          user_id: string
         }
         Insert: {
           event_id: string
           id?: string
           name: string
+          user_id: string
         }
         Update: {
           event_id?: string
           id?: string
           name?: string
+          user_id?: string
         }
         Relationships: [
           {

@@ -1,4 +1,3 @@
-import { headers, cookies } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import Image from "next/image";
@@ -10,7 +9,7 @@ export default function MagicLinkPage({}: {}) {
     "use server";
 
     const email = formData.get("email") as string;
-    const supabase = createClient();
+    const supabase = await createClient();
 
     const { data, error } = await supabase.auth.signInWithOtp({
       email,
