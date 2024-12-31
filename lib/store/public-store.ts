@@ -85,15 +85,15 @@ export const usePublicStore = create<PublicStoreState>((set, get) => ({
       if (error) throw error;
 
       // Calculate total scores for each team
-      const teamsWithScores = data.map(team => {
-        const total_score = team.responses.reduce((sum, response) => {
-          return sum + (response.is_correct === 'correct' ? response.question.points : 0);
-        }, 0);
+      // const teamsWithScores = data.map(team => {
+      //   const total_score = team.responses.reduce((sum, response) => {
+      //     return sum + (response.is_correct === 'correct' ? response.question.points : 0);
+      //   }, 0);
         
-        return { ...team, total_score };
-      });
+      //   return { ...team, total_score };
+      // });
 
-      set({ teams: teamsWithScores });
+      set({ teams: data });
     } catch (error) {
       set({ error: error as Error });
     } finally {

@@ -41,7 +41,7 @@ export default function EventResults() {
     );
   }
 
-  const sortedTeams = [...currentEvent.teams].sort((a, b) => b.total_score - a.total_score);
+  // const sortedTeams = [] // [...currentEvent.teams].sort((a, b) => b.total_score - a.total_score);
 
   return (
     <div className="container mx-auto py-8">
@@ -59,13 +59,13 @@ export default function EventResults() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {sortedTeams.map((team, index) => (
+              {/* {sortedTeams.map((team, index) => (
                 <TableRow key={team.id}>
                   <TableCell>{index + 1}</TableCell>
                   <TableCell>{team.name}</TableCell>
                   <TableCell className="text-right">{team.total_score}</TableCell>
                 </TableRow>
-              ))}
+              ))} */}
             </TableBody>
           </Table>
         </CardContent>
